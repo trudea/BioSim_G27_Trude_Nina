@@ -71,6 +71,11 @@ class BioSim:
         :param landscape: String, code letter for landscape
         :param params: Dict with valid parameter specification for landscape
         """
+        landscape = landscape.split
+        list_landscape = []
+        for line in landscape:
+            list_landscape.append([line])
+
 
     def simulate(self, num_years, vis_years=1, img_years=None):
         """
