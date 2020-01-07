@@ -3,8 +3,8 @@
 """
 """
 
-__author__ = ""
-__email__ = ""
+__author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
+__email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 
 class BioSim:
@@ -41,6 +41,20 @@ class BioSim:
         where img_no are consecutive image numbers starting from 0.
         img_base should contain a path and beginning of a file name.
         """
+        self.island_map = island_map
+        self.ini_pop = ini_pop
+        self.seed = seed # vurdere å bytte ut med random.seed(seed)
+        self.ymax_animals = ymax_animals
+        if self.ymax_animals is None:
+            # juster automatisk
+        self.cmax_animals = cmax_animals
+        if cmax_animals is None:
+            # automatisk
+        self.img_base = img_base
+        if self.img_base is None:
+            # automatisk
+        self.fmt = img_fmt
+        # lage img_no?
 
     def set_animal_parameters(self, species, params):
         """
