@@ -43,7 +43,7 @@ class BioSim:
         """
         self.island_map = island_map
         self.ini_pop = ini_pop
-        self.seed = seed # vurdere å bytte ut med random.seed(seed)
+        random.seed(seed)
         if ymax_animals is None:
             # juster automatisk
         self.ymax_animals = ymax_animals
