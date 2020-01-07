@@ -44,15 +44,15 @@ class BioSim:
         self.island_map = island_map
         self.ini_pop = ini_pop
         self.seed = seed # vurdere å bytte ut med random.seed(seed)
-        self.ymax_animals = ymax_animals
-        if self.ymax_animals is None:
+        if ymax_animals is None:
             # juster automatisk
-        self.cmax_animals = cmax_animals
+        self.ymax_animals = ymax_animals
         if cmax_animals is None:
             # automatisk
-        self.img_base = img_base
-        if self.img_base is None:
+        self.cmax_animals = cmax_animals
+        if img_base is None:
             # automatisk
+        self.img_base = img_base
         self.fmt = img_fmt
         # lage img_no?
 
