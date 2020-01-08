@@ -5,6 +5,10 @@ class Island:
             txt_str = txt_str.split()
         self.landscape = txt_str # liste med tekststrenger
 
+    def new_position(self):
+        #when animal moves, this gives new position
+        pass
+
 class Landscape:
     def __init__(self):
         pass
@@ -13,17 +17,20 @@ class Landscape:
         pass
 
 class Savannah(Landscape):
-    def __init__(self, f_max=300.0):
+    def __init__(self, island, f_max=300.0):
+        self.island = island
         self.f_max = f_max
 
 class Jungle(Landscape):
-    def __init__(self, f_max=800.0, alpha=0.3):
+    def __init__(self, island, f_max=800.0, alpha=0.3):
+        self.island = island
         self.f_max = f_max
         self.alpha = 0.3
 
 class Animal:
-    def __init__(self):
-        self.param_dict = {'lambda': 1.0, 'zeta' = 3.5}
+    def __init__(self, island):
+        self.island = island
+
 
     def feeding(self):
         pass
@@ -85,3 +92,16 @@ class Carnivore(Animal):
 
     def check_if_kills(self):
         pass
+
+class Simulation:
+    def __init__(self):
+        pass
+
+
+first_island = Island()
+first_herbivores = []
+first_carnivores = []
+for _ in range(initial_num_of_herbivores):
+    first_herbivores.append(Herbivore()) # legger ny instance til liste
+for _ in range(initial_num_of_carnivores):
+    first_carnivores.append(Carnivore())
