@@ -3,8 +3,25 @@ class Landscape:
         if txt_str is None:
             txt_str = open('rossum.txt').read()
             # txt_str = txt_str.split() # liste med tekststrenger
-            txt_str = txt_str.replace("\n", "") #  en lang streng
-        self.map = txt_str
+            map_str = txt_str.replace("\n", "") #  en lang streng
+        self.map_string = map_str
+        self.map_dict = {}
+        self.cols = 21 # må endres
+        self.savannah = []
+        self.jungle = []
+        self.desert = []
+        self.mountain = []
+        self.ocean = []
+        for n, i in enumerate(self.map_string):
+            map_dict[num_to_cord] = [i]
+            if i == 'S':
+                self.savannah.append(n)
+            if i == 'J':
+                self.jungle.append(n)
+            if i == 'D':
+                self.desert.append(n)
+            if i == 'M':
+                self.mountain.append(n)
 
     def num_to_coord(self, cols, num):
         x = 0
@@ -18,7 +35,6 @@ class Landscape:
     def coord_to_num(self, cols, x, y):
         num = y*cols + x
 
-
     def new_position(self):
         #when animal moves, this gives new position
         pass
@@ -27,16 +43,23 @@ class Landscape:
         pass
 
 class Savannah(Landscape):
-    default_param_dict = {'f_max' = 300.0}
+    default_param_dict = {'f_max' : 300.0}
+    savannah = []
+    savannah_dict = {}
 
-    def __init__(self, island, param_dict=None):
-        self.island = island
+    def __init__(self, map_string, num, param_dict=None):
+        self.map_string = map_string
+        for n, i in enumerate(self.map_string):
+            if i == 'S':
+                self.coords.append(n)
+                savannah_dict[(num_to_coords(n))] = 0
         if param_dict is None: # burde sannsynligvis være i superklassen
             self.param_dict = default_param_dict
         else:
             for i in default_param_dict:
                 if i not in param_dict:
                     param_dict[i] = default_param_dict[i]
+
 
 
 class Jungle(Landscape):
@@ -55,6 +78,7 @@ class Jungle(Landscape):
 class Animal:
     def __init__(self, island):
         self.island = island
+        self.position
 
     def feeding(self):
         pass
@@ -116,8 +140,8 @@ class Carnivore(Animal):
                           'zeta': 3.5,
                           'xi': 1.1,
                           'omega': 0.9,
-                          'F': 50.0
-                          'DeltaPhiMax': 10.0
+                          'F': 50.0,
+                          'DeltaPhiMax' : 10.0
                           }
 
     def __init__(self, island, param_dict):
@@ -138,12 +162,13 @@ class Simulation:
         pass
 
     def single_run(self):
+        first_island = Island()
+        first_herbivores = []
+        first_carnivores = []
+        for _ in range(initial_num_of_herbivores):
+            first_herbivores.append(Herbivore()) # legger ny instance til liste
+        for _ in range(initial_num_of_carnivores):
+            first_carnivores.append(Carnivore())
 
-
-first_island = Island()
-first_herbivores = []
-first_carnivores = []
-for _ in range(initial_num_of_herbivores):
-    first_herbivores.append(Herbivore()) # legger ny instance til liste
-for _ in range(initial_num_of_carnivores):
-    first_carnivores.append(Carnivore())
+if __name__ == "__main__":
+    fir
