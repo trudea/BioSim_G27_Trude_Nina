@@ -1,27 +1,4 @@
 class Landscape:
-    def __init__(self, txt_str=None):
-        if txt_str is None:
-            txt_str = open('rossum.txt').read()
-            # txt_str = txt_str.split() # liste med tekststrenger
-            map_str = txt_str.replace("\n", "") #  en lang streng
-        self.map_string = map_str
-        self.map_dict = {}
-        self.cols = 21 # må endres
-        self.savannah = []
-        self.jungle = []
-        self.desert = []
-        self.mountain = []
-        self.ocean = []
-        for n, i in enumerate(self.map_string):
-            map_dict[num_to_cord] = [i]
-            if i == 'S':
-                self.savannah.append(n)
-            if i == 'J':
-                self.jungle.append(n)
-            if i == 'D':
-                self.desert.append(n)
-            if i == 'M':
-                self.mountain.append(n)
 
     def num_to_coord(self, cols, num):
         x = 0
@@ -30,10 +7,23 @@ class Landscape:
             y += 1
             num -= cols
         x = num
-        return y, x
+        return (y, x) # y før x
 
-    def coord_to_num(self, cols, x, y):
-        num = y*cols + x
+    def coord_to_num(self, cols, y, x): # y før x
+        return y*cols + x
+
+
+    def __init__(self, txt_str=None):
+        if txt_str is None:
+            txt_str = open('rossum.txt').read()
+            # txt_str = txt_str.split() # liste med tekststrenger
+            map_str = txt_str.replace("\n", "") #  en lang streng
+        self.map_string = map_str
+        self.map_dict = {} # hver key er tuple av posisjonen, y før x
+        self.cols = 21 # må endres
+        for n, i in enumerate(self.map_string):
+            self.map_dict[self.num_to_coord(self.cols, n)] = [i]
+
 
     def new_position(self):
         #when animal moves, this gives new position
@@ -47,7 +37,7 @@ class Savannah(Landscape):
     savannah = []
     savannah_dict = {}
 
-    def __init__(self, map_string, num, param_dict=None):
+    def __init__(self, map_string, param_dict=None):
         self.map_string = map_string
         for n, i in enumerate(self.map_string):
             if i == 'S':
@@ -78,7 +68,10 @@ class Jungle(Landscape):
 class Animal:
     def __init__(self, island):
         self.island = island
-        self.position
+        self.position = 0 # må endres
+
+    def assign_quslities(self):
+        pass
 
     def feeding(self):
         pass
@@ -114,15 +107,15 @@ class Herbivore(Animal):
                           'F': 10.0
                           }
 
-    def __init__(self, island, param_dict):
+    def __init__(self, island, param_dict=None):
         super().__init__(island)
         # bør default_param_dict stå utenfor definisjonen?
         if param_dict is None:
-            self.param_dict = default_param_dict
+            self.param_dict = self.default_param_dict
         else:
-            for i in default_param_dict:
+            for i in self.default_param_dict:
                 if i not in param_dict:
-                    param_dict[i] = default_param_dict[i]
+                    param_dict[i] = self.default_param_dict[i]
         self.param_dict = param_dict
 
 class Carnivore(Animal):
@@ -144,14 +137,14 @@ class Carnivore(Animal):
                           'DeltaPhiMax' : 10.0
                           }
 
-    def __init__(self, island, param_dict):
+    def __init__(self, island, param_dict=None):
         super().__init__(island)
         if param_dict is None:
-            self.param_dict = default_param_dict
+            self.param_dict = self.default_param_dict
         else:
-            for i in default_param_dict:
+            for i in self.default_param_dict:
                 if i not in param_dict:
-                    param_dict[i] = default_param_dict[i]
+                    param_dict[i] = self.default_param_dict[i]
         self.param_dict = param_dict
 
     def check_if_kills(self):
@@ -162,13 +155,16 @@ class Simulation:
         pass
 
     def single_run(self):
-        first_island = Island()
-        first_herbivores = []
-        first_carnivores = []
-        for _ in range(initial_num_of_herbivores):
-            first_herbivores.append(Herbivore()) # legger ny instance til liste
-        for _ in range(initial_num_of_carnivores):
-            first_carnivores.append(Carnivore())
+       pass
 
 if __name__ == "__main__":
-    fir
+    initial_num_of_herbivores = 3
+    initial_num_of_carnivores = 2
+    first_island = Landscape()
+    first_herbivores = []
+    first_carnivores = []
+    for _ in range(initial_num_of_herbivores):
+        first_herbivores.append(Herbivore(first_island))  # legger ny instance til liste
+    for _ in range(initial_num_of_carnivores):
+        first_carnivores.append(Carnivore(first_island))
+    print(first_carnivores[0])
