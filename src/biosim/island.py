@@ -2,8 +2,22 @@ class Landscape:
     def __init__(self, txt_str=None):
         if txt_str is None:
             txt_str = open('rossum.txt').read()
-            txt_str = txt_str.split()
-        self.map = txt_str # liste med tekststrenger
+            # txt_str = txt_str.split() # liste med tekststrenger
+            txt_str = txt_str.replace("\n", "") #  en lang streng
+        self.map = txt_str
+
+    def num_to_coord(self, cols, num):
+        x = 0
+        y = 0
+        while num > cols:
+            y += 1
+            num -= cols
+        x = num
+        return y, x
+
+    def coord_to_num(self, cols, x, y):
+        num = y*cols + x
+
 
     def new_position(self):
         #when animal moves, this gives new position

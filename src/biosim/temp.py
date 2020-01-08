@@ -1,4 +1,4 @@
 txt_str = open('rossum.txt').read()
-txt_str = txt_str.split()
-print(txt_str)
-print(len(txt_str[0]*len(txt_str)))
+string = txt_str.replace("\n", "")
+print(string)
+print(len(string))
