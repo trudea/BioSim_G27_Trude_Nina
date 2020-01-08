@@ -1,8 +1,7 @@
 class Landscape:
 
     def num_to_coord(self, cols, num):
-        x = 0
-        y = 0
+        x, y = 0, 0
         while num > cols:
             y += 1
             num -= cols
@@ -69,9 +68,8 @@ class Animal:
     def __init__(self, island):
         self.island = island
         self.position = 0 # må endres
+        self.weight = 33 # legg inn normalfordelt med klasseparametere
 
-    def assign_quslities(self):
-        pass
 
     def feeding(self):
         pass
