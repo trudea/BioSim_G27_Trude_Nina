@@ -10,8 +10,7 @@ import numpy as np
 from math import exp
 import random
 
-class Landscape:
-
+class Island:
     def __init__(self, txt=None):
         if txt is None:
             txt = open('rossum.txt').read()
@@ -20,21 +19,31 @@ class Landscape:
                     raise ValueError
         lines = []
         line = []
+        y = 0
+        x = -1
         for letter in txt:
+            x += 1
             if letter == 'S':
-                line.append(Savannah())
+                line.append(Savannah(y, x))
             if letter == 'J':
-                line.append(Jungle())
+                line.append(Jungle(y, x))
             if letter == 'O':
-                line.append(Ocean())
+                line.append(Ocean(y, x))
             if letter == 'M':
-                line.append(Mountain())
+                line.append(Mountain(y, x))
             if letter == 'D':
-                line.append(Desert())
+                line.append(Desert(y, x))
             if letter == '\n':
                 lines.append(line)
                 line = []
+                y +=1
+                x = -1
         self.map = np.asarray(lines)
+
+
+class Landscape:
+    def __init__(self):
+        pass
 
     def new_position(self):
         #when animal moves, this gives new position
@@ -43,31 +52,60 @@ class Landscape:
     def growing(self):
         pass
 
+
 class Savannah(Landscape):
     param_dict = {'f_max' : 300.0}
 
-    def __init__(self, param_dict=None):
+    def __init__(self, pos_y, pos_x, param_dict=None):
+        self.herbivores_in_cell = []
+        self.carnivores_in_cell = []
+        self.pos_y = pos_y
+        self.pos_x = pos_x
         if param_dict is not None:
             self.param_dict.update(param_dict)
+        for parameter in self.param_dict:
+            exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
+        self.f = self.f_max
+        # self.herbivores_in_cell = [first_herbivores[0], first_herbivores[1]]
+
+    def replenish(self):
+        self.f += self.alpha * (self.f_max - self.f)
 
 
 
 class Jungle(Landscape):
     param_dict = {'f_max' : 800.0, 'alpha' : 0.3}
 
-    def __init__(self, param_dict=None):
+    def __init__(self, pos_y, pos_x, param_dict=None):
+        self.herbivores_in_cell = []
+        self.carnivores_in_cell = []
+        self.pos_y = pos_y
+        self.pos_x = pos_x
         if param_dict is not None:
             self.param_dict.update(param_dict)
+        for parameter in self.param_dict:
+            exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
+        self.f = self.f_max
 
-
-class Ocean:
-    pass
-
-class Mountain:
-    pass
+    def replenish(self):
+        self.f = self.f_max
 
 class Desert:
-    pass
+    def __init__(self, pos_y, pos_x):
+        self.pos_y = pos_y
+        self.pos_x = pos_x
+        self.herbivores_in_cell = []
+        self.carnivores_in_cell = []
+
+class Ocean:
+    def __init__(self, pos_y, pos_x):
+        self.pos_y = pos_y
+        self.pos_x = pos_x
+
+class Mountain:
+    def __init__(self, pos_y, pos_x):
+        self.pos_y = pos_y
+        self.pos_x = pos_x
 
 
 class Animal:
@@ -80,6 +118,7 @@ class Animal:
 
         # if not self.parameters_set:
         #    self.set_parameters()
+
 
     """
     @classmethod
@@ -180,7 +219,6 @@ class Carnivore(Animal):
 
     def __init__(self, island, param_dict=None):
         super().__init__(island)
-        super().__init__(island)
         if param_dict is not None:
             self.param_dict.update(param_dict)
         for parameter in self.param_dict:
@@ -196,34 +234,62 @@ class Carnivore(Animal):
         pass
 
 class Simulation:
+    default_input = [{'loc': (3,4), 'pop' : [{'species': 'Herbivore', 'age' : 10, 'weight' : 12.5},
+                                      {'species': 'Herbivore', 'age' : 9, 'weight' : 10.3},
+                                      {'species': 'Carnivore', 'age' : 5, 'weight' : 8.1}]},
+             {'loc': (4, 4),
+              'pop': [{'species': 'Herbivore', 'age': 10, 'weight': 12.5},
+                      {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
+                      {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
+
+
     def __init__(self):
         pass
+
 
     def single_run(self):
        pass
 
+
 if __name__ == "__main__":
+    def place_animal(individual_dict):
+        # plassere i riktig celle, fjerne gammel celle og oppdatere posisjonen i dyre-instansen
+        map[1][1].herbivores_in_cell.append(herman)
+        pass
+
+
+    second_herbivores = []
+    second_carnivores = []
+    default_input = [{'loc': (3, 4), 'pop': [
+        {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
+        {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
+        {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]},
+                     {'loc': (4, 4),
+                      'pop': [
+                          {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
+                          {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
+                          {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
+    test_input = {'loc': (3, 4), 'pop': [{'species': 'Herbivore', 'age': 10, 'weight': 12.5}]}
+
+
     initial_num_of_herbivores = 3
     initial_num_of_carnivores = 2
-    first_island = Landscape()
+    first_island = Island()
     map = first_island.map
+    herman = Herbivore(map)
+    print(map[1][1].herbivores_in_cell)
+    map[1][1].herbivores_in_cell.append(herman)
+    print(map[1][1].herbivores_in_cell[0].weight)
+
     first_herbivores = []
     first_carnivores = []
     for _ in range(initial_num_of_herbivores):
         first_herbivores.append(Herbivore(map))  # legger ny instance til liste
-
     for _ in range(initial_num_of_carnivores):
         first_carnivores.append(Carnivore(first_island))
 
-    first_herbivores[0].phi = 0
-    first_herbivores[0].dying()
-    herb_dict = {'w_birth' : 33}
-    herbert = Herbivore(first_island, herb_dict)
 
-    carn_dict = {'sigma_birth' : 10, 'w_birth' : 3}
-    new_dict = {'sigma_birth' : 2}
-    carl = Carnivore(first_island, carn_dict)
-    cole = Carnivore(first_island, new_dict)
+
 
 
 

@@ -3,7 +3,6 @@ import numpy as np
 
 txt = open('rossum.txt').read()
 
-print(txt)
 
 class Animal:
     def __init__(self, age):
@@ -18,7 +17,10 @@ class Herbivore(Animal):
 
 
 if __name__ == "__main__":
-    d = {'eple' : 1, 'banan' : 2}
+    a = np.array([[1, 2],[3, 4]])
+    print(a)
+    print(a[0,1])
 
-
+dictionary = { (0,0) :['first_herbivore', 'second_herbivore']}
+print(a)
 
