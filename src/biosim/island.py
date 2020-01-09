@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+
+"""
+"""
+
+__author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
+__email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
+
+import numpy as np
+from math import exp
+
 class Landscape:
 
     def num_to_coord(self, cols, num):
@@ -70,8 +81,11 @@ class Jungle(Landscape):
 class Animal:
     def __init__(self, island):
         self.island = island
+        self.age = 0
+
+
         self.position = 0 # må endres
-        self.weight = 33 # legg inn normalfordelt med klasseparametere
+
 
 
     def feeding(self):
@@ -110,14 +124,23 @@ class Herbivore(Animal):
 
     def __init__(self, island, param_dict=None):
         super().__init__(island)
-        # bør default_param_dict stå utenfor definisjonen?
         if param_dict is None:
             self.param_dict = self.default_param_dict
         else:
             for i in self.default_param_dict:
                 if i not in param_dict:
                     param_dict[i] = self.default_param_dict[i]
-        self.param_dict = param_dict
+                self.param_dict = param_dict
+        statistic_population = np.random.normal(self.param_dict['w_birth'],
+                                            self.param_dict['sigma_birth'],
+                                            1000)
+        self.weight = np.random.choice(statistic_population)
+        q_plus = 1.0 / (1 + exp(self.param_dict['phi_age'] *
+                                (self.age - self.param_dict['a_half'])))
+        q_minus = 1.0 / (1 + exp(-self.param_dict['phi_weight'] * ()))
+        self.phi = q_plus * q_minus
+
+
 
 class Carnivore(Animal):
     default_param_dict = {'w_birth': 6.0,
@@ -146,7 +169,12 @@ class Carnivore(Animal):
             for i in self.default_param_dict:
                 if i not in param_dict:
                     param_dict[i] = self.default_param_dict[i]
-        self.param_dict = param_dict
+                self.param_dict = param_dict
+        statistic_population = np.random.normal(self.param_dict['w_birth'],
+                                            self.param_dict['sigma_birth'],
+                                            1000)
+        self.weight = np.random.choice(statistic_population)
+
 
     def check_if_kills(self):
         pass
@@ -168,4 +196,5 @@ if __name__ == "__main__":
         first_herbivores.append(Herbivore(first_island))  # legger ny instance til liste
     for _ in range(initial_num_of_carnivores):
         first_carnivores.append(Carnivore(first_island))
-    print(first_carnivores[0])
+
+
