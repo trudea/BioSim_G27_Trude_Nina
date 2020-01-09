@@ -17,10 +17,7 @@ class Herbivore(Animal):
 
 
 if __name__ == "__main__":
-    a = np.array([[1, 2],[3, 4]])
-    print(a)
-    print(a[0,1])
-
-dictionary = { (0,0) :['first_herbivore', 'second_herbivore']}
-print(a)
-
+    dict = {'banan' : 1, 'eple' : 2}
+    print(dict)
+    del dict['banan']
+    print(dict)

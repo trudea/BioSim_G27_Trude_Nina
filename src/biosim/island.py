@@ -113,14 +113,16 @@ class Animal:
     def __init__(self, island):
         # self.phi = None
         self.island = island
-        self.age = 0
-        self.position = 0 # må endres, midlertidig
-
-        # if not self.parameters_set:
-        #    self.set_parameters()
-
-
+        self.age = None
+        self.weight = None
+        self.pos_y = None
+        self.pos_x = None # må endres, midlertidig
     """
+        if not self.parameters_set:
+            self.set_parameters()
+    """
+    """
+
     @classmethod
     def set_parameters(cls, params=None):
         for parameter in cls.param_dict:
@@ -128,8 +130,8 @@ class Animal:
             setattr(cls, parameter, cls.param_dict[parameter])
 
         cls.parameters_set = True
-    """
 
+    """
     def feeding(self, fodder):
         self.weight + (self.beta * fodder)
 
@@ -180,16 +182,27 @@ class Herbivore(Animal):
                   'F': 10.0
                   }
 
-    def __init__(self, island, param_dict=None):
+    def __init__(self, island, attribute_dict=None, pos_y=None, pos_x=None):
         super().__init__(island)
-        if param_dict is not None:
-            self.param_dict.update(param_dict)
-        for parameter in self.param_dict:
-            exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
-        statistic_population = np.random.normal(self.param_dict['w_birth'],
+        if attribute_dict is not None:
+            if 'weight' in attribute_dict:
+                self.weight = attribute_dict['weight']
+            if 'weight' in attribute_dict:
+                self.age = attribute_dict['age']
+                """
+        if attribute_dict is not None:
+            for parameter in self.param_dict:
+                exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
+                """
+        if self.age is None:
+            self.age = 0
+        if self.weight is None:
+            statistic_population = np.random.normal(self.param_dict['w_birth'],
                                             self.param_dict['sigma_birth'],
-                                              1000)
-        self.weight = np.random.choice(statistic_population)
+                                              1000) # lager ny statistisk populasjon for hver instance?
+            self.weight = np.random.choice(statistic_population)
+        self.pos_y = pos_y
+        self.pos_x = pos_x
         q_plus = 1.0 / (1 + exp(self.param_dict['phi_age'] *
                                 (self.age - self.param_dict['a_half'])))
         q_minus = 1.0 / (1 + exp(-self.param_dict['phi_weight'] *
@@ -198,7 +211,7 @@ class Herbivore(Animal):
 
 
 class Carnivore(Animal):
-
+    parameters_set = False
     param_dict = {'w_birth': 6.0,
                           'sigma_birth': 1.0,
                           'beta': 0.75,
@@ -252,14 +265,18 @@ class Simulation:
 
 
 if __name__ == "__main__":
-    def place_animal(individual_dict):
-        # plassere i riktig celle, fjerne gammel celle og oppdatere posisjonen i dyre-instansen
-        map[1][1].herbivores_in_cell.append(herman)
+    first_island = Island()
+    map = first_island.map
+    initial_num_of_herbivores = 3
+    initial_num_of_carnivores = 2
+    current_herbivores = []
+    current_carnivores = []
+    for _ in range(initial_num_of_herbivores):
         pass
+        # current_herbivores.append(Herbivore(map))  # legger ny instance til liste
+    for _ in range(initial_num_of_carnivores):
+        current_carnivores.append(Carnivore(first_island))
 
-
-    second_herbivores = []
-    second_carnivores = []
     default_input = [{'loc': (3, 4), 'pop': [
         {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
         {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
@@ -272,10 +289,38 @@ if __name__ == "__main__":
     test_input = {'loc': (3, 4), 'pop': [{'species': 'Herbivore', 'age': 10, 'weight': 12.5}]}
 
 
-    initial_num_of_herbivores = 3
-    initial_num_of_carnivores = 2
-    first_island = Island()
-    map = first_island.map
+    def place_animals(input, island_map):
+        # tar for seg et og et koordinat (p dict-form) og plasserer et dyr av gangen i koordinatet
+        for location in input:
+            y, x = location['loc']
+            for n, animal in enumerate(location['pop']):
+                if location['pop'][n]['species'] == 'Herbivore':
+                    del location['pop'][n]['species']
+                    herman = Herbivore(island_map, location['pop'][n], y, x)
+                    island_map[y][x].herbivores_in_cell.append(herman)
+                    #print(map[3][4].herbivores_in_cell[n].age)
+        return map
+
+    map = place_animals(default_input, map)
+    print(map[3][4].herbivores_in_cell[1].age)
+
+    def place_animal(individual_dict, island_map):
+        # plassere i riktig celle, fjerne gammel celle og oppdatere posisjonen i dyre-instansen
+        y, x = individual_dict['loc']
+        age = individual_dict['pop'][0]['age']
+        weight = individual_dict['pop'][0]['weight']
+        if individual_dict['pop'][0]['species'] == 'Herbivore':
+            del individual_dict['pop'][0]['species']
+            herman = Herbivore(island_map, individual_dict['pop'][0], y, x)
+            island_map[y][x].herbivores_in_cell.append(herman)
+
+
+
+
+
+
+
+"""
     herman = Herbivore(map)
     print(map[1][1].herbivores_in_cell)
     map[1][1].herbivores_in_cell.append(herman)
@@ -288,8 +333,4 @@ if __name__ == "__main__":
     for _ in range(initial_num_of_carnivores):
         first_carnivores.append(Carnivore(first_island))
 
-
-
-
-
-
+"""
