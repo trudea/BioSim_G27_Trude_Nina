@@ -101,6 +101,7 @@ class Animal:
         pass
 
     def aging(self):
+        self.age += 1
         pass
 
     def weightloss(self):
@@ -121,7 +122,7 @@ class Animal:
             probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
             if round(random.random(), 3) >= probability:
                 # dyret dør
-            
+
 
 class Herbivore(Animal):
     default_param_dict = {'w_birth': 8.0,
