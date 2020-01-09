@@ -79,32 +79,25 @@ class Jungle(Landscape):
 
 
 class Animal:
-    phi = None
-    w_birth = None
-    sigma_birth = None
-    beta = None
-    eta = None
-    a_half = None
-    phi_age = None
-    w_half = None
-    phi_weight = None
-    mu = None
-    lambdah = None # endre navn på lambda?
-    gamma = None
-    zeta = None
-    xi = None
-    omega = None
-    F = None
-    DeltaPhiMax = None
-                          }
-    param_dict = {}
 
     def __init__(self, island):
-        self.phi = None
+        # self.phi = None
         self.island = island
         self.age = 0
         self.position = 0 # må endres
 
+        # if not self.parameters_set:
+        #    self.set_parameters()
+
+    """
+    @classmethod
+    def set_parameters(cls, params=None):
+        for parameter in cls.param_dict:
+            # self.w_birth = default_param_dict[]
+            setattr(cls, parameter, cls.param_dict[parameter])
+
+        cls.parameters_set = True
+    """
 
     def feeding(self):
         pass
@@ -136,42 +129,31 @@ class Animal:
 
 
 class Herbivore(Animal):
-    parameters_set = False
-    default_param_dict = {'w_birth': 8.0,
-                          'sigma_birth': 1.5,
-                          'beta': 0.9,
-                          'eta': 0.05,
-                          'a_half': 40.0,
-                          'phi_age': 0.2,
-                          'w_half': 10.0,
-                          'phi_weight': 0.1,
-                          'mu': 0.25,
-                          'lambda': 1.0,
-                          'gamma': 0.2,
-                          'zeta': 3.5,
-                          'xi': 1.2,
-                          'omega': 0.4,
-                          'F': 10.0
-                          }
-    @classmethod
-    def set_parameters(cls,params=None):
-        for parameter in default_param_dict:
-            self.
-
-        self.parameters_set = True
+    # parameters_set = False
+    param_dict = {'w_birth': 8.0,
+                  'sigma_birth': 1.5,
+                  'beta': 0.9,
+                  'eta': 0.05,
+                  'a_half': 40.0,
+                  'phi_age': 0.2,
+                  'w_half': 10.0,
+                  'phi_weight': 0.1,
+                  'mu': 0.25,
+                  'lambdah': 1.0,
+                  'gamma': 0.2,
+                  'zeta': 3.5,
+                  'xi': 1.2,
+                  'omega': 0.4,
+                  'F': 10.0
+                  }
 
     def __init__(self, island, param_dict=None):
         super().__init__(island)
-        if not self.parameters_set:
-            set_parameters()
-
-        if param_dict is None:
-            self.param_dict = self.default_param_dict
-        else:
-            for i in self.default_param_dict:
-                if i not in param_dict:
-                    param_dict[i] = self.default_param_dict[i]
-                self.param_dict = param_dict
+        if param_dict is not None:
+            self.param_dict.update(param_dict)
+            print(self.param_dict)
+        for parameter in self.param_dict:
+            exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
         statistic_population = np.random.normal(self.param_dict['w_birth'],
                                             self.param_dict['sigma_birth'],
                                               1000)
@@ -184,6 +166,7 @@ class Herbivore(Animal):
 
 
 class Carnivore(Animal):
+    parameters_set = False
     default_param_dict = {'w_birth': 6.0,
                           'sigma_birth': 1.0,
                           'beta': 0.75,
@@ -207,10 +190,13 @@ class Carnivore(Animal):
         if param_dict is None:
             self.param_dict = self.default_param_dict
         else:
-            for i in self.default_param_dict:
-                if i not in param_dict:
-                    param_dict[i] = self.default_param_dict[i]
-                self.param_dict = param_dict
+            # for i in self.default_param_dict:
+            # if i not in param_dict:
+            #   param_dict[i] = self.default_param_dict[i]
+            # self.param_dict = param_dict
+            self.default_param_dict.update(param_dict)
+            self.param_dict = self.default_param_dict #unødvendig, bør heller endre navn på default
+
         statistic_population = np.random.normal(self.param_dict['w_birth'],
                                             self.param_dict['sigma_birth'],
                                             1000)
@@ -235,9 +221,15 @@ if __name__ == "__main__":
     first_carnivores = []
     for _ in range(initial_num_of_herbivores):
         first_herbivores.append(Herbivore(first_island))  # legger ny instance til liste
+        """
     for _ in range(initial_num_of_carnivores):
         first_carnivores.append(Carnivore(first_island))
+    """
     first_herbivores[0].phi = 0
     first_herbivores[0].dying()
-    print(first_herbivores[0].phi)
+    herb_dict = {'w_birth' : 33}
+    herbert = Herbivore(first_island, herb_dict)
+    print(herbert.param_dict['w_birth'])
+    print(herbert.w_birth)
+
 

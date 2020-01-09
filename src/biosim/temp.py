@@ -16,8 +16,8 @@ class Herbivore(Animal):
 
 
 if __name__ == "__main__":
-    h = Herbivore(22)
-    print(h.age)
-    h.set_weight()
-    print(type(h))
-    print(exp(1))
+    print
+    d = {'eple' : 1, 'banan' : 2}
+    for i in d:
+        exec("self.%s = %s" % (i, d[i]))
+    print(eple, banan)
