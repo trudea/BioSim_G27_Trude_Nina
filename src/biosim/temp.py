@@ -1,7 +1,9 @@
 from math import exp
+import numpy as np
 
-txt_str = open('rossum.txt').read()
-string = txt_str.replace("\n", "")
+txt = open('rossum.txt').read()
+
+print(txt)
 
 class Animal:
     def __init__(self, age):
@@ -18,6 +20,10 @@ class Herbivore(Animal):
 if __name__ == "__main__":
     print
     d = {'eple' : 1, 'banan' : 2}
-    for i in d:
-        exec("self.%s = %s" % (i, d[i]))
-    print(eple, banan)
+
+
+    a = np.array([[1, 2],[3, 4]])
+    c = [5, 6]
+    b = list(a)
+    b.append(c)
+    a = np.asarray(b)

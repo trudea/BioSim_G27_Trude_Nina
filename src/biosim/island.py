@@ -12,31 +12,44 @@ import random
 
 class Landscape:
 
-    def num_to_coord(self, cols, num):
-        x, y = 0, 0
-        while num > cols:
-            y += 1
-            num -= cols
-        x = num
-        return (y, x) # y før x
-
-    def coord_to_num(self, cols, y, x): # y før x
-        return y*cols + x
-
-
-    def __init__(self, txt_str=None):
-        if txt_str is None:
-            txt_str = open('rossum.txt').read()
-            # txt_str = txt_str.split() # liste med tekststrenger
-            for i in txt_str[0]:
+    def __init__(self, txt=None):
+        if txt is None:
+            txt = open('rossum.txt').read()
+            for i in txt[0]:
                 if i != 'O':
                     raise ValueError
-            map_str = txt_str.replace("\n", "") #  en lang streng
-        self.map_string = map_str
-        self.map_dict = {} # hver key er tuple av posisjonen, y før x
-        self.cols = 21 # må endres
-        for n, i in enumerate(self.map_string):
-            self.map_dict[self.num_to_coord(self.cols, n)] = [i]
+        map = []
+        lines = []
+        line = []
+        for letter in txt:
+            if letter == 'S':
+                line.append(Savannah())
+            if letter == 'J':
+                line.append(Jungle())
+            if letter == 'O':
+                line.append(Ocean())
+            if letter == 'M':
+                line.append(Mountain())
+            if letter == 'D':
+                line.append(Desert())
+            if letter == '\n':
+                lines.append(line)
+                line = []
+        map = np.asarray(lines)
+        print(len(map[0]))
+        print(map[1][1].f_max)
+
+
+        new_map = np.array(map)
+        for y in new_map:
+            for x in y:
+                if x == '\n':
+                    pass
+                if x == 'S':
+                    x = Savannah()
+        self.map = new_map
+
+
 
 
     def new_position(self):
@@ -47,35 +60,42 @@ class Landscape:
         pass
 
 class Savannah(Landscape):
-    default_param_dict = {'f_max' : 300.0}
+    param_dict = {'f_max' : 300.0}
     savannah = []
     savannah_dict = {}
+    f_max = 5
 
-    def __init__(self, map_string, param_dict=None):
-        self.map_string = map_string
-        for n, i in enumerate(self.map_string):
-            if i == 'S':
-                self.coords.append(n)
-                savannah_dict[(num_to_coords(n))] = 0
+    def __init__(self, param_dict=None):
         if param_dict is None: # burde sannsynligvis være i superklassen
-            self.param_dict = default_param_dict
+            self.param_dict = param_dict
         else:
-            for i in default_param_dict:
+            for i in param_dict:
                 if i not in param_dict:
-                    param_dict[i] = default_param_dict[i]
+                    param_dict[i] = param_dict[i]
+
 
 
 class Jungle(Landscape):
     default_param_dict = {'f_max' : 800.0, 'alpha' : 0.3}
 
-    def __init__(self, island, param_dict):
-        self.island = island
+    def __init__(self, param_dict=None):
+        pass
+        """
         if param_dict is None:
             self.param_dict = default_param_dict
         else:
             for i in default_param_dict:
                 if i not in param_dict:
                     param_dict[i] = default_param_dict[i]
+"""
+class Ocean:
+    pass
+
+class Mountain:
+    pass
+
+class Desert:
+    pass
 
 
 class Animal:
@@ -84,7 +104,7 @@ class Animal:
         # self.phi = None
         self.island = island
         self.age = 0
-        self.position = 0 # må endres
+        self.position = 0 # må endres, midlertidig
 
         # if not self.parameters_set:
         #    self.set_parameters()
@@ -99,8 +119,9 @@ class Animal:
         cls.parameters_set = True
     """
 
-    def feeding(self):
-        pass
+    def feeding(self, fodder):
+        self.weight + (self.beta * fodder)
+
 
     def procreation(self):
         pass
@@ -112,7 +133,8 @@ class Animal:
         self.age += 1
 
     def weightloss(self):
-        pass
+        self.weight - (self.eta * self.weight ) #test en gang per år
+
 
     def dying(self):
         # returnerer om dyret skal dø eller ikke
@@ -151,7 +173,6 @@ class Herbivore(Animal):
         super().__init__(island)
         if param_dict is not None:
             self.param_dict.update(param_dict)
-            print(self.param_dict)
         for parameter in self.param_dict:
             exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
         statistic_population = np.random.normal(self.param_dict['w_birth'],
@@ -166,8 +187,8 @@ class Herbivore(Animal):
 
 
 class Carnivore(Animal):
-    parameters_set = False
-    default_param_dict = {'w_birth': 6.0,
+
+    param_dict = {'w_birth': 6.0,
                           'sigma_birth': 1.0,
                           'beta': 0.75,
                           'eta': 0.125,
@@ -176,7 +197,7 @@ class Carnivore(Animal):
                           'w_half': 4.0,
                           'phi_weight': 0.4,
                           'mu': 0.4,
-                          'lambda': 1.0,
+                          'lambdah': 1.0,
                           'gamma': 0.8,
                           'zeta': 3.5,
                           'xi': 1.1,
@@ -187,15 +208,11 @@ class Carnivore(Animal):
 
     def __init__(self, island, param_dict=None):
         super().__init__(island)
-        if param_dict is None:
-            self.param_dict = self.default_param_dict
-        else:
-            # for i in self.default_param_dict:
-            # if i not in param_dict:
-            #   param_dict[i] = self.default_param_dict[i]
-            # self.param_dict = param_dict
-            self.default_param_dict.update(param_dict)
-            self.param_dict = self.default_param_dict #unødvendig, bør heller endre navn på default
+        super().__init__(island)
+        if param_dict is not None:
+            self.param_dict.update(param_dict)
+        for parameter in self.param_dict:
+            exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
 
         statistic_population = np.random.normal(self.param_dict['w_birth'],
                                             self.param_dict['sigma_birth'],
@@ -217,19 +234,24 @@ if __name__ == "__main__":
     initial_num_of_herbivores = 3
     initial_num_of_carnivores = 2
     first_island = Landscape()
+    map = first_island.map
     first_herbivores = []
     first_carnivores = []
     for _ in range(initial_num_of_herbivores):
-        first_herbivores.append(Herbivore(first_island))  # legger ny instance til liste
-        """
+        first_herbivores.append(Herbivore(map))  # legger ny instance til liste
+
     for _ in range(initial_num_of_carnivores):
         first_carnivores.append(Carnivore(first_island))
-    """
+
     first_herbivores[0].phi = 0
     first_herbivores[0].dying()
     herb_dict = {'w_birth' : 33}
     herbert = Herbivore(first_island, herb_dict)
-    print(herbert.param_dict['w_birth'])
-    print(herbert.w_birth)
+
+    carn_dict = {'sigma_birth' : 10, 'w_birth' : 3}
+    new_dict = {'sigma_birth' : 2}
+    carl = Carnivore(first_island, carn_dict)
+    cole = Carnivore(first_island, new_dict)
+
 
 
