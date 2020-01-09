@@ -18,6 +18,6 @@ class Herbivore(Animal):
 
 if __name__ == "__main__":
     dict = {'banan' : 1, 'eple' : 2}
-    print(dict)
-    del dict['banan']
+    dict2 = dict.copy()
+    dict2['banan'] = 3
     print(dict)
