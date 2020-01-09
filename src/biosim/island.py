@@ -8,6 +8,7 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 import numpy as np
 from math import exp
+import random
 
 class Landscape:
 
@@ -64,7 +65,6 @@ class Savannah(Landscape):
                     param_dict[i] = default_param_dict[i]
 
 
-
 class Jungle(Landscape):
     default_param_dict = {'f_max' : 800.0, 'alpha' : 0.3}
 
@@ -79,7 +79,9 @@ class Jungle(Landscape):
 
 
 class Animal:
-    def __init__(self, island):
+    def __init__(self, island, param_dict):
+        self.phi = None
+        self.param_dict = param_dict
         self.island = island
         self.age = 0
 
@@ -89,6 +91,7 @@ class Animal:
 
 
     def feeding(self):
+
         pass
 
     def procreation(self):
@@ -98,10 +101,27 @@ class Animal:
         pass
 
     def aging(self):
+        self.age += 1
         pass
 
     def weightloss(self):
         pass
+
+    def dying(self):
+        if self.phi == 0:
+            """Fjern fra dyrelista/populasjonen, valueerror under 0"""
+            return 1              # Sannsynlighet for død
+        """else:
+            probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
+            self.phi = random.choices([1, 0], [probability, 1 - probability])
+            if self.phi == 0:
+                '''død'''"""
+
+        # random.random() genererer random floating point
+        else:
+            probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
+            if round(random.random(), 3) >= probability:
+                # dyret dør
 
 
 class Herbivore(Animal):
@@ -133,13 +153,13 @@ class Herbivore(Animal):
                 self.param_dict = param_dict
         statistic_population = np.random.normal(self.param_dict['w_birth'],
                                             self.param_dict['sigma_birth'],
-                                            1000)
+                                              1000)
         self.weight = np.random.choice(statistic_population)
         q_plus = 1.0 / (1 + exp(self.param_dict['phi_age'] *
                                 (self.age - self.param_dict['a_half'])))
-        q_minus = 1.0 / (1 + exp(-self.param_dict['phi_weight'] * ()))
+        q_minus = 1.0 / (1 + exp(-self.param_dict['phi_weight'] *
+                                 (self.weight - self.param_dict['w_half'])))
         self.phi = q_plus * q_minus
-
 
 
 class Carnivore(Animal):
