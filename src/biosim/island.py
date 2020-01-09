@@ -308,34 +308,22 @@ if __name__ == "__main__":
                     temp_dict['weight'] = location['pop'][n]['weight']
                     herman = Herbivore(island_map, temp_dict, y, x)
                     island_map[y][x].herbivores_in_cell.append(herman)
-                    #print(map[3][4].herbivores_in_cell[n].age)
                 if location['pop'][n]['species'] == 'Carnivore':
                     temp_dict = {}
                     temp_dict['age'] = location['pop'][n]['age']
                     temp_dict['weight'] = location['pop'][n]['weight']
                     herman = Carnivore(island_map, temp_dict, y, x)
                     island_map[y][x].carnivores_in_cell.append(herman)
-                    # print(island_map[y][x].carnivores_in_cell[0])
         return map
 
     map = place_animals(default_input, map)
     print(map[3][4].carnivores_in_cell[0].weight)
-    # print(map[3][4].herbivores_in_cell[1].age)
 
 
 
 
 
 
-    def place_animal(individual_dict, island_map):
-        # plassere i riktig celle, fjerne gammel celle og oppdatere posisjonen i dyre-instansen
-        y, x = individual_dict['loc']
-        age = individual_dict['pop'][0]['age']
-        weight = individual_dict['pop'][0]['weight']
-        if individual_dict['pop'][0]['species'] == 'Herbivore':
-            del individual_dict['pop'][0]['species']
-            herman = Herbivore(island_map, individual_dict['pop'][0], y, x)
-            island_map[y][x].herbivores_in_cell.append(herman)
 
 
 
