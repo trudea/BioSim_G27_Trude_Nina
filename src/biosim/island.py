@@ -16,6 +16,9 @@ class Landscape:
         if txt_str is None:
             txt_str = open('rossum.txt').read()
             # txt_str = txt_str.split() # liste med tekststrenger
+            for i in txt_str[0]:
+                if i != 'O':
+                    raise ValueError
             map_str = txt_str.replace("\n", "") #  en lang streng
         self.map_string = map_str
         self.map_dict = {} # hver key er tuple av posisjonen, y før x
