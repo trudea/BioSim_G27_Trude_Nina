@@ -18,7 +18,6 @@ class Landscape:
             for i in txt[0]:
                 if i != 'O':
                     raise ValueError
-        map = []
         lines = []
         line = []
         for letter in txt:
@@ -35,22 +34,7 @@ class Landscape:
             if letter == '\n':
                 lines.append(line)
                 line = []
-        map = np.asarray(lines)
-        print(len(map[0]))
-        print(map[1][1].f_max)
-
-
-        new_map = np.array(map)
-        for y in new_map:
-            for x in y:
-                if x == '\n':
-                    pass
-                if x == 'S':
-                    x = Savannah()
-        self.map = new_map
-
-
-
+        self.map = np.asarray(lines)
 
     def new_position(self):
         #when animal moves, this gives new position
@@ -61,33 +45,21 @@ class Landscape:
 
 class Savannah(Landscape):
     param_dict = {'f_max' : 300.0}
-    savannah = []
-    savannah_dict = {}
-    f_max = 5
 
     def __init__(self, param_dict=None):
-        if param_dict is None: # burde sannsynligvis være i superklassen
-            self.param_dict = param_dict
-        else:
-            for i in param_dict:
-                if i not in param_dict:
-                    param_dict[i] = param_dict[i]
+        if param_dict is not None:
+            self.param_dict.update(param_dict)
 
 
 
 class Jungle(Landscape):
-    default_param_dict = {'f_max' : 800.0, 'alpha' : 0.3}
+    param_dict = {'f_max' : 800.0, 'alpha' : 0.3}
 
     def __init__(self, param_dict=None):
-        pass
-        """
-        if param_dict is None:
-            self.param_dict = default_param_dict
-        else:
-            for i in default_param_dict:
-                if i not in param_dict:
-                    param_dict[i] = default_param_dict[i]
-"""
+        if param_dict is not None:
+            self.param_dict.update(param_dict)
+
+
 class Ocean:
     pass
 

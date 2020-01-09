@@ -18,12 +18,7 @@ class Herbivore(Animal):
 
 
 if __name__ == "__main__":
-    print
     d = {'eple' : 1, 'banan' : 2}
 
 
-    a = np.array([[1, 2],[3, 4]])
-    c = [5, 6]
-    b = list(a)
-    b.append(c)
-    a = np.asarray(b)
+
