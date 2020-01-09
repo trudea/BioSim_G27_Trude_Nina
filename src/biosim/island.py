@@ -79,19 +79,34 @@ class Jungle(Landscape):
 
 
 class Animal:
-    def __init__(self, island, param_dict):
+    phi = None
+    w_birth = None
+    sigma_birth = None
+    beta = None
+    eta = None
+    a_half = None
+    phi_age = None
+    w_half = None
+    phi_weight = None
+    mu = None
+    lambdah = None # endre navn på lambda?
+    gamma = None
+    zeta = None
+    xi = None
+    omega = None
+    F = None
+    DeltaPhiMax = None
+                          }
+    param_dict = {}
+
+    def __init__(self, island):
         self.phi = None
-        self.param_dict = param_dict
         self.island = island
         self.age = 0
-
-
         self.position = 0 # må endres
 
 
-
     def feeding(self):
-
         pass
 
     def procreation(self):
@@ -101,29 +116,27 @@ class Animal:
         pass
 
     def aging(self):
-        pass
+        self.age += 1
 
     def weightloss(self):
         pass
 
     def dying(self):
-        if self.phi == 0:
-            """Fjern fra dyrelista/populasjonen, valueerror under 0"""
-            return 1              # Sannsynlighet for død
+        # returnerer om dyret skal dø eller ikke
         """else:
-            probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
-            self.phi = random.choices([1, 0], [probability, 1 - probability])
-            if self.phi == 0:
-                '''død'''"""
-
-        # random.random() genererer random floating point
+                   probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
+                   self.phi = random.choices([1, 0], [probability, 1 - probability])
+                   if self.phi == 0:
+                       '''død'''"""
+        probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
+        if self.phi == 0 or round(random.random(), 3) >= probability:
+                return True
         else:
-            probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
-            if round(random.random(), 3) >= probability:
-                # dyret dør
-            
+            return False
+
 
 class Herbivore(Animal):
+    parameters_set = False
     default_param_dict = {'w_birth': 8.0,
                           'sigma_birth': 1.5,
                           'beta': 0.9,
@@ -140,9 +153,18 @@ class Herbivore(Animal):
                           'omega': 0.4,
                           'F': 10.0
                           }
+    @classmethod
+    def set_parameters(cls,params=None):
+        for parameter in default_param_dict:
+            self.
+
+        self.parameters_set = True
 
     def __init__(self, island, param_dict=None):
         super().__init__(island)
+        if not self.parameters_set:
+            set_parameters()
+
         if param_dict is None:
             self.param_dict = self.default_param_dict
         else:
@@ -215,5 +237,7 @@ if __name__ == "__main__":
         first_herbivores.append(Herbivore(first_island))  # legger ny instance til liste
     for _ in range(initial_num_of_carnivores):
         first_carnivores.append(Carnivore(first_island))
-
+    first_herbivores[0].phi = 0
+    first_herbivores[0].dying()
+    print(first_herbivores[0].phi)
 
