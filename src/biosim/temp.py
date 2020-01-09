@@ -1,3 +1,5 @@
+from math import exp
+
 txt_str = open('rossum.txt').read()
 string = txt_str.replace("\n", "")
 
@@ -18,3 +20,4 @@ if __name__ == "__main__":
     print(h.age)
     h.set_weight()
     print(type(h))
+    print(exp(1))
