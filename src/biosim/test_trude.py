@@ -161,8 +161,7 @@ class Animal:
     def weightloss(self):
         self.weight -= (self.eta * self.weight) #test en gang per år
 
-
-    def check_if_dying(self):
+    def dying(self):
         # returnerer om dyret skal dø eller ikke
         """else:
                    probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
@@ -280,29 +279,9 @@ class Simulation:
     def __init__(self):
         pass
 
-    def place_animals(input, island_map):
-        # tar for seg et og et koordinat (på dict-form) og plasserer et dyr av gangen i koordinatet
-        for location in input:
-            y, x = location['loc']
-            for n, animal in enumerate(location['pop']):
-                if location['pop'][n]['species'] == 'Herbivore':
-                    temp_dict = {}
-                    temp_dict['age'] = location['pop'][n]['age']
-                    temp_dict['weight'] = location['pop'][n]['weight']
-                    herman = Herbivore(island_map, temp_dict, y, x)
-                    island_map[y][x].herbivores_in_cell.append(herman)
-                if location['pop'][n]['species'] == 'Carnivore':
-                    temp_dict = {}
-                    temp_dict['age'] = location['pop'][n]['age']
-                    temp_dict['weight'] = location['pop'][n]['weight']
-                    herman = Carnivore(island_map, temp_dict, y, x)
-                    island_map[y][x].carnivores_in_cell.append(herman)
-        return map
 
     def single_run(self):
        pass
-
-
 
 
 if __name__ == "__main__":
@@ -313,7 +292,8 @@ if __name__ == "__main__":
     current_herbivores = []
     current_carnivores = []
     for _ in range(initial_num_of_herbivores):
-        current_herbivores.append(Herbivore(map))  # legger ny instance til liste
+        pass
+        # current_herbivores.append(Herbivore(map))  # legger ny instance til liste
     for _ in range(initial_num_of_carnivores):
         current_carnivores.append(Carnivore(first_island))
 
@@ -348,14 +328,8 @@ if __name__ == "__main__":
                     island_map[y][x].carnivores_in_cell.append(herman)
         return map
 
-    def move_animal(map[y][x].carnivores_in_cell[n], new_x, new_y):
-        # the_animal = map[y][x].carnivores_in_cell[n]
-        the_animal =
-        previous_x = the_animal.pos_x
-        previous_y = the_animal.pos_y
-
     map = place_animals(default_input, map)
-    print(map[3][4].carnivores_in_cell[0].pos_y)
+    x = type(map[3][4].carnivores_in_cell[0]).__name__
 
 
 
