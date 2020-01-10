@@ -198,7 +198,7 @@ class Animal:
 
 
 class Herbivore(Animal):
-    # parameters_set = False
+    parameters_set = False
     param_dict = {'w_birth': 8.0,
                   'sigma_birth': 1.5,
                   'beta': 0.9,
@@ -218,16 +218,18 @@ class Herbivore(Animal):
 
     def __init__(self, island, attribute_dict=None, pos_y=None, pos_x=None):
         super().__init__(island)
+        if not self.parameters_set:
+            for parameter in self.param_dict:
+                if parameter == 'lambda':
+                    self.lambdah = self.param_dict['lambda']
+                else:
+                    exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
+            parameters_set = True
         if attribute_dict is not None:
             if 'weight' in attribute_dict:
                 self.weight = attribute_dict['weight']
-            if 'weight' in attribute_dict:
+            if 'age' in attribute_dict:
                 self.age = attribute_dict['age']
-                """
-        if attribute_dict is not None:
-            for parameter in self.param_dict:
-                exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
-                """
         if self.age is None:
             self.age = 0
         if self.weight is None:
@@ -266,6 +268,13 @@ class Carnivore(Animal):
 
     def __init__(self, island, attribute_dict=None, pos_y=None, pos_x=None):
         super().__init__(island)
+        if not self.parameters_set:
+            for parameter in self.param_dict:
+                if parameter == 'lambda':
+                    self.lambdah = self.param_dict['lambda']
+                else:
+                    exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
+            parameters_set = True
         if attribute_dict is not None:
             if 'weight' in attribute_dict:
                 self.weight = attribute_dict['weight']
@@ -377,8 +386,8 @@ if __name__ == "__main__":
 
     map = place_animals(default_input, map)
 
-    s = Savannah(0,0)
-    print(s.f_max)
+
+
 
 
 
