@@ -17,28 +17,28 @@ class Island:
     def __init__(self, txt=None):
         if txt is None:
             txt = open('rossum.txt').read()
-        lines = []
-        line = []
-        y = 0
-        x = 0
-        n = 0
-        land_dict = {'S' : Savannah, 'J': Jungle,
-                    'O' : Ocean, 'M' : Mountain, 'D' : Desert}
+            if txt[-1] == "\n":
+                #legg inn noe som fjerner siste element
+                pass
+        if txt[-1] is not "\n":
+            print(len(txt))
+            txt += "\n"
+            print(len(txt))
+        land_dict = {'S': Savannah, 'J': Jungle,
+                     'O': Ocean, 'M': Mountain, 'D': Desert}
+        line, lines = [], []
+        y, x = 0, 0
         for letter in txt:
             if letter in land_dict:
-                line.append(land_dict[letter](y, x))
+                line.append(land_dict[letter](x, y))
                 x += 1
-            elif letter == "\n":
+            if letter == "\n":
                 lines.append(line)
                 line = []
-                n += 1
                 y += 1
                 x = 0
-            lines.append(line)
         self.map = np.asarray(lines)
 
-
-        """
         left_column = [line[0] for line in self.map]
         right_column = [line[-1] for line in self.map]
         to_check = [self.map[0], self.map[-1], left_column, right_column]
@@ -46,7 +46,6 @@ class Island:
             for element in list:
                 if not isinstance(element, Ocean):
                     raise ValueError
-        """
 
         """
         for letter in txt:
@@ -302,9 +301,10 @@ class Simulation:
 
 
 if __name__ == "__main__":
-
+    """
     first_island = Island()
     map = first_island.map
+    """
     """
     initial_num_of_herbivores = 3
     initial_num_of_carnivores = 2
@@ -357,7 +357,7 @@ if __name__ == "__main__":
 
     c = Carnivore(map, {'age':99})
     h = Herbivore(map)
-    simple_string = 'OOOOO\nOJJJO\nOOOOO'
+    simple_string = 'SOO\nOOO'
     simple_island = Island(simple_string)
 
 
