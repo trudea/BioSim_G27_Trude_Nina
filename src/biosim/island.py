@@ -41,11 +41,13 @@ class Island:
                 x = -1
         self.map = np.asarray(lines)
 
-        
-        edge = [self.lines[0], self.lines[-1]]
-        for element in edge:
-            if element is not 'O':
-                raise ValueError
+        error_check = [lines[0][y], lines[-1][y]]
+        for y in range(len(lines[0])):
+            for _ in error_check:
+                if type(_).__name__ is not 'Ocean':
+                    raise ValueError
+
+
 
 
 class Landscape:
@@ -64,6 +66,7 @@ class Savannah(Landscape):
     param_dict = {'f_max' : 300.0}
 
     def __init__(self, pos_y, pos_x, param_dict=None):
+        super().__init__()
         self.herbivores_in_cell = []
         self.carnivores_in_cell = []
         self.pos_y = pos_y
