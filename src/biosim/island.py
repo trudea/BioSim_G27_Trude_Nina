@@ -76,8 +76,7 @@ class Mountain(Landscape):
 
 class Animal:
     parameters_set = False
-    def __init__(self, island, attribute_dict):
-        self.island = island
+    def __init__(self, attribute_dict):
         if not self.parameters_set:
             for parameter in self.param_dict:
                 if parameter == 'lambda':
@@ -169,8 +168,8 @@ class Herbivore(Animal):
                   'F': 10.0
                   }
 
-    def __init__(self, island, attribute_dict=None):
-        super().__init__(island, attribute_dict)
+    def __init__(self, attribute_dict=None):
+        super().__init__(attribute_dict)
 
 class Carnivore(Animal):
     param_dict = {'w_birth': 6.0,
@@ -191,45 +190,11 @@ class Carnivore(Animal):
                           'DeltaPhiMax' : 10.0
                           }
 
-    def __init__(self, island, attribute_dict=None):
-        super().__init__(island, attribute_dict)
+    def __init__(self, attribute_dict=None):
+        super().__init__(attribute_dict)
 
     def check_if_kills(self):
         pass
-
-
-class Simulation:
-    default_input = [{'loc': (3,4), 'pop' : [{'species': 'Herbivore', 'age' : 10, 'weight' : 12.5},
-                                      {'species': 'Herbivore', 'age' : 9, 'weight' : 10.3},
-                                      {'species': 'Carnivore', 'age' : 5, 'weight' : 8.1}]},
-             {'loc': (4, 4),
-              'pop': [{'species': 'Herbivore', 'age': 10, 'weight': 12.5},
-                      {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
-                      {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
-
-
-    def __init__(self):
-        pass
-
-    def place_animals(input, island_map):
-        # tar for seg et og et koordinat (på dict-form) og plasserer et dyr av gangen i koordinatet
-        for location in input:
-            y, x = location['loc']
-            for n, animal in enumerate(location['pop']):
-                if location['pop'][n]['species'] == 'Herbivore':
-                    temp_dict = {}
-                    temp_dict['age'] = location['pop'][n]['age']
-                    temp_dict['weight'] = location['pop'][n]['weight']
-                    herman = Herbivore(island_map, temp_dict, y, x)
-                    island_map[y][x].herbivores_in_cell.append(herman)
-                if location['pop'][n]['species'] == 'Carnivore':
-                    temp_dict = {}
-                    temp_dict['age'] = location['pop'][n]['age']
-                    temp_dict['weight'] = location['pop'][n]['weight']
-                    herman = Carnivore(island_map, temp_dict, y, x)
-                    island_map[y][x].carnivores_in_cell.append(herman)
-        return map
-
 
 
 class Cell:
@@ -295,30 +260,14 @@ class Island:
                 y, x = placement_dict['loc']
                 the_cell = self.island[y][x]
                 for individual in placement_dict['pop']:
-                    if placement_dict['species'] == 'Herbivore':
+                    if individual['species'] == 'Herbivore':
                         self.island[y][x].herb_pop.append(Herbivore(individual))
-                    elif placement_dict['species'] == 'Carnivore':
+                    elif individual['species'] == 'Carnivore':
                         self.island[y][x].carn_pop.append(Carnivore(individual))
 
 
 
 if __name__ == "__main__":
-    """
-    first_island = Island()
-    map = first_island.map
-    """
-    """
-    initial_num_of_herbivores = 3
-    initial_num_of_carnivores = 2
-    current_herbivores = []
-    current_carnivores = []
-    """
-    """
-    for _ in range(initial_num_of_herbivores):
-        current_herbivores.append(Herbivore(map))  # legger ny instance til liste
-    for _ in range(initial_num_of_carnivores):
-        current_carnivores.append(Carnivore(first_island))
-"""
     default_input = [{'loc': (3, 4), 'pop': [
         {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
         {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
@@ -328,39 +277,14 @@ if __name__ == "__main__":
                           {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
                           {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
                           {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
-    test_input = {'loc': (3, 4), 'pop': [{'species': 'Herbivore', 'age': 10, 'weight': 12.5}]}
 
 
-
-
-
-    def place_animals(input, island_map): # opprinnelig kode
-        # tar for seg et og et koordinat (på dict-form) og plasserer et dyr av gangen i koordinatet
-        for location in input:
-            y, x = location['loc']
-            for n, animal in enumerate(location['pop']):
-                if location['pop'][n]['species'] == 'Herbivore':
-                    temp_dict = {}
-                    temp_dict['age'] = location['pop'][n]['age']
-                    temp_dict['weight'] = location['pop'][n]['weight']
-                    herman = Herbivore(island_map, temp_dict)
-                    island_map[y][x].herbivores_in_cell.append(herman)
-                if location['pop'][n]['species'] == 'Carnivore':
-                    temp_dict = {}
-                    temp_dict['age'] = location['pop'][n]['age']
-                    temp_dict['weight'] = location['pop'][n]['weight']
-                    herman = Carnivore(island_map, temp_dict, y, x)
-                    island_map[y][x].carnivores_in_cell.append(herman)
-        return map
-
-    def move_animal(the_animal, new_x, new_y):
-        # the_animal = map[y][x].carnivores_in_cell[n]
-        previous_x = the_animal.pos_x
-        previous_y = the_animal.pos_y
 
     # c = Cell(0,0,'S')
     # print(type(c.landscape).__name__)
     i = Island()
+    i.place_animals(default_input)
+    print(i.island[4][4].carn_pop[1].weight)
 
 
 
