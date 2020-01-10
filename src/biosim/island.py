@@ -22,12 +22,33 @@ class Island:
         y = 0
         x = 0
         n = 0
-        land_dict = {'S' : Savannah(y, x), 'J': Jungle(y, x),
-                    'O' : Ocean(y,x), 'M' : Mountain(x, y), 'D' : Desert(x, y)}
+        land_dict = {'S' : Savannah, 'J': Jungle,
+                    'O' : Ocean, 'M' : Mountain, 'D' : Desert}
         for letter in txt:
-            pass
+            if letter in land_dict:
+                line.append(land_dict[letter](y, x))
+                x += 1
+            elif letter == "\n":
+                lines.append(line)
+                line = []
+                n += 1
+                y += 1
+                x = 0
+            lines.append(line)
+        self.map = np.asarray(lines)
 
 
+        """
+        left_column = [line[0] for line in self.map]
+        right_column = [line[-1] for line in self.map]
+        to_check = [self.map[0], self.map[-1], left_column, right_column]
+        for list in to_check:
+            for element in list:
+                if not isinstance(element, Ocean):
+                    raise ValueError
+        """
+
+        """
         for letter in txt:
             if letter == 'S':
                line.append(Savannah(y, x))
@@ -45,19 +66,7 @@ class Island:
                 n += 1
                 y += 1
             x += 1
-        self.map = np.asarray(lines)
-
-
-
-        left_column = [line[0] for line in self.map]
-        right_column = [line[-1] for line in self.map]
-        to_check = [self.map[0], self.map[-1], left_column, right_column]
-        for list in to_check:
-            for element in list:
-                if not isinstance(element, Ocean):
-                    raise ValueError
-
-
+        """
 
 
 
@@ -293,12 +302,15 @@ class Simulation:
 
 
 if __name__ == "__main__":
+
     first_island = Island()
     map = first_island.map
+    """
     initial_num_of_herbivores = 3
     initial_num_of_carnivores = 2
     current_herbivores = []
     current_carnivores = []
+    """
     """
     for _ in range(initial_num_of_herbivores):
         current_herbivores.append(Herbivore(map))  # legger ny instance til liste
@@ -345,14 +357,11 @@ if __name__ == "__main__":
 
     c = Carnivore(map, {'age':99})
     h = Herbivore(map)
+    simple_string = 'OOOOO\nOJJJO\nOOOOO'
+    simple_island = Island(simple_string)
 
-    streng = []
-    for line in map:
-        print(len(line))
-        for i in line:
-            streng.append(type(i).__name__)
-    print(streng)
-    print(len(streng))
+
+
 
 
 
