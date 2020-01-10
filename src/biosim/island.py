@@ -20,9 +20,9 @@ class Island:
         lines = []
         line = []
         y = 0
-        x = -1
+        x = 0
+        n = 0
         for letter in txt:
-            x += 1
             if letter == 'S':
                line.append(Savannah(y, x))
             if letter == 'J':
@@ -36,10 +36,14 @@ class Island:
             if letter == '\n':
                 lines.append(line)
                 line = []
+                n += 1
                 y += 1
-                x = -1
-        lines.append(line)
+            x += 1
         self.map = np.asarray(lines)
+
+
+
+"""
         left_column = [line[0] for line in self.map]
         right_column = [line[-1] for line in self.map]
         to_check = [self.map[0], self.map[-1], left_column, right_column]
@@ -47,30 +51,13 @@ class Island:
             for element in list:
                 if not isinstance(element, Ocean):
                     raise ValueError
-
-
-
-
-
 """
-        to_check = [lines_check[0], lines_check[1], lines_check[:][1], lines_check[:][-1]]
-        print(lines_check[:][1])
-        for list in to_check:
-            for letter in list:
-                if letter != 'O':
-                    raise ValueError
-"""
-"""
-        right_column = [lines[0] for item in lines]
-        left_column = [lines[-1] for item in lines]
-        error_check = [lines[0][y], lines[-1][y], right_column, left_column]
-        for y in range(len(lines[0])):
-            for list in error_check:
-                for letter in list:
-                    if type(letter).__name__ is not 'Ocean':
-                        raise ValueError
 
-"""
+
+
+
+
+
 class Landscape:
     def __init__(self):
         pass
@@ -143,14 +130,36 @@ class Mountain:
 
 
 class Animal:
-
-    def __init__(self, island):
-        # self.phi = None
+    parameters_set = False
+    def __init__(self, island, attribute_dict):
         self.island = island
+        if not self.parameters_set:
+            for parameter in self.param_dict:
+                if parameter == 'lambda':
+                    self.lambdah = self.param_dict['lambda']
+                else:
+                    exec("self.%s = %s" % (
+                    parameter, self.param_dict[parameter]))
+            self.parameters_set = True
         self.age = None
         self.weight = None
-        self.pos_y = None
-        self.pos_x = None # må endres, midlertidig
+        if attribute_dict is not None:
+            if 'weight' in attribute_dict:
+                self.weight = attribute_dict['weight']
+            if 'age' in attribute_dict:
+                self.age = attribute_dict['age']
+        if self.age is None:
+            self.age = 0
+        if self.weight is None:
+            statistic_population = np.random.normal(self.param_dict['w_birth'],
+                                            self.param_dict['sigma_birth'],
+                                              1000) # lager ny statistisk populasjon for hver instance?
+            self.weight = np.random.choice(statistic_population)
+        q_plus = 1.0 / (1 + exp(self.param_dict['phi_age'] *
+                                (self.age - self.param_dict['a_half'])))
+        q_minus = 1.0 / (1 + exp(-self.param_dict['phi_weight'] *
+                                 (self.weight - self.param_dict['w_half'])))
+        self.phi = q_plus * q_minus
     """
         if not self.parameters_set:
             self.set_parameters()
@@ -198,7 +207,6 @@ class Animal:
 
 
 class Herbivore(Animal):
-    parameters_set = False
     param_dict = {'w_birth': 8.0,
                   'sigma_birth': 1.5,
                   'beta': 0.9,
@@ -216,38 +224,10 @@ class Herbivore(Animal):
                   'F': 10.0
                   }
 
-    def __init__(self, island, attribute_dict=None, pos_y=None, pos_x=None):
-        super().__init__(island)
-        if not self.parameters_set:
-            for parameter in self.param_dict:
-                if parameter == 'lambda':
-                    self.lambdah = self.param_dict['lambda']
-                else:
-                    exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
-            parameters_set = True
-        if attribute_dict is not None:
-            if 'weight' in attribute_dict:
-                self.weight = attribute_dict['weight']
-            if 'age' in attribute_dict:
-                self.age = attribute_dict['age']
-        if self.age is None:
-            self.age = 0
-        if self.weight is None:
-            statistic_population = np.random.normal(self.param_dict['w_birth'],
-                                            self.param_dict['sigma_birth'],
-                                              1000) # lager ny statistisk populasjon for hver instance?
-            self.weight = np.random.choice(statistic_population)
-        self.pos_y = pos_y
-        self.pos_x = pos_x
-        q_plus = 1.0 / (1 + exp(self.param_dict['phi_age'] *
-                                (self.age - self.param_dict['a_half'])))
-        q_minus = 1.0 / (1 + exp(-self.param_dict['phi_weight'] *
-                                 (self.weight - self.param_dict['w_half'])))
-        self.phi = q_plus * q_minus
-
+    def __init__(self, island, attribute_dict=None):
+        super().__init__(island, attribute_dict)
 
 class Carnivore(Animal):
-    parameters_set = False
     param_dict = {'w_birth': 6.0,
                           'sigma_birth': 1.0,
                           'beta': 0.75,
@@ -266,33 +246,8 @@ class Carnivore(Animal):
                           'DeltaPhiMax' : 10.0
                           }
 
-    def __init__(self, island, attribute_dict=None, pos_y=None, pos_x=None):
-        super().__init__(island)
-        if not self.parameters_set:
-            for parameter in self.param_dict:
-                if parameter == 'lambda':
-                    self.lambdah = self.param_dict['lambda']
-                else:
-                    exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
-            parameters_set = True
-        if attribute_dict is not None:
-            if 'weight' in attribute_dict:
-                self.weight = attribute_dict['weight']
-            if 'age' in attribute_dict:
-                self.age = attribute_dict['age']
-        if self.age is None:
-                self.age = 0
-        if self.weight is None:
-            statistic_population = np.random.normal(
-                self.param_dict['w_birth'],
-                self.param_dict['sigma_birth'],
-                1000)  # lager ny statistisk populasjon for hver instance?
-            self.weight = np.random.choice(statistic_population)
-        self.pos_y = pos_y
-        self.pos_x = pos_x
-
-
-
+    def __init__(self, island, attribute_dict=None):
+        super().__init__(island, attribute_dict)
 
     def check_if_kills(self):
         pass
@@ -333,21 +288,19 @@ class Simulation:
        pass
 
 
-
-
 if __name__ == "__main__":
-    rossum_string = 'OOOOOOOOOOOOOOOOOOOOO\nOSSSSSJJJJMMJJJJJJJOO\nOSSSSSJJJJMMJJJJJJJOO\nOSSSSSJJJJMMJJJJJJJOO\nOOSSJJJJJJJMMJJJJJJJO\nOOSSJJJJJJJMMJJJJJJJO\nOOOOOOOSMMMMJJJJJJJJO\nOSSSSSJJJJMMJJJJJJJOO\nOSSSSSSSSSMMJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSSDDDDDMMJJJJJOOO\nOSSSSSDDDDDJJJJOOOOOO\nOOSSSDDDDDDJJOOOOOOOO\nOOSSSSDDDDDDJJOOOOOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSDDDDDDJJJJOOOOOO\nOOSSSSDDDDDJJJOOOOOOO\nOOOSSSSJJJJJJJOOOOOOO\nOOOSSSSSSOOOOOOOOOOOO\nOOOOOOOOOOOOOOOOOOOOO'
-    first_island = Island(rossum_string)
+    first_island = Island()
     map = first_island.map
     initial_num_of_herbivores = 3
     initial_num_of_carnivores = 2
     current_herbivores = []
     current_carnivores = []
+    """
     for _ in range(initial_num_of_herbivores):
         current_herbivores.append(Herbivore(map))  # legger ny instance til liste
     for _ in range(initial_num_of_carnivores):
         current_carnivores.append(Carnivore(first_island))
-
+"""
     default_input = [{'loc': (3, 4), 'pop': [
         {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
         {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
@@ -384,7 +337,20 @@ if __name__ == "__main__":
         previous_x = the_animal.pos_x
         previous_y = the_animal.pos_y
 
-    map = place_animals(default_input, map)
+    # map = place_animals(default_input, map)
+
+    c = Carnivore(map, {'age':99})
+    h = Herbivore(map)
+
+    streng = []
+    for line in map:
+        print(len(line))
+        for i in line:
+            streng.append(type(i).__name__)
+    print(streng)
+    print(len(streng))
+
+
 
 
 
