@@ -46,7 +46,7 @@ class BioSim:
         random.seed(seed)
         if ymax_animals is None:
             # juster automatisk
-        self.ymax_animals = ymax_animals
+            self.ymax_animals = ymax_animals
         if cmax_animals is None:
             # automatisk
         self.cmax_animals = cmax_animals
