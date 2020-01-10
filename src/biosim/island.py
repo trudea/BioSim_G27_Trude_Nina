@@ -22,12 +22,30 @@ class Island:
         y = 0
         x = 0
         n = 0
-        land_dict = {'S' : Savannah(y, x), 'J': Jungle(y, x),
-                    'O' : Ocean(y,x), 'M' : Mountain(x, y), 'D' : Desert(x, y)}
+        land_dict = {'S' : Savannah, 'J': Jungle,
+                    'O' : Ocean, 'M' : Mountain, 'D' : Desert}
         for letter in txt:
-            pass
+            if letter in land_dict:
+                line.append(land_dict[letter](y, x))
+                x += 1
+            else:
+                lines.append(line)
+                line = []
+                n += 1
+                y += 1
+                x = 0
+        self.map = np.asarray(lines)
+
+        left_column = [line[0] for line in self.map]
+        right_column = [line[-1] for line in self.map]
+        to_check = [self.map[0], self.map[-1], left_column, right_column]
+        for list in to_check:
+            for element in list:
+                if not isinstance(element, Ocean):
+                    raise ValueError
 
 
+        """
         for letter in txt:
             if letter == 'S':
                line.append(Savannah(y, x))
@@ -45,19 +63,7 @@ class Island:
                 n += 1
                 y += 1
             x += 1
-        self.map = np.asarray(lines)
-
-
-
-        left_column = [line[0] for line in self.map]
-        right_column = [line[-1] for line in self.map]
-        to_check = [self.map[0], self.map[-1], left_column, right_column]
-        for list in to_check:
-            for element in list:
-                if not isinstance(element, Ocean):
-                    raise ValueError
-
-
+        """
 
 
 

@@ -34,3 +34,4 @@ if __name__ == "__main__":
             #må sende inn alt som har blitt definert i underklassen
 
     klasse = B
+    k = klasse()
