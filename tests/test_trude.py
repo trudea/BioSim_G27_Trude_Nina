@@ -12,6 +12,13 @@ class Testanimal:
     def test_get_position(self):
         pass
 
+    def test_place_animal(self):
+        pass
+
+    def test_check_animal_in_cell(self):
+        pass
+
+
     def test_move_animal(self):
         pass
 
