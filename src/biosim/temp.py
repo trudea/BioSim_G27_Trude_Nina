@@ -33,5 +33,4 @@ if __name__ == "__main__":
             super().__init__(liv)
             #må sende inn alt som har blitt definert i underklassen
 
-    are = B(7)
-    print(are.liv)
+    klasse = B
