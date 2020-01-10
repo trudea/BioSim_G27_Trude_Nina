@@ -17,7 +17,10 @@ class Herbivore(Animal):
 
 
 if __name__ == "__main__":
-    dict = {'banan' : 1, 'eple' : 2}
-    dict2 = dict.copy()
-    dict2['banan'] = 3
-    print(dict)
+    a = np.array([[1, 2, 3], [3, 4, 5],[6, 7, 8]])
+    liste = [[1, 2, 3], [3, 4, 5], [6, 7, 8]]
+    for i in range(3):
+        print(a[i][0])
+    # print(a[:][0])
+    test = [liste[0] for liste in a]
+    print(test)

@@ -6,6 +6,8 @@
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
+
+# import animal.py
 import numpy as np
 from math import exp
 import random
@@ -15,9 +17,6 @@ class Island:
     def __init__(self, txt=None):
         if txt is None:
             txt = open('rossum.txt').read()
-            for i in txt[0]:
-                if i != 'O':
-                    raise ValueError
         lines = []
         line = []
         y = 0
@@ -25,7 +24,7 @@ class Island:
         for letter in txt:
             x += 1
             if letter == 'S':
-                line.append(Savannah(y, x))
+               line.append(Savannah(y, x))
             if letter == 'J':
                 line.append(Jungle(y, x))
             if letter == 'O':
@@ -39,8 +38,29 @@ class Island:
                 line = []
                 y += 1
                 x = -1
+        lines.append(line)
         self.map = np.asarray(lines)
+        left_column = [line[0] for line in self.map]
+        right_column = [line[-1] for line in self.map]
+        to_check = [self.map[0], self.map[-1], left_column, right_column]
+        for list in to_check:
+            for element in list:
+                if not isinstance(element, Ocean):
+                    raise ValueError
 
+
+
+
+
+"""
+        to_check = [lines_check[0], lines_check[1], lines_check[:][1], lines_check[:][-1]]
+        print(lines_check[:][1])
+        for list in to_check:
+            for letter in list:
+                if letter != 'O':
+                    raise ValueError
+"""
+"""
         right_column = [lines[0] for item in lines]
         left_column = [lines[-1] for item in lines]
         error_check = [lines[0][y], lines[-1][y], right_column, left_column]
@@ -50,7 +70,7 @@ class Island:
                     if type(letter).__name__ is not 'Ocean':
                         raise ValueError
 
-
+"""
 class Landscape:
     def __init__(self):
         pass
@@ -64,7 +84,7 @@ class Landscape:
 
 
 class Savannah(Landscape):
-    param_dict = {'f_max' : 300.0}
+    param_dict = {'f_max' : 300.0, 'alpha' : 0.3}
 
     def __init__(self, pos_y, pos_x, param_dict=None):
         super().__init__()
@@ -85,7 +105,7 @@ class Savannah(Landscape):
 
 
 class Jungle(Landscape):
-    param_dict = {'f_max' : 800.0, 'alpha' : 0.3}
+    param_dict = {'f_max' : 800.0}
 
     def __init__(self, pos_y, pos_x, param_dict=None):
         self.herbivores_in_cell = []
@@ -350,20 +370,17 @@ if __name__ == "__main__":
                     island_map[y][x].carnivores_in_cell.append(herman)
         return map
 
-    s = Savannah(0,0)
-    print(s)
-"""
-    def move_animal(map[y][x].carnivores_in_cell[n], new_x, new_y):
+    def move_animal(the_animal, new_x, new_y):
         # the_animal = map[y][x].carnivores_in_cell[n]
-        the_animal =
         previous_x = the_animal.pos_x
         previous_y = the_animal.pos_y
 
     map = place_animals(default_input, map)
-    print(map[3][4].carnivores_in_cell[0].pos_y)
+
+    s = Savannah(0,0)
+    print(s.f_max)
 
 
-"""
 
 
 
