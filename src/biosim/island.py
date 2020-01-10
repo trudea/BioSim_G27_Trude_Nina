@@ -53,6 +53,7 @@ class Island:
 
 
 
+
 class Landscape:
     def __init__(self):
         pass
@@ -309,7 +310,8 @@ class Simulation:
 
 
 if __name__ == "__main__":
-    first_island = Island()
+    rossum_string = 'OOOOOOOOOOOOOOOOOOOOO\nOSSSSSJJJJMMJJJJJJJOO\nOSSSSSJJJJMMJJJJJJJOO\nOSSSSSJJJJMMJJJJJJJOO\nOOSSJJJJJJJMMJJJJJJJO\nOOSSJJJJJJJMMJJJJJJJO\nOOOOOOOSMMMMJJJJJJJJO\nOSSSSSJJJJMMJJJJJJJOO\nOSSSSSSSSSMMJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSSDDDDDMMJJJJJOOO\nOSSSSSDDDDDJJJJOOOOOO\nOOSSSDDDDDDJJOOOOOOOO\nOOSSSSDDDDDDJJOOOOOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSDDDDDDJJJJOOOOOO\nOOSSSSDDDDDJJJOOOOOOO\nOOOSSSSJJJJJJJOOOOOOO\nOOOSSSSSSOOOOOOOOOOOO\nOOOOOOOOOOOOOOOOOOOOO'
+    first_island = Island(rossum_string)
     map = first_island.map
     initial_num_of_herbivores = 3
     initial_num_of_carnivores = 2
@@ -350,7 +352,7 @@ if __name__ == "__main__":
                     herman = Carnivore(island_map, temp_dict, y, x)
                     island_map[y][x].carnivores_in_cell.append(herman)
         return map
-
+"""
     def move_animal(map[y][x].carnivores_in_cell[n], new_x, new_y):
         # the_animal = map[y][x].carnivores_in_cell[n]
         the_animal =
@@ -361,7 +363,7 @@ if __name__ == "__main__":
     print(map[3][4].carnivores_in_cell[0].pos_y)
 
 
-
+"""
 
 
 
