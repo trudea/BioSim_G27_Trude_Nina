@@ -1,7 +1,8 @@
 from math import exp
+import numpy as np
 
-txt_str = open('rossum.txt').read()
-string = txt_str.replace("\n", "")
+txt = open('rossum.txt').read()
+
 
 class Animal:
     def __init__(self, age):
@@ -16,8 +17,7 @@ class Herbivore(Animal):
 
 
 if __name__ == "__main__":
-    h = Herbivore(22)
-    print(h.age)
-    h.set_weight()
-    print(type(h))
-    print(exp(1))
+    dict = {'banan' : 1, 'eple' : 2}
+    dict2 = dict.copy()
+    dict2['banan'] = 3
+    print(dict)
