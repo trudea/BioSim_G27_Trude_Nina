@@ -12,7 +12,7 @@ import numpy as np
 from math import exp
 import random
 
-
+"""
 class Island:
     def __init__(self, txt=None):
         if txt is None:
@@ -46,30 +46,7 @@ class Island:
             for element in list:
                 if not isinstance(element, Ocean):
                     raise ValueError
-
-        """
-        for letter in txt:
-            if letter == 'S':
-               line.append(Savannah(y, x))
-            if letter == 'J':
-                line.append(Jungle(y, x))
-            if letter == 'O':
-                line.append(Ocean(y, x))
-            if letter == 'M':
-                line.append(Mountain(y, x))
-            if letter == 'D':
-                line.append(Desert(y, x))
-            if letter == '\n':
-                lines.append(line)
-                line = []
-                n += 1
-                y += 1
-            x += 1
-        """
-
-
-
-
+"""
 class Landscape:
     def __init__(self):
         pass
@@ -85,12 +62,10 @@ class Landscape:
 class Savannah(Landscape):
     param_dict = {'f_max' : 300.0, 'alpha' : 0.3}
 
-    def __init__(self, pos_y, pos_x, param_dict=None):
+    def __init__(self, param_dict=None):
         super().__init__()
         self.herbivores_in_cell = []
         self.carnivores_in_cell = []
-        self.pos_y = pos_y
-        self.pos_x = pos_x
         if param_dict is not None:
             self.param_dict.update(param_dict)
         for parameter in self.param_dict:
@@ -106,11 +81,8 @@ class Savannah(Landscape):
 class Jungle(Landscape):
     param_dict = {'f_max' : 800.0}
 
-    def __init__(self, pos_y, pos_x, param_dict=None):
-        self.herbivores_in_cell = []
-        self.carnivores_in_cell = []
-        self.pos_y = pos_y
-        self.pos_x = pos_x
+    def __init__(self, param_dict=None):
+        super().__init__()
         if param_dict is not None:
             self.param_dict.update(param_dict)
         for parameter in self.param_dict:
@@ -121,24 +93,20 @@ class Jungle(Landscape):
         self.f = self.f_max
 
 
-class Desert:
-    def __init__(self, pos_y, pos_x):
-        self.pos_y = pos_y
-        self.pos_x = pos_x
-        self.herbivores_in_cell = []
-        self.carnivores_in_cell = []
+class Desert(Landscape):
+    def __init__(self):
+        super().__init__()
+        pass
 
 
-class Ocean:
-    def __init__(self, pos_y, pos_x):
-        self.pos_y = pos_y
-        self.pos_x = pos_x
+class Ocean(Landscape):
+    def __init__(self):
+        super().__init__()
 
 
-class Mountain:
-    def __init__(self, pos_y, pos_x):
-        self.pos_y = pos_y
-        self.pos_x = pos_x
+class Mountain(Landscape):
+    def __init__(self):
+        super().__init__()
 
 
 class Animal:
@@ -264,6 +232,7 @@ class Carnivore(Animal):
     def check_if_kills(self):
         pass
 
+
 class Simulation:
     default_input = [{'loc': (3,4), 'pop' : [{'species': 'Herbivore', 'age' : 10, 'weight' : 12.5},
                                       {'species': 'Herbivore', 'age' : 9, 'weight' : 10.3},
@@ -298,6 +267,62 @@ class Simulation:
 
     def single_run(self):
        pass
+
+class Cell:
+    land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M': Mountain,
+                     'D': Desert}
+    def __init__(self, y, x, letter):
+        self.landscape = self.land_dict[letter]()
+        self.y = y
+        self.x = x
+        self.cell_population = []
+
+class Island:
+    land_dict = {'S': Savannah, 'J': Jungle,
+                 'O': Ocean, 'M': Mountain, 'D': Desert}
+    def string_to_array(self, txt):
+        # bør kanskje importeres
+        if txt[-1] is not "\n":
+            txt += "\n"
+        line, lines = [], []
+        y, x = 0, 0
+        for letter in txt:
+            if letter in self.land_dict:
+                line.append(letter)
+                x += 1
+            if letter == "\n":
+                lines.append(line)
+                line = []
+                y += 1
+                x = 0
+        return np.asarray(lines)
+
+    def check_edges(self):
+        left_column = [line[0] for line in self.map]
+        right_column = [line[-1] for line in self.map]
+        to_check = [self.map[0], self.map[-1], left_column, right_column]
+        for list in to_check:
+            for element in list:
+                if element != 'O':
+                    raise ValueError
+
+    def __init__(self, txt=None):
+        if txt is None:
+            txt = open('rossum.txt').read()
+            if txt[-1] == "\n":
+                #legg inn noe som fjerner siste element hvis det er formen vi vil ha det på senere
+                pass
+        self.map = self.string_to_array(txt) # array of one-letter-strings
+        self.check_edges()
+        # creating array of cells
+        island_line = []
+        island_lines = []
+        for y, line in enumerate(self.map):
+            for x, letter in enumerate(line):
+                island_line.append(Cell(y, x, letter))
+            island_lines.append(island_line)
+            island_line = []
+        self.island = np.array(island_lines)
 
 
 if __name__ == "__main__":
@@ -353,12 +378,10 @@ if __name__ == "__main__":
         previous_x = the_animal.pos_x
         previous_y = the_animal.pos_y
 
-    # map = place_animals(default_input, map)
+    # c = Cell(0,0,'S')
+    # print(type(c.landscape).__name__)
+    i = Island()
 
-    c = Carnivore(map, {'age':99})
-    h = Herbivore(map)
-    simple_string = 'SOO\nOOO'
-    simple_island = Island(simple_string)
 
 
 
