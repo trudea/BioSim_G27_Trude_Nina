@@ -41,6 +41,14 @@ class Island:
                 x = -1
         self.map = np.asarray(lines)
 
+        right_column = [lines[0] for item in lines]
+        left_column = [lines[-1] for item in lines]
+        error_check = [lines[0][y], lines[-1][y], right_column, left_column]
+        for y in range(len(lines[0])):
+            for list in error_check:
+                for letter in list:
+                    if type(letter).__name__ is not 'Ocean':
+                        raise ValueError
 
 
 
