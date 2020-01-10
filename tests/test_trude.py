@@ -81,5 +81,6 @@ class TestAnimal:
     def test_herbivore_feeding(self):
         herbivore = bs.Herbivore(None, None, None)
         weight = herbivore.weight
-        #vent
-        herbivore.feeding(self, F)
+        F = herbivore.param_dict['F']
+        herbivore.feeding(F)
+        assert weight < herbivore.weight
