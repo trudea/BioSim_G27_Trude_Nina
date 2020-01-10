@@ -40,6 +40,11 @@ class Island:
                 x = -1
         self.map = np.asarray(lines)
 
+    def map_check(self):
+        if self.map[:][0] or self.map[:][-1] or self.map[:][0] \
+                and self.map[:][-1] is not 'O':
+            raise ValueError
+
 
 class Landscape:
     def __init__(self):
@@ -90,6 +95,7 @@ class Jungle(Landscape):
     def replenish(self):
         self.f = self.f_max
 
+
 class Desert:
     def __init__(self, pos_y, pos_x):
         self.pos_y = pos_y
@@ -116,7 +122,7 @@ class Animal:
         self.age = None
         self.weight = None
         self.pos_y = None
-        self.pos_x = None # må endres, midlertidig
+        self.pos_x = None# må endres, midlertidig
     """
         if not self.parameters_set:
             self.set_parameters()
@@ -133,7 +139,7 @@ class Animal:
 
     """
     def feeding(self, fodder):
-        self.weight + (self.beta * fodder)
+        self.weight += (self.beta * fodder)
 
 
     def procreation(self):
@@ -146,8 +152,7 @@ class Animal:
         self.age += 1
 
     def weightloss(self):
-        self.weight - (self.eta * self.weight ) #test en gang per år
-
+        self.weight -= (self.eta * self.weight) #test en gang per år
 
     def dying(self):
         # returnerer om dyret skal dø eller ikke
@@ -317,7 +322,7 @@ if __name__ == "__main__":
         return map
 
     map = place_animals(default_input, map)
-    print(map[3][4].carnivores_in_cell[0].weight)
+    print(type(map[3][4].carnivores_in_cell[0]).__name__)
 
 
 
