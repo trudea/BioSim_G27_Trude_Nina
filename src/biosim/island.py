@@ -12,41 +12,7 @@ import numpy as np
 from math import exp
 import random
 
-"""
-class Island:
-    def __init__(self, txt=None):
-        if txt is None:
-            txt = open('rossum.txt').read()
-            if txt[-1] == "\n":
-                #legg inn noe som fjerner siste element
-                pass
-        if txt[-1] is not "\n":
-            print(len(txt))
-            txt += "\n"
-            print(len(txt))
-        land_dict = {'S': Savannah, 'J': Jungle,
-                     'O': Ocean, 'M': Mountain, 'D': Desert}
-        line, lines = [], []
-        y, x = 0, 0
-        for letter in txt:
-            if letter in land_dict:
-                line.append(land_dict[letter](x, y))
-                x += 1
-            if letter == "\n":
-                lines.append(line)
-                line = []
-                y += 1
-                x = 0
-        self.map = np.asarray(lines)
 
-        left_column = [line[0] for line in self.map]
-        right_column = [line[-1] for line in self.map]
-        to_check = [self.map[0], self.map[-1], left_column, right_column]
-        for list in to_check:
-            for element in list:
-                if not isinstance(element, Ocean):
-                    raise ValueError
-"""
 class Landscape:
     def __init__(self):
         pass
@@ -96,7 +62,6 @@ class Jungle(Landscape):
 class Desert(Landscape):
     def __init__(self):
         super().__init__()
-        pass
 
 
 class Ocean(Landscape):
@@ -265,8 +230,7 @@ class Simulation:
                     island_map[y][x].carnivores_in_cell.append(herman)
         return map
 
-    def single_run(self):
-       pass
+
 
 class Cell:
     land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M': Mountain,
@@ -275,7 +239,8 @@ class Cell:
         self.landscape = self.land_dict[letter]()
         self.y = y
         self.x = x
-        self.cell_population = []
+        self.herb_pop = [] # instances av Herbivore i celle
+        self.carn_pop = [] # instances av Carnivore i celle
 
 class Island:
     land_dict = {'S': Savannah, 'J': Jungle,
@@ -324,6 +289,18 @@ class Island:
             island_line = []
         self.island = np.array(island_lines)
 
+    def place_animals(self, input_list):
+        ani_dict = {'Herbivore': Herbivore, 'Carnivore': Carnivore}
+        for placement_dict in input_list:
+                y, x = placement_dict['loc']
+                the_cell = self.island[y][x]
+                for individual in placement_dict['pop']:
+                    if placement_dict['species'] == 'Herbivore':
+                        self.island[y][x].herb_pop.append(Herbivore(individual))
+                    elif placement_dict['species'] == 'Carnivore':
+                        self.island[y][x].carn_pop.append(Carnivore(individual))
+
+
 
 if __name__ == "__main__":
     """
@@ -354,7 +331,10 @@ if __name__ == "__main__":
     test_input = {'loc': (3, 4), 'pop': [{'species': 'Herbivore', 'age': 10, 'weight': 12.5}]}
 
 
-    def place_animals(input, island_map):
+
+
+
+    def place_animals(input, island_map): # opprinnelig kode
         # tar for seg et og et koordinat (på dict-form) og plasserer et dyr av gangen i koordinatet
         for location in input:
             y, x = location['loc']
@@ -363,7 +343,7 @@ if __name__ == "__main__":
                     temp_dict = {}
                     temp_dict['age'] = location['pop'][n]['age']
                     temp_dict['weight'] = location['pop'][n]['weight']
-                    herman = Herbivore(island_map, temp_dict, y, x)
+                    herman = Herbivore(island_map, temp_dict)
                     island_map[y][x].herbivores_in_cell.append(herman)
                 if location['pop'][n]['species'] == 'Carnivore':
                     temp_dict = {}
