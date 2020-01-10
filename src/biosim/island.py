@@ -24,7 +24,8 @@ class Island:
         n = 0
         land_dict = {'S' : Savannah(y, x), 'J': Jungle(y, x),
                     'O' : Ocean(y,x), 'M' : Mountain(x, y), 'D' : Desert(x, y)}
-
+        for letter in txt:
+            pass
 
 
         for letter in txt:
