@@ -80,7 +80,7 @@ class TestAnimal:
 
     def test_herbivore_feeding(self):
         herbivore = bs.Herbivore(None, None, None)
-        weight = herbivore.weight
-        F = herbivore.param_dict['F']
-        herbivore.feeding(F)
-        assert weight < herbivore.weight
+        previous_weight = herbivore.weight
+        feed = herbivore.param_dict['F']
+        herbivore.feeding(feed)
+        assert previous_weight < herbivore.weight
