@@ -386,6 +386,8 @@ if __name__ == "__main__":
 
     map = place_animals(default_input, map)
 
+    print(type(map[0][0]).__name__)
+
 
 
 

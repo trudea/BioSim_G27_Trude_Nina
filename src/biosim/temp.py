@@ -19,8 +19,18 @@ class Herbivore(Animal):
 if __name__ == "__main__":
     a = np.array([[1, 2, 3], [3, 4, 5],[6, 7, 8]])
     liste = [[1, 2, 3], [3, 4, 5], [6, 7, 8]]
-    for i in range(3):
-        print(a[i][0])
-    # print(a[:][0])
-    test = [liste[0] for liste in a]
-    print(test)
+
+    class A:
+        def __init__(self):
+           self.a = 1
+           self.c = self.a + self.b
+            # ønsker å ha en oppdater parametere-funksjon her. Må hente fra dict fra b
+
+    class B(A):
+        def __init__(self):
+            self.b = 2
+            super().__init__()
+            #må sende inn alt som har blitt definert i underklassen
+
+    are = B()
+    print(are.c)
