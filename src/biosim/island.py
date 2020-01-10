@@ -131,16 +131,6 @@ class Animal:
     def losing_weight(self):
         self.weight -= (self.eta * self.weight) #test en gang per år
 
-    def eating(self, available_fodder):
-        if available_fodder >= self.F:
-            fodder_eaten = self.F
-            remaining_fodder = available_fodder - self.F
-        if available_fodder < self.F:
-            fodder_eaten = available_fodder
-            remaining_fodder = 0
-        if fodder_eaten > 0:
-            self.gaining_weight(fodder_eaten)
-        return remaining_fodder
 
     def check_if_dying(self):
         # returnerer om dyret skal dø eller ikke
@@ -177,6 +167,16 @@ class Herbivore(Animal):
     def __init__(self, attribute_dict=None):
         super().__init__(attribute_dict)
 
+    def weightgain_and_fodder_left(self, available_fodder):
+        if available_fodder >= self.F:
+            fodder_eaten = self.F
+            remaining_fodder = available_fodder - self.F
+        if available_fodder < self.F:
+            fodder_eaten = available_fodder
+            remaining_fodder = 0
+        if fodder_eaten > 0:
+            self.gaining_weight(fodder_eaten)
+        return remaining_fodder
 
 class Carnivore(Animal):
     param_dict = {'w_birth': 6.0,
@@ -259,16 +259,16 @@ class Island:
                 island_line.append(Cell(y, x, letter))
             island_lines.append(island_line)
             island_line = []
-        self.island = np.array(island_lines)
+        self.map = np.array(island_lines)
 
     def place_animals(self, input_list):
         for placement_dict in input_list:
                 y, x = placement_dict['loc']
                 for individual in placement_dict['pop']:
                     if individual['species'] == 'Herbivore':
-                        self.island[y][x].herb_pop.append(Herbivore(individual))
+                        self.map[y][x].herb_pop.append(Herbivore(individual))
                     elif individual['species'] == 'Carnivore':
-                        self.island[y][x].carn_pop.append(Carnivore(individual))
+                        self.map[y][x].carn_pop.append(Carnivore(individual))
 
 
     def procreation(self):
@@ -278,11 +278,11 @@ class Island:
         pass
 
 class Run:
-    def bubble_sort(datavariable):
-        copy = list(datavariable)
+    def bubble_sort_animals(original_order):
+        copy = list(original_order)
         for i in range(len(copy) - 1):
             for j in range(len(copy) - i - 1):
-                if copy[j] > copy[j + 1]:
+                if copy[j].phi < copy[j + 1].phi:
                     copy[j], copy[j + 1] = copy[j + 1], copy[j]
         return copy
 
@@ -296,21 +296,27 @@ class Run:
                           {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
                           {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
 
-    i = Island()
-    i.place_animals(default_input)
-    def __init__(self, desired_years):
+    def __init__(self, desired_years=10, input=None):
         self.desired_years = desired_years
         self.years_run = 0
+        if input is None:
+            input = default_input
+        self.island = Island()
+        self.island.place_animals(input)
 
     def one_cycle(self):
     #while(self.years_run < self.desired_years):
         for row in i.island:
             for cell in row:
                 cell.landscape.replenish()
-                # eating
-                # sortere herbivorer etter fitness
+                # eating, first herbs, then carns
+                cell.herb_pop = self.bubble_sort_animals(cell.herb_pop)
                 for herbivore in cell.herb_pop:
-                    cell.landscape.f = herbivore.eating()
+                    cell.landscape.f = herbivore.weightgain_and_fodder_left()
+                cell.carn_pop = self.bubble_sort_animals(cell.carn_pop)
+                for carnivore in cell.carn_pop:
+                    # cell.landscape.f = carnivore.weightgain_and_fodder_left()
+                    pass
                 # procreation
                 # migration
                 # aging
@@ -328,15 +334,11 @@ if __name__ == "__main__":
                           {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
                           {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
 
-    i = Island()
-    i.place_animals(default_input)
-    for row in i.island:
-        for cell in row:
-            for herbivore in cell.herb_pop:
-                herbivore.gaining_weight(cell.landscape.f)
-                herbivore.
+    #i = Island()
+    #i.place_animals(default_input)
 
-            #for cell.carn_pop
+    run = Run()
+    print(run.island.map[3][4].herb_pop[1].weight)
 
 
 

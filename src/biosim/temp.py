@@ -12,56 +12,49 @@ class Desert:
 class Ocean:
     pass
 
-land_dict = {'S' : Savannah, 'J': Jungle,
-                    'O' : Ocean, 'M' : Mountain, 'D' : Desert}
-txt = open('rossum.txt').read()
-line, lines = [], []
-x, y = 0, 0
-for letter in txt:
-    if letter in land_dict:
-        line.append(letter)
-        x += 1
-    if letter == "\n":
-        lines.append(line)
-        line = []
-        y += 1
-
-print(len(lines[0]))
-
 
 class Animal:
-    def __init__(self, age):
-        self.age = age
+    def __init__(self):
+        self.phi = None
 
     def set_weight(self):
         self.weight = 33
 
 class Herbivore(Animal):
-    def __init__(self, age):
-        super().__init__(age)
+    def __init__(self):
+        super().__init__()
 
 
 if __name__ == "__main__":
-    a = np.array([[1, 2, 3], [3, 4, 5],[6, 7, 8]])
-    liste = [[1, 2, 3], [3, 4, 5], [6, 7, 8]]
+    def bubble_sort(datavariable):
+        copy = list(datavariable)
+        for i in range(len(copy) - 1):
+            for j in range(len(copy) - i - 1):
+                if copy[j] > copy[j + 1]:
+                    copy[j], copy[j + 1] = copy[j + 1], copy[j]
+        return copy
 
-    class A:
-        def __init__(self, liv):
-           self.a = 1
-           self.c = self.a + self.b
-           self.liv = liv
-            # ønsker å ha en oppdater parametere-funksjon her. Må hente fra dict fra b
+    #et element er en instans, må sorteres etter element.phi
 
-    class B(A):
-        def __init__(self, liv):
-            self.b = 2
-            super().__init__(liv)
-            #må sende inn alt som har blitt definert i underklassen
+    test = []
+    def bubble_sort_animals(original_order):
+        copy = list(original_order)
+        for i in range(len(copy) - 1):
+            for j in range(len(copy) - i - 1):
+                if copy[j].phi < copy[j + 1].phi:
+                    copy[j], copy[j + 1] = copy[j + 1], copy[j]
+        return copy
 
-    klasse = B
+    herman = Herbivore()
+    herbert = Herbivore()
+    hermine = Herbivore()
+    herman.phi = 0.3
+    herbert.phi = 0.1
+    hermine.phi = 0.5
+    test_liste=[herman, herbert, hermine]
+    new_animal_order = bubble_sort_animals(test_liste)
+    for i in new_animal_order:
+        print(i.phi)
 
-    line = []
-    lines = []
-    print(abs(-1000))
 
 
