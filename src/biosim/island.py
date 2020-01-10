@@ -31,7 +31,6 @@ class Island:
         for letter in txt:
             if letter in land_dict:
                 line.append(land_dict[letter](x, y))
-                print(y,x)
                 x += 1
             if letter == "\n":
                 lines.append(line)
@@ -40,35 +39,6 @@ class Island:
                 x = 0
         self.map = np.asarray(lines)
 
-
-
-
-
-
-
-        """
-        lines = []
-        line = []
-        y = 0
-        x = 0
-
-        for letter in txt:
-            if letter in land_dict:
-                # line.append(land_dict[letter](y, x))
-                line.append(letter)
-                x += 1
-            elif letter == "\n":
-                lines.append(line)
-                line = []
-                y += 1
-                x = 0
-            lines.append(line)
-        print(lines)
-        print(len(lines))
-        self.map = np.asarray(lines)
-
-        """
-        """
         left_column = [line[0] for line in self.map]
         right_column = [line[-1] for line in self.map]
         to_check = [self.map[0], self.map[-1], left_column, right_column]
@@ -76,7 +46,6 @@ class Island:
             for element in list:
                 if not isinstance(element, Ocean):
                     raise ValueError
-        """
 
         """
         for letter in txt:
@@ -389,8 +358,7 @@ if __name__ == "__main__":
     c = Carnivore(map, {'age':99})
     h = Herbivore(map)
     simple_string = 'SOO\nOOO'
-    simple_island = Island()
-    print(type(simple_island.map[20][3]).__name__)
+    simple_island = Island(simple_string)
 
 
 
