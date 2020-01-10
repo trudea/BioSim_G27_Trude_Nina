@@ -51,9 +51,6 @@ class Island:
                         raise ValueError
 
 
-
-
-
 class Landscape:
     def __init__(self):
         pass
@@ -352,6 +349,9 @@ if __name__ == "__main__":
                     herman = Carnivore(island_map, temp_dict, y, x)
                     island_map[y][x].carnivores_in_cell.append(herman)
         return map
+
+    s = Savannah(0,0)
+    print(s)
 """
     def move_animal(map[y][x].carnivores_in_cell[n], new_x, new_y):
         # the_animal = map[y][x].carnivores_in_cell[n]
