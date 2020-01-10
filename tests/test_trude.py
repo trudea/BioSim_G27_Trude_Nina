@@ -12,6 +12,20 @@ class Testanimal:
     def test_get_position(self):
         pass
 
+    def test_place_animal(self):
+        input = [{'loc': (3, 4), 'pop': [
+            {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
+            {'species': 'Herbivore', 'age': 9, 'weight': 10.3}]}]
+
+        i = bs.Island()
+        i.place_animals(input)
+        herbivore_list = i.island[3][4].herb.pop[1]
+        assert type(herbivore_list).__name__ == 'Herbivore'
+
+    def test_check_animal_in_cell(self):
+        pass
+
+
     def test_move_animal(self):
         pass
 
