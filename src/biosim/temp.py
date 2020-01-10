@@ -1,7 +1,32 @@
 from math import exp
 import numpy as np
+class Savannah:
+    pass
 
+class Jungle:
+    pass
+class Mountain:
+    pass
+class Desert:
+    pass
+class Ocean:
+    pass
+
+land_dict = {'S' : Savannah, 'J': Jungle,
+                    'O' : Ocean, 'M' : Mountain, 'D' : Desert}
 txt = open('rossum.txt').read()
+line, lines = [], []
+x, y = 0, 0
+for letter in txt:
+    if letter in land_dict:
+        line.append(letter)
+        x += 1
+    if letter == "\n":
+        lines.append(line)
+        line = []
+        y += 1
+
+print(len(lines[0]))
 
 
 class Animal:
@@ -34,4 +59,8 @@ if __name__ == "__main__":
             #må sende inn alt som har blitt definert i underklassen
 
     klasse = B
-    k = klasse()
+
+    line = []
+    lines = []
+
+

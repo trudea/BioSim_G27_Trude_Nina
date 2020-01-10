@@ -17,28 +17,54 @@ class Island:
     def __init__(self, txt=None):
         if txt is None:
             txt = open('rossum.txt').read()
+            if txt[-1] == "\n":
+                #legg inn noe som fjerner siste element
+                print('geg')
+                pass
+        land_dict = {'S': Savannah, 'J': Jungle,
+                     'O': Ocean, 'M': Mountain, 'D': Desert}
+        line, lines = [], []
+        x, y = 0, 0
+        for letter in txt:
+            if letter in land_dict:
+                line.append(letter)
+                x += 1
+            if letter == "\n":
+                lines.append(line)
+                line = []
+                y += 1
+        lines.append(line)
+        print(lines[-1])
+        self.map = np.asarray(lines)
+
+
+
+
+
+
+
+        """
         lines = []
         line = []
         y = 0
         x = 0
-        n = 0
-        land_dict = {'S' : Savannah, 'J': Jungle,
-                    'O' : Ocean, 'M' : Mountain, 'D' : Desert}
+
         for letter in txt:
             if letter in land_dict:
-                line.append(land_dict[letter](y, x))
+                # line.append(land_dict[letter](y, x))
+                line.append(letter)
                 x += 1
             elif letter == "\n":
                 lines.append(line)
                 line = []
-                n += 1
                 y += 1
                 x = 0
             lines.append(line)
-            print(len(lines))
+        print(lines)
+        print(len(lines))
         self.map = np.asarray(lines)
 
-
+        """
         """
         left_column = [line[0] for line in self.map]
         right_column = [line[-1] for line in self.map]
@@ -303,9 +329,10 @@ class Simulation:
 
 
 if __name__ == "__main__":
-
+    """
     first_island = Island()
     map = first_island.map
+    """
     """
     initial_num_of_herbivores = 3
     initial_num_of_carnivores = 2
@@ -358,9 +385,8 @@ if __name__ == "__main__":
 
     c = Carnivore(map, {'age':99})
     h = Herbivore(map)
-    simple_string = 'OOOOO\nOJJJO\nOOOOO'
-    simple_island = Island(simple_string)
-    print(type(map[210][5]).__name__)
+    simple_string = 'SOO\nOOO'
+    simple_island = Island()
 
 
 
