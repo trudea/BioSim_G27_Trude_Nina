@@ -19,22 +19,25 @@ class Island:
             txt = open('rossum.txt').read()
             if txt[-1] == "\n":
                 #legg inn noe som fjerner siste element
-                print('geg')
                 pass
+        if txt[-1] is not "\n":
+            print(len(txt))
+            txt += "\n"
+            print(len(txt))
         land_dict = {'S': Savannah, 'J': Jungle,
                      'O': Ocean, 'M': Mountain, 'D': Desert}
         line, lines = [], []
-        x, y = 0, 0
+        y, x = 0, 0
         for letter in txt:
             if letter in land_dict:
-                line.append(letter)
+                line.append(land_dict[letter](x, y))
+                print(y,x)
                 x += 1
             if letter == "\n":
                 lines.append(line)
                 line = []
                 y += 1
-        lines.append(line)
-        print(lines[-1])
+                x = 0
         self.map = np.asarray(lines)
 
 
@@ -387,6 +390,7 @@ if __name__ == "__main__":
     h = Herbivore(map)
     simple_string = 'SOO\nOOO'
     simple_island = Island()
+    print(type(simple_island.map[20][3]).__name__)
 
 
 
