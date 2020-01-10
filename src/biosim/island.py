@@ -26,11 +26,10 @@ class Island:
                     'O' : Ocean, 'M' : Mountain, 'D' : Desert}
         for letter in txt:
             if letter in land_dict:
-                # print(land_dict[letter](x, y))
-                # line.append(land_dict[letter](y, x))
+                line.append(land_dict[letter](y, x))
                 x += 1
             elif letter == "\n":
-                # lines.append(line)
+                lines.append(line)
                 line = []
                 n += 1
                 y += 1
@@ -360,6 +359,7 @@ if __name__ == "__main__":
     h = Herbivore(map)
     simple_string = 'OOOOO\nOJJJO\nOOOOO'
     simple_island = Island(simple_string)
+
 
 
 
