@@ -68,27 +68,27 @@ class TestIsland:
 class TestAnimal:
 
     def test_herbivore(self):
-        herbivore = bs.Herbivore(None, None, None)
+        herbivore = bs.Herbivore(None, None)
         assert isinstance(herbivore, bs.Herbivore)
 
     def test_carnivore(self):
-        carnivore = bs.Carnivore(None, None, None)
+        carnivore = bs.Carnivore(None, None)
         assert isinstance(carnivore, bs.Carnivore)
 
     def test_aging(self):
-        herbivore = bs.Herbivore(None, None, None)
+        herbivore = bs.Herbivore(None, None)
         age = herbivore.age
         herbivore.aging()
         assert herbivore.age > age
 
     def test_weightloss(self):
-        herbivore = bs.Herbivore(None, None, None)
+        herbivore = bs.Herbivore(None, None)
         weight = herbivore.weight
         herbivore.weightloss()
         assert herbivore.weight < weight
 
     def test_herbivore_feeding(self):
-        herbivore = bs.Herbivore(None, None, None)
+        herbivore = bs.Herbivore(None, None)
         previous_weight = herbivore.weight
         feed = herbivore.param_dict['F']
         herbivore.feeding(feed)
