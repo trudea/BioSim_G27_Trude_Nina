@@ -21,16 +21,17 @@ if __name__ == "__main__":
     liste = [[1, 2, 3], [3, 4, 5], [6, 7, 8]]
 
     class A:
-        def __init__(self):
+        def __init__(self, liv):
            self.a = 1
            self.c = self.a + self.b
+           self.liv = liv
             # ønsker å ha en oppdater parametere-funksjon her. Må hente fra dict fra b
 
     class B(A):
-        def __init__(self):
+        def __init__(self, liv):
             self.b = 2
-            super().__init__()
+            super().__init__(liv)
             #må sende inn alt som har blitt definert i underklassen
 
-    are = B()
-    print(are.c)
+    are = B(7)
+    print(are.liv)
