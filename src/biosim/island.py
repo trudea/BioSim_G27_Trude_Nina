@@ -35,6 +35,7 @@ class Island:
                 y += 1
                 x = 0
             lines.append(line)
+            print(len(lines))
         self.map = np.asarray(lines)
 
 
@@ -359,6 +360,7 @@ if __name__ == "__main__":
     h = Herbivore(map)
     simple_string = 'OOOOO\nOJJJO\nOOOOO'
     simple_island = Island(simple_string)
+    print(type(map[210][5]).__name__)
 
 
 
