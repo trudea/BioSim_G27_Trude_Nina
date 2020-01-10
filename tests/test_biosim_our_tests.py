@@ -24,6 +24,12 @@ class TestIsland:
         print(i)
         assert isinstance(i, bs.Island)
 
+    def test_map_coordinate_instance(self):
+        # gi et koordinat og få ut klassenavn
+        map = 'OOOOO\nOJJJO\nOOOOO'
+        island = bs.Island(map)
+        assert type(island.map[0][0]).__name__ == 'Ocean'
+
     def test_map_ocean(self):
         with pytest.raises(ValueError):
             bs.Island('SSS\nOOO')
