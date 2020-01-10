@@ -62,5 +62,6 @@ if __name__ == "__main__":
 
     line = []
     lines = []
+    print(abs(-1000))
 
 

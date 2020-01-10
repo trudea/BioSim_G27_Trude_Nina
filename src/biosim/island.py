@@ -62,6 +62,7 @@ class Jungle(Landscape):
 class Desert(Landscape):
     def __init__(self):
         super().__init__()
+        self.f = 0
 
 
 class Ocean(Landscape):
@@ -119,22 +120,27 @@ class Animal:
         cls.parameters_set = True
 
     """
-    def feeding(self, fodder):
-        self.weight += (self.beta * fodder)
 
-
-    def procreation(self):
-        pass
-
-    def migration(self):
-        pass
 
     def aging(self):
         self.age += 1
 
-    def weightloss(self):
+    def gaining_weight(self, fodder):
+        self.weight += (self.beta * fodder)
+
+    def losing_weight(self):
         self.weight -= (self.eta * self.weight) #test en gang per år
 
+    def eating(self, available_fodder):
+        if available_fodder >= self.F:
+            fodder_eaten = self.F
+            remaining_fodder = available_fodder - self.F
+        if available_fodder < self.F:
+            fodder_eaten = available_fodder
+            remaining_fodder = 0
+        if fodder_eaten > 0:
+            self.gaining_weight(fodder_eaten)
+        return remaining_fodder
 
     def check_if_dying(self):
         # returnerer om dyret skal dø eller ikke
@@ -170,6 +176,7 @@ class Herbivore(Animal):
 
     def __init__(self, attribute_dict=None):
         super().__init__(attribute_dict)
+
 
 class Carnivore(Animal):
     param_dict = {'w_birth': 6.0,
@@ -255,10 +262,8 @@ class Island:
         self.island = np.array(island_lines)
 
     def place_animals(self, input_list):
-        ani_dict = {'Herbivore': Herbivore, 'Carnivore': Carnivore}
         for placement_dict in input_list:
                 y, x = placement_dict['loc']
-                the_cell = self.island[y][x]
                 for individual in placement_dict['pop']:
                     if individual['species'] == 'Herbivore':
                         self.island[y][x].herb_pop.append(Herbivore(individual))
@@ -266,6 +271,43 @@ class Island:
                         self.island[y][x].carn_pop.append(Carnivore(individual))
 
 
+    def procreation(self):
+        pass
+
+    def migration(self):
+        pass
+
+class Run:
+    default_input = [{'loc': (3, 4), 'pop': [
+        {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
+        {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
+        {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]},
+                     {'loc': (4, 4),
+                      'pop': [
+                          {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
+                          {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
+                          {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
+
+    i = Island()
+    i.place_animals(default_input)
+    def __init__(self, desired_years):
+        self.desired_years = desired_years
+        self.years_run = 0
+
+    def one_cycle(self):
+    #while(self.years_run < self.desired_years):
+        for row in i.island:
+            for cell in row:
+                cell.landscape.replenish()
+                # eating
+                # sortere herbivorer etter fitness
+                for herbivore in cell.herb_pop:
+                    cell.landscape.f = herbivore.eating()
+                # procreation
+                # migration
+                # aging
+                # weightloss
+                # death
 
 if __name__ == "__main__":
     default_input = [{'loc': (3, 4), 'pop': [
@@ -278,14 +320,15 @@ if __name__ == "__main__":
                           {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
                           {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
 
-
-
-    # c = Cell(0,0,'S')
-    # print(type(c.landscape).__name__)
     i = Island()
     i.place_animals(default_input)
-    print(i.island[4][4].carn_pop[1].weight)
+    for row in i.island:
+        for cell in row:
+            for herbivore in cell.herb_pop:
+                herbivore.gaining_weight(cell.landscape.f)
+                herbivore.
 
+            #for cell.carn_pop
 
 
 
