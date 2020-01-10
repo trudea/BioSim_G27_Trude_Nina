@@ -22,6 +22,11 @@ class Island:
         y = 0
         x = 0
         n = 0
+        land_dict = {'S' : Savannah(y, x), 'J': Jungle(y, x),
+                    'O' : Ocean(y,x), 'M' : Mountain(x, y), 'D' : Desert(x, y)}
+
+
+
         for letter in txt:
             if letter == 'S':
                line.append(Savannah(y, x))
@@ -43,7 +48,6 @@ class Island:
 
 
 
-"""
         left_column = [line[0] for line in self.map]
         right_column = [line[-1] for line in self.map]
         to_check = [self.map[0], self.map[-1], left_column, right_column]
@@ -51,7 +55,6 @@ class Island:
             for element in list:
                 if not isinstance(element, Ocean):
                     raise ValueError
-"""
 
 
 
