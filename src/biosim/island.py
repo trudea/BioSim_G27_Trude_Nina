@@ -278,6 +278,14 @@ class Island:
         pass
 
 class Run:
+    def bubble_sort(datavariable):
+        copy = list(datavariable)
+        for i in range(len(copy) - 1):
+            for j in range(len(copy) - i - 1):
+                if copy[j] > copy[j + 1]:
+                    copy[j], copy[j + 1] = copy[j + 1], copy[j]
+        return copy
+
     default_input = [{'loc': (3, 4), 'pop': [
         {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
         {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
