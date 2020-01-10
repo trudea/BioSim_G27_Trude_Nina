@@ -10,6 +10,7 @@ import numpy as np
 from math import exp
 import random
 
+
 class Island:
     def __init__(self, txt=None):
         if txt is None:
@@ -36,14 +37,15 @@ class Island:
             if letter == '\n':
                 lines.append(line)
                 line = []
-                y +=1
+                y += 1
                 x = -1
         self.map = np.asarray(lines)
 
-    def map_check(self):
-        if self.map[:][0] or self.map[:][-1] or self.map[:][0] \
-                and self.map[:][-1] is not 'O':
-            raise ValueError
+        
+        edge = [self.lines[0], self.lines[-1]]
+        for element in edge:
+            if element is not 'O':
+                raise ValueError
 
 
 class Landscape:
@@ -103,10 +105,12 @@ class Desert:
         self.herbivores_in_cell = []
         self.carnivores_in_cell = []
 
+
 class Ocean:
     def __init__(self, pos_y, pos_x):
         self.pos_y = pos_y
         self.pos_x = pos_x
+
 
 class Mountain:
     def __init__(self, pos_y, pos_x):
@@ -122,7 +126,7 @@ class Animal:
         self.age = None
         self.weight = None
         self.pos_y = None
-        self.pos_x = None# må endres, midlertidig
+        self.pos_x = None # må endres, midlertidig
     """
         if not self.parameters_set:
             self.set_parameters()
@@ -179,7 +183,7 @@ class Herbivore(Animal):
                   'w_half': 10.0,
                   'phi_weight': 0.1,
                   'mu': 0.25,
-                  'lambdah': 1.0,
+                  'lambda': 1.0,
                   'gamma': 0.2,
                   'zeta': 3.5,
                   'xi': 1.2,
@@ -226,7 +230,7 @@ class Carnivore(Animal):
                           'w_half': 4.0,
                           'phi_weight': 0.4,
                           'mu': 0.4,
-                          'lambdah': 1.0,
+                          'lambda': 1.0,
                           'gamma': 0.8,
                           'zeta': 3.5,
                           'xi': 1.1,
@@ -322,7 +326,10 @@ if __name__ == "__main__":
         return map
 
     map = place_animals(default_input, map)
-    print(type(map[3][4].carnivores_in_cell[0]).__name__)
+    x = type(map[3][4].carnivores_in_cell[0]).__name__
+
+
+
 
 
 
