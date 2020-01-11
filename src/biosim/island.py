@@ -26,6 +26,13 @@ class Cell:
         self.pop = []
         self.tot_w_herbivores = sum([animal.weight for animal in self.pop if type(animal)==Herbivore])
 
+    def num_specimen_in_cell(self, species):  # privat? burde kanskje være utenfor?
+        n = 0
+        for animal in self.pop:
+            if type(animal) == species:
+                n += 1
+        return n
+
 
 class Island:
     land_dict = {'S': Savannah, 'J': Jungle,
@@ -56,14 +63,9 @@ class Island:
                 if element != 'O':
                     raise ValueError
 
-    def num_specimen_in_cell(cell, species):  # privat? burde kanskje være utenfor?
-        n = 0
-        for animal in cell.pop:
-            if type(animal) == species:
-                n += 1
-        return n
 
-    def relative_abundance(self, cell, animal, N): # er noe kluss med at fodder avhenger av art
+
+    def rel_abundance(self, cell, animal, N): # er noe kluss med at fodder avhenger av art
         if type(animal) == Herbivore:
             fodder = cell.f
         if type(animal) == Carnivore:
@@ -104,23 +106,24 @@ class Island:
     def remove_animal(self, cell, animal):
         cell.pop.remove(animal)
 
-
-
-    def check_if_animal_would_move_to_adjecent_cells(island, cell, animal):
+    def choose_new_cell(self, cell, animal):
         N = self.num_specimen_in_cell(cell, type(animal))
         adj_cells ={}
         y, x = cell.pos
-        for row in island.map:
+        for row in self.map:
             for other_cell in row:
                 if type(other_cell) == Savannah or type(other_cell) == Jungle or type(other_cell) == Desert:
                     if (other_cell.pos[0] == y-1 or other_cell.pos[0] == y+1 and
                             other_cell.pos[1] == x-1 or other_cell.pos[1] == x+1):
                         adj_cells[other_cell] = {}
         if len(adj_cells) > 0:
-            tempting_cell = None
-            tempting_rel_abundance = None
             for adj_cell in adj_cells:
-                adj_cells[adj_cell]['rel_abund'] = rel_abundance(adj_cell, animal, N)
                 rel_abund = rel_abund(adj_cell, animal, N)
                 propensity = propensity(adj_cell, animal, rel_abund)
-                adj_cells[adj_cell]['propensity'] = propensity(adj_cell, animal)
+                adj_cells[adj_cell]['propensity'] = propensity
+            for adj_cell in adj_cells:
+                adj_cell['probability'] = adj_cell['propensity'] / sum([element[propensity] for element in adj_cells ])
+
+    def move_animal(self, old_cell, new_cell, animal):
+        new_cell.pop.append(animal)
+        old_cell.pop.remove(animal)

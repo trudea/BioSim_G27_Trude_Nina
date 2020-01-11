@@ -70,8 +70,8 @@ class Run:
         for row in self.island.map:
             for cell in row:
                 N_dict = {Herbivore:
-                              Island.num_specimen_in_cell(cell, Herbivore),
-                          Carnivore: Island.num_specimen_in_cell(cell, Carnivore)}
+                              cell.num_specimen_in_cell(Herbivore),
+                          Carnivore: cell.num_specimen_in_cell(Carnivore)}
                 for animal in cell.pop:
                     N = N_dict[type(animal)]
                     print(N)
@@ -87,8 +87,10 @@ class Run:
         for row in self.island.map:
             for cell in row:
                 for animal in cell.pop:
-                    # check for each adjecent cell if animal would move there,tar inn self.island
-                    pass
+                    if animal.check_if_animal_moves:
+                        new_cell = self.island.choose_new_cell(cell, animal)
+                        self.island.move_animal(cell, new_cell, animal)
+
 
     def collective_aging(self):
         for row in self.island.map:

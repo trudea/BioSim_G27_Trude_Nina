@@ -98,6 +98,13 @@ class Animal:
         else:
             return False
 
+    def check_if_animal_moves(self):
+        probability = self.mu * self.phi
+        if round(random.random(), 7) <= probability:
+            return True
+        else:
+            return False
+
 
 class Herbivore(Animal):
     param_dict = {'w_birth': 8.0,
