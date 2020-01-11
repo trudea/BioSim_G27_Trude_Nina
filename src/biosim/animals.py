@@ -68,7 +68,7 @@ class Animal:
         self.weight -= (self.eta * self.weight) #test en gang per år
 
 
-    def check_if_dying(self):
+    def check_if_dies(self):
         # returnerer om dyret skal dø eller ikke
         """else:
                    probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
@@ -76,8 +76,8 @@ class Animal:
                    if self.phi == 0:
                        '''død'''"""
         probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
-        if self.phi == 0 or round(random.random(), 3) >= probability:
-                return True
+        if self.phi == 0 or round(random.random(), 3) <= probability: # riktig ulikhet?
+            return True
         else:
             return False
 
@@ -136,7 +136,20 @@ class Carnivore(Animal):
     def __init__(self, attribute_dict=None):
         super().__init__(attribute_dict)
 
-    def check_if_kills(self):
+    def check_if_kills(self, herbivore):
+        if self.phi < herbivore.phi:
+            return False
+        elif 0 < self.phi - herbivore.phi < 1:
+                probability = (self.phi - herbivore.phi) / self.DeltaPhiMax
+                if round(random.random(), 3) <= probability:
+                    return True
+                else:
+                    return False
+        else:
+            return False
+
+
+    def eating_herbivore(self):
         pass
 
 def bubble_sort_animals(original_order): # tar inn liste av instances, skal ta in liste med...
