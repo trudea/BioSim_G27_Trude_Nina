@@ -20,12 +20,11 @@ class Cell:
                      'D': Desert}
     def __init__(self, y, x, letter):
         self.landscape = self.land_dict[letter]()
-        self.y = y
-        self.x = x
-        self.pos = (y, x)
-        self.herb_pop = [] # instances av Herbivore i celle
-        self.carn_pop = [] # instances av Carnivore i celle
+        # self.y = y
+        # self.x = x
+        self.pos = (y, x) # using this
         self.pop = []
+        self.tot_w_herbivores = sum([animal.weight for animal in self.pop if type(animal)==Herbivore])
 
 
 class Island:
@@ -57,6 +56,26 @@ class Island:
                 if element != 'O':
                     raise ValueError
 
+    def num_specimen_in_cell(cell, species):  # privat? burde kanskje være utenfor?
+        n = 0
+        for animal in cell.pop:
+            if type(animal) == species:
+                n += 1
+        return n
+
+    def relative_abundance(self, cell, animal, N): # er noe kluss med at fodder avhenger av art
+        if type(animal) == Herbivore:
+            fodder = cell.f
+        if type(animal) == Carnivore:
+            fodder = cell.tot_w_herbivores
+        return fodder / ((N + 1) * animal.F)
+
+    def propensity(self, cell, animal, rel_abund):
+        if type(cell) == Mountain or type(cell) == Ocean: # unødvendig fordi de ikke ble lagt til i adj-lista?
+            return 0
+        else:
+            return exp(animal.lambdah * rel_abund)
+
     def __init__(self, txt=None):
         if txt is None:
             txt = open('rossum.txt').read()
@@ -85,18 +104,23 @@ class Island:
     def remove_animal(self, cell, animal):
         cell.pop.remove(animal)
 
-    def num_specimen_in_cell(cell, species): # privat? burde være i island
-        n = 0
-        for animal in cell.pop:
-            if type(animal)==species:
-                n+=1
-        return n
+
 
     def check_if_animal_would_move_to_adjecent_cells(island, cell, animal):
-        adjecent_cells =[]
+        N = self.num_specimen_in_cell(cell, type(animal))
+        adj_cells ={}
         y, x = cell.pos
         for row in island.map:
             for other_cell in row:
-                if (other_cell.pos[0] == y-1 or other_cell.pos[0] == y+1 and
-                        other_cell.pos[1] == x-1 or other_cell.pos[1] == x+1):
-                    adjecent_cells.append(other_cell)
+                if type(other_cell) == Savannah or type(other_cell) == Jungle or type(other_cell) == Desert:
+                    if (other_cell.pos[0] == y-1 or other_cell.pos[0] == y+1 and
+                            other_cell.pos[1] == x-1 or other_cell.pos[1] == x+1):
+                        adj_cells[other_cell] = {}
+        if len(adj_cells) > 0:
+            tempting_cell = None
+            tempting_rel_abundance = None
+            for adj_cell in adj_cells:
+                adj_cells[adj_cell]['rel_abund'] = rel_abundance(adj_cell, animal, N)
+                rel_abund = rel_abund(adj_cell, animal, N)
+                propensity = propensity(adj_cell, animal, rel_abund)
+                adj_cells[adj_cell]['propensity'] = propensity(adj_cell, animal)

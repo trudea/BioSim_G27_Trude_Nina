@@ -22,21 +22,12 @@ class Landscape:
     def __init__(self):
         pass
 
-    def new_position(self):
-        #when animal moves, this gives new position
-        pass
-
-    def growing(self):
-        pass
-
 
 class Savannah(Landscape):
     param_dict = {'f_max' : 300.0, 'alpha' : 0.3}
 
     def __init__(self, param_dict=None):
         super().__init__()
-        self.herbivores_in_cell = []
-        self.carnivores_in_cell = []
         if param_dict is not None:
             self.param_dict.update(param_dict)
         for parameter in self.param_dict:

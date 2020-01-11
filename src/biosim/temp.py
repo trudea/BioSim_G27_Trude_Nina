@@ -17,4 +17,25 @@ island = Island()
 c = Cell(0,0,'S')
 c.pop.append(Herbivore())
 x = Island.num_specimen_in_cell(c, Herbivore)
-print(x)
+carl = Carnivore()
+carl.weight = 2
+carla = Carnivore()
+carla.weight = 2
+camille = Carnivore()
+camille.weight = 2
+herbert = Herbivore()
+herbert.weight = 1
+hermine = Herbivore()
+hermine.weight = 1
+herman = Herbivore()
+herman.weight = 1
+
+liste = [carl, carla, camille, herbert, hermine, herman]
+weights = sum([animal.weight for animal in liste if type(animal)==Carnivore])
+
+a = 1
+b = 3
+c = 2
+
+if c == a or b:
+    print(True)
