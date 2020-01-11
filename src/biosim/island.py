@@ -89,11 +89,3 @@ class Island:
             if type(animal)==species:
                 n+=1
         return n
-
-
-    def procreation(self):
-        pass
-
-    def migration(self):
-        pass
-

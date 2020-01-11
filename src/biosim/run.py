@@ -69,17 +69,31 @@ class Run:
         species_dict = [Herbivore, Carnivore]
         for row in self.island.map:
             for cell in row:
+                N_dict = {Herbivore:
+                              Island.num_specimen_in_cell(cell, Herbivore),
+                          Carnivore: Island.num_specimen_in_cell(cell, Carnivore)}
                 for animal in cell.pop:
-                    N = Island.num_specimen_in_cell(cell, type(animal))
+                    N = N_dict[type(animal)]
+                    print(N)
                     if N >= 2:
-                        if self.check_if_procreates(N):
-                            # create new animal in cell
-                            cell.pop.append(type(animal)())
-                            print(type(animal))
+                            if animal.check_if_procreates(N):
+                                newborn = cell.pop.append(type(animal)())
+                                if newborn.weight < animal.weight:
+                                    cell.pop.append(newborn)
+                                    animal.weight -= animal.zeta * newborn.weight
 
-    def collective_aging(self): # OOOOOOOOO
-        for animal in self.island.cell.pop:
-            animal.aging()
+
+    def collective_migration(self):
+        for row in self.island.map:
+            for cell in row:
+                for animal in cell.pop:
+                    # check for each adjecent cell if animal would move there, 
+
+    def collective_aging(self):
+        for row in self.island.map:
+            for cell in row:
+                for animal in self.island.cell.pop:
+                    animal.aging()
 
 
     def one_cycle(self):
@@ -92,7 +106,7 @@ class Run:
         # procreation
         self.collective_procreation()
         # migration
-
+        self.collective_migration()
         # aging
         self.collective_aging()
         # weightloss
