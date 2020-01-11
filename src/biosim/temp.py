@@ -13,9 +13,9 @@ def death(param_dict, phi):
 
 
 herman = Herbivore()
-scar = Carnivore()
-herman.phi = 0.1
-scar.phi = 1
-a = scar.check_if_kills(herman)
-print(a)
+herman.weight = 2
+print(herman.phi)
+herman.weight = 50
+herman.evaluate_fitness()
+print(herman.phi)
 

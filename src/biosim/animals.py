@@ -13,6 +13,15 @@ import random
 
 class Animal:
     parameters_set = False
+
+    def evaluate_fitness(self):
+        q_plus = 1.0 / (1 + exp(self.param_dict['phi_age'] *
+                                (self.age - self.param_dict['a_half'])))
+        q_minus = 1.0 / (1 + exp(-self.param_dict['phi_weight'] *
+                                 (self.weight - self.param_dict['w_half'])))
+        self.phi = q_plus * q_minus
+
+
     def __init__(self, attribute_dict):
         if not self.parameters_set:
             for parameter in self.param_dict:
@@ -36,11 +45,8 @@ class Animal:
                                             self.param_dict['sigma_birth'],
                                               1000) # lager ny statistisk populasjon for hver instance?
             self.weight = np.random.choice(statistic_population)
-        q_plus = 1.0 / (1 + exp(self.param_dict['phi_age'] *
-                                (self.age - self.param_dict['a_half'])))
-        q_minus = 1.0 / (1 + exp(-self.param_dict['phi_weight'] *
-                                 (self.weight - self.param_dict['w_half'])))
-        self.phi = q_plus * q_minus
+        self.evaluate_fitness()
+
     """
         if not self.parameters_set:
             self.set_parameters()

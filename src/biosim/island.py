@@ -115,14 +115,14 @@ class Run:
         self.island.place_animals(input)
 
     def one_cycle(self):
-    #while(self.years_run < self.desired_years):
-    active = [Savannah, Jungle, Desert]
+        #while(self.years_run < self.desired_years):
+        active = [Savannah, Jungle, Desert]
         for row in self.island.map:
             for cell in row:
                 if type(cell)==Savannah or type(cell)==Jungle:
                     cell.landscape.replenish()
                     # eating, first herbs, then carns
-                if type(cell) in active:
+                if type(cell) in active and len(cell.pop) > 0:
                     cell.pop = self.bubble_sort_animals(cell.pop) # sorterer alle
                     # dyrene etter fitness, men bare å passe på at vi velger ut et species når vi kaller
                     for animal in cell.pop:
@@ -130,12 +130,15 @@ class Run:
                             cell.landscape.f = animal.weightgain_and_fodder_left()
                     for animal in cell.pop:
                         if type(animal) == Carnivore:
+                            eaten = 0
                             for other_animal in cell.pop:
-                                if type(other_animal) == Herbivore:
+                                #unngår while for at ikke skal gjentas selv om carn ikke mett
+                                if eaten < animal.F and type(other_animal) == Herbivore:
                                     if animal.check_if_kills(other_animal):
                                         animal.gaining_weight(other_animal.weight)
-                                        # reevaluer fitness til carnivoren
-                                        # fjern herbivoren
+                                        animal.evaluate_fitness()
+                                        herbivore.phi = 0 # nei, må fjernes fra lista
+                                        herbivore.weight = 0
 
                                 # procreation
                                 # migration
@@ -167,22 +170,7 @@ if __name__ == "__main__":
             # print(True)
             pass
     pop = default_input[0]['pop']
-    print(run.island.map[4][4].pop)
-    pop = run.island.map[4][4].pop
-    for animal in pop:
-        print(animal.phi)
-
-    liste = bubble_sort_animals(pop)
-    for animal in liste:
-        print(animal.phi)
-    """
-    liste = bubble_sort_animals(pop)
-    for animal in pop:
-        #print.animal.phi
-        pass
-    """
-
-
+    
 
 
 
