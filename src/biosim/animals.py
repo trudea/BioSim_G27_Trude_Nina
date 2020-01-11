@@ -87,6 +87,15 @@ class Animal:
         else:
             return False
 
+    def check_if_procreates(self):
+            probability = self.gamma * self.phi * (N - 1)
+            if probability > 1:
+                probability = 1
+            if round(random.random(), 7) <= probability:
+                return True
+            else:
+                return False
+
 
 class Herbivore(Animal):
     param_dict = {'w_birth': 8.0,

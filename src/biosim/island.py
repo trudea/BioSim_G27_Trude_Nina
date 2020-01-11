@@ -157,9 +157,14 @@ class Run:
         species_dict = [Herbivore, Carnivore]
         for row in self.island.map:
             for cell in row:
-                for species in species_dict:
-                    if self.num_species_in_cell(cell, species) >= 2:
-                        for animal i
+                for animal in cell.pop:
+                    N = self.num_species_in_cell(cell, type(animal))
+                    if N >= 2:
+                        probability = animal.gamma * animal.phi * (N-1)
+                        if probability > 1:
+                            probability = 1
+                        if round(random.random(), 3) <= probability:
+                            return True
 
 
 
