@@ -5,7 +5,9 @@ from animals import Herbivore, Carnivore
 from landscapes import Savannah, Jungle, Mountain, Desert, Ocean
 from island import Island, Cell, AdjacentCell
 
-exis = 'OOOOSOOOO'
+temp = {'banan': 1, 'eple': 2}
+for element in temp:
+    print(element)
 
 
 

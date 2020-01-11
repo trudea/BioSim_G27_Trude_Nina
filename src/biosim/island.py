@@ -130,15 +130,12 @@ class Island:
         # N = cell.num_specimen(type(animal))
         adj_cells = []
         y, x = cell.pos
-        possible_cells = [self.map[y-1][x], self.map[y+1][x], self.map[y][x-1], self.map[y][x-1]]
+        possible_cells = [self.map[y-1][x], self.map[y+1][x], self.map[y][x-1], self.map[y][x+1]]
         for element in possible_cells:
             if type(element.landscape)==Ocean:
                 possible_cells.remove(element)
             elif type(element.landscape) == Mountain:
                 possible_cells.remove(element)
-        print(len(possible_cells))
-
-
         if len(possible_cells) == 0:
             return False
         elif len(possible_cells) == 1:
@@ -148,10 +145,15 @@ class Island:
         for element in possible_cells:
             rel_abund = element.get_rel_abundance(animal)
             temp_dict[element] ={'propensity': exp(animal.lambdah * rel_abund)}
-        total_propensity = sum(print([temp_dict[i]['propensity'] for i in temp_dict]))
-        for element in possible_cells:
-            element['probability'] = element['propensity'] / total_propensity
-        print([element['probability'] for element in possible_cells])
+            print(temp_dict[element]['propensity'])
+        total_propensity = sum([temp_dict[element]['propensity'] for element in temp_dict])
+        for element in temp_dict:
+            print('hey')
+            print(len(temp_dict))
+            keys = temp_dict.keys()
+            for key in keys:
+                temp_dict[key]['probability'] = temp_dict[key]['propensity'] / total_propensity
+                
 
 
         if len(adj_cells) > 1:
