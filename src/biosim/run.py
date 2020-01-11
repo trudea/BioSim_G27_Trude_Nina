@@ -30,7 +30,7 @@ class Run:
         self.desired_years = desired_years
         self.years_run = 0
         if input is None:
-            input = default_input
+            input = self.default_input
         self.island = Island()
         self.island.place_animals(input)
 
@@ -81,14 +81,13 @@ class Run:
                                     cell.pop.append(newborn)
                                     animal.weight -= animal.zeta * newborn.weight
 
-
+    """
     def collective_migration(self):
         for row in self.island.map:
             for cell in row:
                 for animal in cell.pop:
                     if animal.check_if_animal_moves:
                         new_cell = self.island.choose_new_cell(cell, animal)
-                        print(new_cell)
                         self.island.move_animal(cell, new_cell, animal)
 
 
@@ -110,32 +109,53 @@ class Run:
                 for animal in cell.pop:
                     if animal.check_if_dying():
                         self.island.remove_animal(cell, animal)
+                        
+    """
+
+    def migration(self, animal, cell):
+        if animal.check_if_animal_moves:
+            new_cell = self.island.choose_new_cell(cell, animal)
+            self.island.move_animal(cell, new_cell, animal)
+
+    def aging(self, animal, cell):
+        animal.aging()
+
+    def weightloss(self, animal, cell):
+        animal.losing_weight()
+
+    def dying(self, animal, cell):
+        if animal.check_if_dying():
+            self.island.remove_animal(cell, animal)
+
+    def collective_action(self, myfunc):
+        for row in self.island.map:
+            for cell in row:
+                for animal in cell.pop:
+                    myfunc(animal, cell)
 
     def one_cycle(self):
-        #while(self.years_run < self.desired_years):
         self.collective_replenishing()
         self.collective_feeding()
         self.collective_procreation()
-        # migration
-        self.collective_migration()
-        self.collective_aging()
-        self.collective_weightloss()
-        self.collective_dying()
+        # self.collective_migration()
+        self.collective_action(self.migration)
+        #self.collective_aging()
+        self.collective_action(self.aging)
+        #self.collective_weightloss()
+        self.collective_action(self.weightloss)
+        #self.collective_dying()
+        self.collective_action(self.dying)
+
+
+    def run(self):
+        years = 0
+        while(years < self.desired_years):
+            self.one_cycle()
+            years += 1
 
 if __name__ == "__main__":
-    default_input = [{'loc': (3, 4), 'pop': [
-        {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
-        {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
-        {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]},
-                     {'loc': (4, 4),
-                      'pop': [
-                          {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
-                          {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
-                          {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
-
-
     run = Run()
-    #run.one_cycle()
+    run.run()
 
 
 
