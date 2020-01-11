@@ -86,8 +86,6 @@ class Island:
 
 
 
-
-
     def get_propensity(self, animal, rel_abund):
         """
         if type(cell) == Mountain or type(cell) == Ocean: # unødvendig fordi de ikke ble lagt til i adj-lista?
@@ -129,21 +127,33 @@ class Island:
         AdjacentCell.total_propensity = 0
         AdjacentCell.total_probability = 0
         active = {Savannah: 'S', Jungle : 'J', Desert : 'D'}
-        N = cell.num_specimen(type(animal))
+        # N = cell.num_specimen(type(animal))
         adj_cells = []
         y, x = cell.pos
-        for row in self.map:
-            for other_cell in row:
-                if type(other_cell.landscape) in active:
-                    if (other_cell.pos[0] == y-1 or other_cell.pos[0] == y+1 and
-                            other_cell.pos[1] == x-1 or other_cell.pos[1] == x+1):
-                                y_pos = other_cell.pos[0]
-                                x_pos = other_cell.pos[1]
-                                letter = active[type(other_cell.landscape)]
-                                adj_cells.append(AdjacentCell(x_pos, y_pos, letter))
-        if len(adj_cells) == 1:
-            for element in adj_cells:
-                return element
+        possible_cells = [self.map[y-1][x], self.map[y+1][x], self.map[y][x-1], self.map[y][x-1]]
+        for element in possible_cells:
+            if type(element.landscape)==Ocean:
+                possible_cells.remove(element)
+            elif type(element.landscape) == Mountain:
+                possible_cells.remove(element)
+        print(len(possible_cells))
+
+
+        if len(possible_cells) == 0:
+            return False
+        elif len(possible_cells) == 1:
+            return possible_cells[0]
+        total_propensity = 0
+        temp_dict = {}
+        for element in possible_cells:
+            rel_abund = element.get_rel_abundance(animal)
+            temp_dict[element] ={'propensity': exp(animal.lambdah * rel_abund)}
+        total_propensity = sum(print([temp_dict[i]['propensity'] for i in temp_dict]))
+        for element in possible_cells:
+            element['probability'] = element['propensity'] / total_propensity
+        print([element['probability'] for element in possible_cells])
+
+
         if len(adj_cells) > 1:
             for candidate in adj_cells:
                 rel_abund = candidate.get_rel_abundance(animal)

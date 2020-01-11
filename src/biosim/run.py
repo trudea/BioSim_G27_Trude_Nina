@@ -117,12 +117,11 @@ class Run:
         self.collective_feeding()
         self.collective_procreation()
         # migration
-        #self.collective_migration()
+        self.collective_migration()
         self.collective_aging()
         self.collective_weightloss()
-        # death
         self.collective_dying()
-        
+
 if __name__ == "__main__":
     default_input = [{'loc': (3, 4), 'pop': [
         {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
