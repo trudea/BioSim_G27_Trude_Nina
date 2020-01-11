@@ -116,23 +116,34 @@ class Run:
 
     def one_cycle(self):
     #while(self.years_run < self.desired_years):
-        for row in i.island:
+    active = [Savannah, Jungle, Desert]
+        for row in self.island.map:
             for cell in row:
-                cell.landscape.replenish()
-                # eating, first herbs, then carns
-                cell.pop = self.bubble_sort_animals(cell.pop) # sorterer alle
-                # dyrene etter fitness, men bare å passe på at vi velger ut et species når vi kaller
-                for animal in cell.pop:
-                    if type(animal) == Herbivore:
-                        cell.landscape.f = animal.weightgain_and_fodder_left()
-                for animal in cell.pop:
-                    if type(animal) == Carnivore:
-                        pass
-                # procreation
-                # migration
-                # aging
-                # weightloss
-                # death
+                if type(cell)==Savannah or type(cell)==Jungle:
+                    cell.landscape.replenish()
+                    # eating, first herbs, then carns
+                if type(cell) in active:
+                    cell.pop = self.bubble_sort_animals(cell.pop) # sorterer alle
+                    # dyrene etter fitness, men bare å passe på at vi velger ut et species når vi kaller
+                    for animal in cell.pop:
+                        if type(animal) == Herbivore:
+                            cell.landscape.f = animal.weightgain_and_fodder_left()
+                    for animal in cell.pop:
+                        if type(animal) == Carnivore:
+                            for other_animal in cell.pop:
+                                if type(other_animal) == Herbivore:
+                                    if animal.check_if_kills(other_animal):
+                                        animal.gaining_weight(other_animal.weight)
+                                        # reevaluer fitness til carnivoren
+                                        # fjern herbivoren
+
+                                # procreation
+                                # migration
+                                # aging
+                                for animal in cell.pop:
+                                    self.aging()
+                                # weightloss
+                                # death
 
 if __name__ == "__main__":
     default_input = [{'loc': (3, 4), 'pop': [
@@ -149,6 +160,7 @@ if __name__ == "__main__":
     #i.place_animals(default_input)
 
     run = Run()
+    run.one_cycle()
     for animal in run.island.map[3][4].pop:
         # print(type(animal))
         if type(animal) == Herbivore:

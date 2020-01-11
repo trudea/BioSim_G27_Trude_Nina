@@ -61,8 +61,8 @@ class Animal:
     def aging(self):
         self.age += 1
 
-    def gaining_weight(self, fodder):
-        self.weight += (self.beta * fodder)
+    def gaining_weight(self, intake_weight):
+        self.weight += (self.beta * intake_weight)
 
     def losing_weight(self):
         self.weight -= (self.eta * self.weight) #test en gang per år
