@@ -13,9 +13,9 @@ def death(param_dict, phi):
 
 
 herman = Herbivore()
-herman.weight = 2
-print(herman.phi)
-herman.weight = 50
-herman.evaluate_fitness()
-print(herman.phi)
+hermine = Herbivore()
+herbert = Herbivore()
 
+liste = [herman, hermine, herbert]
+liste.remove(hermine)
+print(liste)

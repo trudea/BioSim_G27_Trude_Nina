@@ -80,6 +80,9 @@ class Island:
                 for individual in placement_dict['pop']:
                     self.map[y][x].pop.append(ani_dict[individual['species']](individual))
 
+    def remove_animal(self, cell, animal):
+        cell.pop.remove(animal)
+
 
     def procreation(self):
         pass
@@ -114,16 +117,18 @@ class Run:
         self.island = Island()
         self.island.place_animals(input)
 
-    def one_cycle(self):
-        #while(self.years_run < self.desired_years):
+    def collective_replenishing(self):
+        for row in self.island.map:
+            for cell in row:
+                if type(cell) == Savannah or type(cell) == Jungle:
+                    cell.landscape.replenish()
+
+    def collective_feeding(self):
         active = [Savannah, Jungle, Desert]
         for row in self.island.map:
             for cell in row:
-                if type(cell)==Savannah or type(cell)==Jungle:
-                    cell.landscape.replenish()
-                    # eating, first herbs, then carns
                 if type(cell) in active and len(cell.pop) > 0:
-                    cell.pop = self.bubble_sort_animals(cell.pop) # sorterer alle
+                    cell.pop = self.bubble_sort_animals(cell.pop)  # sorterer alle
                     # dyrene etter fitness, men bare å passe på at vi velger ut et species når vi kaller
                     for animal in cell.pop:
                         if type(animal) == Herbivore:
@@ -132,21 +137,36 @@ class Run:
                         if type(animal) == Carnivore:
                             eaten = 0
                             for other_animal in cell.pop:
-                                #unngår while for at ikke skal gjentas selv om carn ikke mett
-                                if eaten < animal.F and type(other_animal) == Herbivore:
+                                # unngår while for at ikke skal gjentas selv om carn ikke mett
+                                if eaten < animal.F and type(
+                                        other_animal) == Herbivore:
                                     if animal.check_if_kills(other_animal):
                                         animal.gaining_weight(other_animal.weight)
                                         animal.evaluate_fitness()
-                                        herbivore.phi = 0 # nei, må fjernes fra lista
-                                        herbivore.weight = 0
+                                        self.remove_animal(cell, other_animal)
 
-                                # procreation
-                                # migration
-                                # aging
-                                for animal in cell.pop:
-                                    self.aging()
-                                # weightloss
-                                # death
+    def collective_procreation:
+        for row in self.island.map:
+            for cell in row:
+                if len(cell.pop) >= 2:
+                    for animal in cell.pop:
+                        probability = 
+
+
+    def one_cycle(self):
+        #while(self.years_run < self.desired_years):
+        #bør deles opp i funksjoner
+        self.collective_replenishing()
+        self.collective_feeding()
+
+
+        # procreation
+        # migration
+        # aging
+        for animal in cell.pop:
+            self.aging()
+        # weightloss
+        # death
 
 if __name__ == "__main__":
     default_input = [{'loc': (3, 4), 'pop': [
@@ -170,7 +190,7 @@ if __name__ == "__main__":
             # print(True)
             pass
     pop = default_input[0]['pop']
-    
+
 
 
 
