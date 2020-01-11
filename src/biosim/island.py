@@ -18,6 +18,8 @@ from animals import Herbivore, Carnivore, bubble_sort_animals
 class Cell:
     land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M': Mountain,
                      'D': Desert}
+
+
     def __init__(self, y, x, letter):
         self.landscape = self.land_dict[letter]()
         # self.y = y
@@ -26,13 +28,32 @@ class Cell:
         self.pop = []
         self.tot_w_herbivores = sum([animal.weight for animal in self.pop if type(animal)==Herbivore])
 
-    def num_specimen_in_cell(self, species):  # privat? burde kanskje være utenfor?
+    def num_specimen(self, species):  # privat? burde kanskje være utenfor?
         n = 0
         for animal in self.pop:
             if type(animal) == species:
                 n += 1
         return n
 
+    def get_rel_abundance(self, animal): # er noe kluss med at fodder avhenger av art
+        if type(animal) == Herbivore:
+            fodder = self.landscape.f
+        if type(animal) == Carnivore:
+            fodder = self.tot_w_herbivores
+        N = self.num_specimen(type(animal))
+        return fodder / ((N + 1) * animal.F)
+
+class AdjacentCell(Cell):
+    total_propensity = 0
+    total_probability = 0
+    remembered_limit = 0
+
+    def __init__(self, y, x, letter):
+        super().__init__(y, x, letter)
+        self.propensity = None
+        self.probability = None
+        self.lower_limit = 0
+        self.upper_limit = 0
 
 class Island:
     land_dict = {'S': Savannah, 'J': Jungle,
@@ -65,18 +86,16 @@ class Island:
 
 
 
-    def rel_abundance(self, cell, animal, N): # er noe kluss med at fodder avhenger av art
-        if type(animal) == Herbivore:
-            fodder = cell.f
-        if type(animal) == Carnivore:
-            fodder = cell.tot_w_herbivores
-        return fodder / ((N + 1) * animal.F)
 
-    def propensity(self, cell, animal, rel_abund):
+
+    def get_propensity(self, animal, rel_abund):
+        """
         if type(cell) == Mountain or type(cell) == Ocean: # unødvendig fordi de ikke ble lagt til i adj-lista?
             return 0
+
         else:
-            return exp(animal.lambdah * rel_abund)
+        """
+        return exp(animal.lambdah * rel_abund)
 
     def __init__(self, txt=None):
         if txt is None:
@@ -107,22 +126,45 @@ class Island:
         cell.pop.remove(animal)
 
     def choose_new_cell(self, cell, animal):
-        N = self.num_specimen_in_cell(cell, type(animal))
-        adj_cells ={}
+        AdjacentCell.total_propensity = 0
+        AdjacentCell.total_probability = 0
+        active = {Savannah: 'S', Jungle : 'J', Desert : 'D'}
+        N = cell.num_specimen(type(animal))
+        adj_cells = []
         y, x = cell.pos
         for row in self.map:
             for other_cell in row:
-                if type(other_cell) == Savannah or type(other_cell) == Jungle or type(other_cell) == Desert:
+                if type(other_cell.landscape) in active:
                     if (other_cell.pos[0] == y-1 or other_cell.pos[0] == y+1 and
                             other_cell.pos[1] == x-1 or other_cell.pos[1] == x+1):
-                        adj_cells[other_cell] = {}
-        if len(adj_cells) > 0:
-            for adj_cell in adj_cells:
-                rel_abund = rel_abund(adj_cell, animal, N)
-                propensity = propensity(adj_cell, animal, rel_abund)
-                adj_cells[adj_cell]['propensity'] = propensity
-            for adj_cell in adj_cells:
-                adj_cell['probability'] = adj_cell['propensity'] / sum([element[propensity] for element in adj_cells ])
+                                y_pos = other_cell.pos[0]
+                                x_pos = other_cell.pos[1]
+                                letter = active[type(other_cell.landscape)]
+                                adj_cells.append(AdjacentCell(x_pos, y_pos, letter))
+        if len(adj_cells) == 1:
+            for element in adj_cells:
+                return element
+        if len(adj_cells) > 1:
+            for candidate in adj_cells:
+                rel_abund = candidate.get_rel_abundance(animal)
+                print(rel_abund)
+                candidate.propensity = self.get_propensity(animal, rel_abund)
+            AdjacentCell.total_propensity = sum([element.propensity for element in adj_cells])
+            AdjacentCell.total_probability = 0
+            for candidate in adj_cells:
+                candidate.probability = candidate.propensity / candidate.total_propensity
+                candidate.total_probability += candidate.probability
+                candidate.lower_limit = candidate.remembered_limit
+                candidate.upper_limit += candidate.lower_limit
+                candidate.remembered_limit = candidate.upper_limit
+            number = round(random.random(), 7)
+            #print('Number: ', number)
+            for element in adj_cells:
+                #  print('Lower: ', element.lower_limit, 'Upper: ', element.upper_limit)
+                if element.lower_limit <= number <= element.upper_limit:
+                    return element
+
+
 
     def move_animal(self, old_cell, new_cell, animal):
         new_cell.pop.append(animal)

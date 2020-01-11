@@ -70,11 +70,10 @@ class Run:
         for row in self.island.map:
             for cell in row:
                 N_dict = {Herbivore:
-                              cell.num_specimen_in_cell(Herbivore),
-                          Carnivore: cell.num_specimen_in_cell(Carnivore)}
+                              cell.num_specimen(Herbivore),
+                          Carnivore: cell.num_specimen(Carnivore)}
                 for animal in cell.pop:
                     N = N_dict[type(animal)]
-                    print(N)
                     if N >= 2:
                             if animal.check_if_procreates(N):
                                 newborn = cell.pop.append(type(animal)())
@@ -89,6 +88,7 @@ class Run:
                 for animal in cell.pop:
                     if animal.check_if_animal_moves:
                         new_cell = self.island.choose_new_cell(cell, animal)
+                        print(new_cell)
                         self.island.move_animal(cell, new_cell, animal)
 
 
@@ -124,17 +124,10 @@ if __name__ == "__main__":
                           {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
                           {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
 
-    #i = Island()
-    #i.place_animals(default_input)
 
     run = Run()
     run.one_cycle()
-    for animal in run.island.map[3][4].pop:
-        # print(type(animal))
-        if type(animal) == Herbivore:
-            # print(True)
-            pass
-    pop = default_input[0]['pop']
+
 
 
 
