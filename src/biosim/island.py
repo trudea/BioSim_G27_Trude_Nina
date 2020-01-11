@@ -145,37 +145,20 @@ class Island:
         for element in possible_cells:
             rel_abund = element.get_rel_abundance(animal)
             temp_dict[element] ={'propensity': exp(animal.lambdah * rel_abund)}
-            print(temp_dict[element]['propensity'])
         total_propensity = sum([temp_dict[element]['propensity'] for element in temp_dict])
-        for element in temp_dict:
-            print('hey')
-            print(len(temp_dict))
-            keys = temp_dict.keys()
-            for key in keys:
-                temp_dict[key]['probability'] = temp_dict[key]['propensity'] / total_propensity
-                
-
-
-        if len(adj_cells) > 1:
-            for candidate in adj_cells:
-                rel_abund = candidate.get_rel_abundance(animal)
-                print(rel_abund)
-                candidate.propensity = self.get_propensity(animal, rel_abund)
-            AdjacentCell.total_propensity = sum([element.propensity for element in adj_cells])
-            AdjacentCell.total_probability = 0
-            for candidate in adj_cells:
-                candidate.probability = candidate.propensity / candidate.total_propensity
-                candidate.total_probability += candidate.probability
-                candidate.lower_limit = candidate.remembered_limit
-                candidate.upper_limit += candidate.lower_limit
-                candidate.remembered_limit = candidate.upper_limit
-            number = round(random.random(), 7)
-            #print('Number: ', number)
-            for element in adj_cells:
-                #  print('Lower: ', element.lower_limit, 'Upper: ', element.upper_limit)
-                if element.lower_limit <= number <= element.upper_limit:
-                    return element
-
+        keys = temp_dict.keys()
+        for key in keys:
+            temp_dict[key]['probability'] = temp_dict[key]['propensity'] / total_propensity
+        remembered_limit = 0
+        for key in keys:
+            temp_dict[key]['lower_limit'] = remembered_limit
+            temp_dict[key]['upper_limit'] = remembered_limit + temp_dict[key]['probability']
+            remembered_limit = temp_dict[key]['upper_limit']
+            # print('Lower: ', temp_dict[key]['lower_limit'], 'Upper: ', temp_dict[key]['upper_limit'])
+        number = round(random.random(), 7)
+        for key in keys:
+            if temp_dict[key]['lower_limit'] < number < temp_dict[key]['upper_limit']:
+                return key
 
 
     def move_animal(self, old_cell, new_cell, animal):
