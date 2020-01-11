@@ -145,12 +145,23 @@ class Run:
                                         animal.evaluate_fitness()
                                         self.remove_animal(cell, other_animal)
 
-    def collective_procreation:
+    def num_of_species_in_cell(cell, species): # privat?
+        n = 0
+        for animal in cell.pop:
+            if type(animal)==species:
+                n+=1
+        return n
+
+
+    def collective_procreation(self):
+        species_dict = [Herbivore, Carnivore]
         for row in self.island.map:
             for cell in row:
-                if len(cell.pop) >= 2:
-                    for animal in cell.pop:
-                        probability = 
+                for species in species_dict:
+                    if self.num_species_in_cell(cell, species) >= 2:
+                        for animal i
+
+
 
 
     def one_cycle(self):
