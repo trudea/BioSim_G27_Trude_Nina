@@ -6,6 +6,14 @@
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
+# -*- coding: utf-8 -*-
+
+"""
+"""
+
+__author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
+__email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
+
 import numpy as np
 from math import exp
 import random

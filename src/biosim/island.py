@@ -12,7 +12,7 @@ import numpy as np
 from math import exp
 import random
 from landscapes import Savannah, Jungle, Ocean, Mountain, Desert
-from animals import Herbivore, Carnivore
+from animals import Herbivore, Carnivore, bubble_sort_animals
 
 
 class Cell:
@@ -78,10 +78,6 @@ class Island:
         for placement_dict in input_list:
                 y, x = placement_dict['loc']
                 for individual in placement_dict['pop']:
-                    if individual['species'] == 'Herbivore':
-                        self.map[y][x].herb_pop.append(Herbivore(individual))
-                    elif individual['species'] == 'Carnivore':
-                        self.map[y][x].carn_pop.append(Carnivore(individual))
                     self.map[y][x].pop.append(ani_dict[individual['species']](individual))
 
 
@@ -126,12 +122,6 @@ class Run:
                 # eating, first herbs, then carns
                 cell.pop = self.bubble_sort_animals(cell.pop) # sorterer alle
                 # dyrene etter fitness, men bare å passe på at vi velger ut et species når vi kaller
-                """
-                cell.herb_pop = self.bubble_sort_animals(cell.herb_pop)
-                for herbivore in cell.herb_pop:
-                    cell.landscape.f = herbivore.weightgain_and_fodder_left()
-                cell.carn_pop = self.bubble_sort_animals(cell.carn_pop)
-                """
                 for animal in cell.pop:
                     if type(animal) == Herbivore:
                         cell.landscape.f = animal.weightgain_and_fodder_left()
@@ -160,9 +150,25 @@ if __name__ == "__main__":
 
     run = Run()
     for animal in run.island.map[3][4].pop:
-        print(type(animal))
+        # print(type(animal))
         if type(animal) == Herbivore:
-            print(True)
+            # print(True)
+            pass
+    pop = default_input[0]['pop']
+    print(run.island.map[4][4].pop)
+    pop = run.island.map[4][4].pop
+    for animal in pop:
+        print(animal.phi)
+
+    liste = bubble_sort_animals(pop)
+    for animal in liste:
+        print(animal.phi)
+    """
+    liste = bubble_sort_animals(pop)
+    for animal in pop:
+        #print.animal.phi
+        pass
+    """
 
 
 

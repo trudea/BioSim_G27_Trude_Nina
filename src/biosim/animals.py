@@ -138,3 +138,11 @@ class Carnivore(Animal):
 
     def check_if_kills(self):
         pass
+
+def bubble_sort_animals(original_order): # tar inn liste av instances, skal ta in liste med...
+    copy = list(original_order)
+    for i in range(len(copy) - 1):
+        for j in range(len(copy) - i - 1):
+            if copy[j].phi < copy[j + 1].phi:
+                copy[j], copy[j + 1] = copy[j + 1], copy[j]
+    return copy
