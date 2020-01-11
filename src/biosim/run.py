@@ -98,21 +98,31 @@ class Run:
                 for animal in cell.pop:
                     animal.aging()
 
+    def collective_weightloss(self):
+        for row in self.island.map:
+            for cell in row:
+                for animal in cell.pop:
+                    animal.losing_weight()
+
+    def collective_dying(self):
+        for row in self.island.map:
+            for cell in row:
+                for animal in cell.pop:
+                    if animal.check_if_dying():
+                        self.island.remove_animal(cell, animal)
 
     def one_cycle(self):
         #while(self.years_run < self.desired_years):
-        #bør deles opp i funksjoner
         self.collective_replenishing()
         self.collective_feeding()
-        # procreation
         self.collective_procreation()
         # migration
-        self.collective_migration()
-        # aging
+        #self.collective_migration()
         self.collective_aging()
-        # weightloss
+        self.collective_weightloss()
         # death
-
+        self.collective_dying()
+        
 if __name__ == "__main__":
     default_input = [{'loc': (3, 4), 'pop': [
         {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
@@ -126,7 +136,8 @@ if __name__ == "__main__":
 
 
     run = Run()
-    run.one_cycle()
+    #run.one_cycle()
+
 
 
 

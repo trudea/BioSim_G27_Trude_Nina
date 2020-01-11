@@ -71,10 +71,10 @@ class Animal:
         self.weight += (self.beta * intake_weight)
 
     def losing_weight(self):
-        self.weight -= (self.eta * self.weight) #test en gang per år
+        self.weight -= (self.eta * self.weight)
 
 
-    def check_if_dies(self):
+    def check_if_dying(self):
         # returnerer om dyret skal dø eller ikke
         """else:
                    probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
