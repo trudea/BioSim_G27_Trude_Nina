@@ -22,9 +22,11 @@ class Cell:
         self.landscape = self.land_dict[letter]()
         self.y = y
         self.x = x
+        self.pos = (y, x)
         self.herb_pop = [] # instances av Herbivore i celle
         self.carn_pop = [] # instances av Carnivore i celle
         self.pop = []
+
 
 class Island:
     land_dict = {'S': Savannah, 'J': Jungle,
@@ -89,3 +91,12 @@ class Island:
             if type(animal)==species:
                 n+=1
         return n
+
+    def check_if_animal_would_move_to_adjecent_cells(island, cell, animal):
+        adjecent_cells =[]
+        y, x = cell.pos
+        for row in island.map:
+            for other_cell in row:
+                if (other_cell.pos[0] == y-1 or other_cell.pos[0] == y+1 and
+                        other_cell.pos[1] == x-1 or other_cell.pos[1] == x+1):
+                    adjecent_cells.append(other_cell)

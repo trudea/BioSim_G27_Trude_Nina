@@ -87,12 +87,13 @@ class Run:
         for row in self.island.map:
             for cell in row:
                 for animal in cell.pop:
-                    # check for each adjecent cell if animal would move there, 
+                    # check for each adjecent cell if animal would move there,tar inn self.island
+                    pass
 
     def collective_aging(self):
         for row in self.island.map:
             for cell in row:
-                for animal in self.island.cell.pop:
+                for animal in cell.pop:
                     animal.aging()
 
 
@@ -101,8 +102,6 @@ class Run:
         #bør deles opp i funksjoner
         self.collective_replenishing()
         self.collective_feeding()
-
-
         # procreation
         self.collective_procreation()
         # migration
