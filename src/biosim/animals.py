@@ -87,14 +87,16 @@ class Animal:
         else:
             return False
 
-    def check_if_procreates(self):
-            probability = self.gamma * self.phi * (N - 1)
-            if probability > 1:
-                probability = 1
-            if round(random.random(), 7) <= probability:
-                return True
-            else:
-                return False
+    def check_if_procreates(self, N):
+        if self.weight < self.zeta * (self.w_birth + self.sigma_birth):
+            return False
+        probability = self.gamma * self.phi * (N - 1)
+        if probability > 1:
+            probability = 1
+        if round(random.random(), 7) <= probability:
+            return True
+        else:
+            return False
 
 
 class Herbivore(Animal):
@@ -118,7 +120,8 @@ class Herbivore(Animal):
     def __init__(self, attribute_dict=None):
         super().__init__(attribute_dict)
 
-    def weightgain_and_fodder_left(self, available_fodder):
+    def weightgain_and_fodder_left(self, available_fodder): # bør endre remaining_fodder til return
+        #bør flyttes ut av dyreklasse og inn i feks island klasse
         if available_fodder >= self.F:
             fodder_eaten = self.F
             remaining_fodder = available_fodder - self.F

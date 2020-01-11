@@ -160,13 +160,13 @@ class Run:
                 for animal in cell.pop:
                     N = self.num_species_in_cell(cell, type(animal))
                     if N >= 2:
-                        probability = animal.gamma * animal.phi * (N-1)
-                        if probability > 1:
-                            probability = 1
-                        if round(random.random(), 3) <= probability:
-                            return True
+                        if self.check_if_procreates(N):
+                            # create new animal in cell
+                            cell.pop.append(type(animal)())
 
-
+    def collective_aging(self):
+        for animal in cell.pop:
+            animal.aging()
 
 
     def one_cycle(self):
@@ -177,10 +177,11 @@ class Run:
 
 
         # procreation
+        self.collective_procreation()
         # migration
+
         # aging
-        for animal in cell.pop:
-            self.aging()
+        self.collective_aging()
         # weightloss
         # death
 
