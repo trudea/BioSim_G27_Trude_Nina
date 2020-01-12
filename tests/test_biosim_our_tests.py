@@ -7,6 +7,7 @@ import BioSim_G27_Trude_Nina.src.biosim.animals as ani
 import BioSim_G27_Trude_Nina.src.biosim.landscapes as land
 import BioSim_G27_Trude_Nina.src.biosim.run as run
 import pytest
+import random
 
 # fiks fixtures for lettere koding
 
@@ -195,6 +196,15 @@ class TestAnimal:
         # må kunne plassere den
         herbivore.check_if_dying()
         assert hasattr(isl.Island, 'Herbivore') is False
+
+    def test_little_fodder(self):
+        herbivore = ani.Herbivore()
+        herbivore_weight_if_not_limited = (herbivore.weight +
+                                           herbivore.param_dict['F'])
+        savannah = land.Savannah()
+        savannah.f = random.randint(0, (herbivore.param_dict['F'] - 1))
+        herbivore.weightgain_and_fodder_left(savannah)
+        assert herbivore.weight < herbivore_weight_if_not_limited
 
     def test_parameter_change(self):
 
