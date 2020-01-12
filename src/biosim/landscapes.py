@@ -19,7 +19,6 @@ class Savannah(Landscape):
         for parameter in self.param_dict:
             exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
         self.f = self.f_max
-        # self.herbivores_in_cell = [first_herbivores[0], first_herbivores[1]]
 
     def replenish(self):
         self.f += self.alpha * (self.f_max - self.f)

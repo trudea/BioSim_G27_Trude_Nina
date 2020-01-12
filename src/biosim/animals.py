@@ -49,7 +49,6 @@ class Animal:
             statistic_population = \
                 np.random.normal(self.param_dict['w_birth'],
                                  self.param_dict['sigma_birth'], 1000)
-            # lager ny statistisk populasjon for hver instance?
             self.weight = np.random.choice(statistic_population)
         self.evaluate_fitness()
 
@@ -187,10 +186,6 @@ class Carnivore(Animal):
                 return False
         else:
             return False
-
-    def eating_herbivore(self):
-        pass
-
 
 def bubble_sort_animals(original_order):
     # tar inn liste av instances, skal ta in liste med...

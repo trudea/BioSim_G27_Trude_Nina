@@ -7,9 +7,9 @@ __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 
-from .landscapes import Savannah, Jungle, Ocean, Mountain, Desert
-from .animals import Herbivore, Carnivore, bubble_sort_animals
-from .island import Island, Cell
+from landscapes import Savannah, Jungle, Ocean, Mountain, Desert
+from animals import Herbivore, Carnivore, bubble_sort_animals
+from island import Island, Cell
 
 
 class Run:
@@ -43,10 +43,6 @@ class Run:
             for cell in row:
                 if type(cell) in active and len(cell.pop) > 0:
                     cell.pop = self.bubble_sort_animals(cell.pop)
-                    # sorterer alle
-                    # dyrene etter fitness, men bare å passe på
-                    # at vi velger ut et species når vi kaller
-
                     for animal in cell.pop:
                         if type(animal) == Herbivore:
                             cell.landscape.f = \
