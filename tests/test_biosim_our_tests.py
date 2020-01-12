@@ -56,7 +56,9 @@ class TestLandscapes:
         Checks if a change of parameters actually applies to class instance
         """
         jungle = isl.Jungle(param_dict={'f_max': 500})
-        assert jungle.param_dict['f_max'] is not 800
+        savannah = isl.Savannah(param_dict={'f_max': 200})
+        assert jungle.param_dict['f_max'] is not 800 \
+            and savannah.param_dict['f_max'] is not 300
 
     def test_jungle_instance(self):
         """
