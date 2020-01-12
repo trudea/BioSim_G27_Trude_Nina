@@ -16,32 +16,39 @@ from animals import Herbivore, Carnivore, bubble_sort_animals
 
 
 class Cell:
-    land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M': Mountain,
-                     'D': Desert}
-
+    land_dict = {'S': Savannah, 'J': Jungle,
+                 'O': Ocean, 'M': Mountain, 'D': Desert}
 
     def __init__(self, y, x, letter):
         self.landscape = self.land_dict[letter]()
         # self.y = y
         # self.x = x
-        self.pos = (y, x) # using this
+        self.pos = (y, x)  # using this
         self.pop = []
-        self.tot_w_herbivores = sum([animal.weight for animal in self.pop if type(animal)==Herbivore])
+        self.tot_w_herbivores = \
+            sum([animal.weight for animal in self.pop if type(animal)
+                 == Herbivore])
 
-    def num_specimen(self, species):  # privat? burde kanskje være utenfor?
+    def num_specimen(self, species):  # privat? burde kanskje være utenfor,
+        # ja vi trenger nok kun bare å telle antall specimen når vi lager
+        # grafen over populasjon - T
         n = 0
         for animal in self.pop:
             if type(animal) == species:
                 n += 1
         return n
 
-    def get_rel_abundance(self, animal): # er noe kluss med at fodder avhenger av art
+    def get_rel_abundance(self, animal):
+        # er noe kluss med at fodder avhenger av art
         if type(animal) == Herbivore:
             fodder = self.landscape.f
+
         if type(animal) == Carnivore:
             fodder = self.tot_w_herbivores
+
         N = self.num_specimen(type(animal))
         return fodder / ((N + 1) * animal.F)
+
 
 class AdjacentCell(Cell):
     total_propensity = 0
@@ -55,9 +62,11 @@ class AdjacentCell(Cell):
         self.lower_limit = 0
         self.upper_limit = 0
 
+
 class Island:
     land_dict = {'S': Savannah, 'J': Jungle,
                  'O': Ocean, 'M': Mountain, 'D': Desert}
+
     def string_to_array(self, txt):
         # bør kanskje importeres
         if txt[-1] is not "\n":
@@ -84,11 +93,12 @@ class Island:
                 if element != 'O':
                     raise ValueError
 
-
-
     def get_propensity(self, animal, rel_abund):
+        
         """
-        if type(cell) == Mountain or type(cell) == Ocean: # unødvendig fordi de ikke ble lagt til i adj-lista?
+
+        if type(cell) == Mountain or type(cell) == Ocean:
+        # unødvendig fordi de ikke ble lagt til i adj-lista?
             return 0
 
         else:
@@ -99,9 +109,10 @@ class Island:
         if txt is None:
             txt = open('rossum.txt').read()
             if txt[-1] == "\n":
-                #legg inn noe som fjerner siste element hvis det er formen vi vil ha det på senere
+                # legg inn noe som fjerner siste element hvis det er formen
+                # vi vil ha det på senere
                 pass
-        self.map = self.string_to_array(txt) # array of one-letter-strings
+        self.map = self.string_to_array(txt)  # array of one-letter-strings
         self.check_edges()
         # creating array of cells
         island_line = []
@@ -115,10 +126,12 @@ class Island:
 
     def place_animals(self, input_list):
         ani_dict = {'Herbivore': Herbivore, 'Carnivore': Carnivore}
+
         for placement_dict in input_list:
-                y, x = placement_dict['loc']
-                for individual in placement_dict['pop']:
-                    self.map[y][x].pop.append(ani_dict[individual['species']](individual))
+            y, x = placement_dict['loc']
+            for individual in placement_dict['pop']:
+                self.map[y][x].pop.append(ani_dict[individual['species']](
+                    individual))
 
     def remove_animal(self, cell, animal):
         cell.pop.remove(animal)
@@ -126,13 +139,14 @@ class Island:
     def choose_new_cell(self, cell, animal):
         AdjacentCell.total_propensity = 0
         AdjacentCell.total_probability = 0
-        active = {Savannah: 'S', Jungle : 'J', Desert : 'D'}
+        active = {Savannah: 'S', Jungle: 'J', Desert: 'D'}
         # N = cell.num_specimen(type(animal))
         adj_cells = []
         y, x = cell.pos
-        possible_cells = [self.map[y-1][x], self.map[y+1][x], self.map[y][x-1], self.map[y][x+1]]
+        possible_cells = [self.map[y-1][x], self.map[y+1][x], self.map[y][x-1],
+                          self.map[y][x+1]]
         for element in possible_cells:
-            if type(element.landscape)==Ocean:
+            if type(element.landscape) == Ocean:
                 possible_cells.remove(element)
             elif type(element.landscape) == Mountain:
                 possible_cells.remove(element)
@@ -144,22 +158,31 @@ class Island:
         temp_dict = {}
         for element in possible_cells:
             rel_abund = element.get_rel_abundance(animal)
-            temp_dict[element] ={'propensity': exp(animal.lambdah * rel_abund)}
-        total_propensity = sum([temp_dict[element]['propensity'] for element in temp_dict])
+            temp_dict[element] = \
+                {'propensity': exp(animal.lambdah * rel_abund)}
+        total_propensity = \
+            sum([temp_dict[element]['propensity'] for element in temp_dict])
         keys = temp_dict.keys()
+
         for key in keys:
-            temp_dict[key]['probability'] = temp_dict[key]['propensity'] / total_propensity
+            temp_dict[key]['probability'] = \
+                temp_dict[key]['propensity'] / total_propensity
         remembered_limit = 0
+
         for key in keys:
             temp_dict[key]['lower_limit'] = remembered_limit
-            temp_dict[key]['upper_limit'] = remembered_limit + temp_dict[key]['probability']
+            temp_dict[key]['upper_limit'] =\
+                remembered_limit + temp_dict[key]['probability']
             remembered_limit = temp_dict[key]['upper_limit']
-            # print('Lower: ', temp_dict[key]['lower_limit'], 'Upper: ', temp_dict[key]['upper_limit'])
+
+            # print('Lower: ', temp_dict[key]['lower_limit'],
+            # 'Upper: ', temp_dict[key]['upper_limit'])
+
         number = round(random.random(), 7)
         for key in keys:
-            if temp_dict[key]['lower_limit'] < number < temp_dict[key]['upper_limit']:
+            if temp_dict[key]['lower_limit'] < \
+                    number < temp_dict[key]['upper_limit']:
                 return key
-
 
     def move_animal(self, old_cell, new_cell, animal):
         new_cell.pop.append(animal)
