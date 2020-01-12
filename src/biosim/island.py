@@ -9,8 +9,8 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 import numpy as np
 from math import exp
 import random
-from landscapes import Savannah, Jungle, Ocean, Mountain, Desert
-from animals import Herbivore, Carnivore, bubble_sort_animals
+from .landscapes import Savannah, Jungle, Ocean, Mountain, Desert
+from .animals import Herbivore, Carnivore, bubble_sort_animals
 
 
 class Cell:
