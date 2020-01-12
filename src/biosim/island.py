@@ -9,8 +9,8 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 import numpy as np
 from math import exp
 import random
-from .landscapes import Savannah, Jungle, Ocean, Mountain, Desert
-from .animals import Herbivore, Carnivore, bubble_sort_animals
+from landscapes import Savannah, Jungle, Ocean, Mountain, Desert
+from animals import Herbivore, Carnivore, bubble_sort_animals
 
 
 class Cell:
@@ -84,7 +84,6 @@ class Island:
                 pass
         self.map = self.string_to_array(txt)  # array of one-letter-strings
         self.check_edges()
-        # creating array of cells
         island_line = []
         island_lines = []
         for y, line in enumerate(self.map):
@@ -107,11 +106,6 @@ class Island:
         cell.pop.remove(animal)
 
     def choose_new_cell(self, cell, animal):
-        AdjacentCell.total_propensity = 0
-        AdjacentCell.total_probability = 0
-        active = {Savannah: 'S', Jungle: 'J', Desert: 'D'}
-        # N = cell.num_specimen(type(animal))
-        adj_cells = []
         y, x = cell.pos
         possible_cells = [self.map[y-1][x], self.map[y+1][x], self.map[y][x-1],
                           self.map[y][x+1]]
@@ -124,7 +118,6 @@ class Island:
             return False
         elif len(possible_cells) == 1:
             return possible_cells[0]
-        total_propensity = 0
         temp_dict = {}
         for element in possible_cells:
             rel_abund = element.get_rel_abundance(animal)
@@ -144,9 +137,6 @@ class Island:
             temp_dict[key]['upper_limit'] =\
                 remembered_limit + temp_dict[key]['probability']
             remembered_limit = temp_dict[key]['upper_limit']
-
-            # print('Lower: ', temp_dict[key]['lower_limit'],
-            # 'Upper: ', temp_dict[key]['upper_limit'])
 
         number = round(random.random(), 7)
         for key in keys:
