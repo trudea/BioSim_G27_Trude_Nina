@@ -95,6 +95,7 @@ class Animal:
             return False
 
     def check_if_procreates(self, N):
+        # N må være liten n, er en PEP-8 violation
         if self.weight < self.zeta * (self.w_birth + self.sigma_birth):
             return False
         probability = self.gamma * self.phi * (N - 1)

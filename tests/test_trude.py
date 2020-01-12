@@ -1,4 +1,9 @@
-import BioSim_G27_Trude_Nina.src.biosim.island as bs
+
+import BioSim_G27_Trude_Nina.src.biosim.island as isl
+import BioSim_G27_Trude_Nina.src.biosim.animals as ani
+import BioSim_G27_Trude_Nina.src.biosim.landscapes as land
+import BioSim_G27_Trude_Nina.src.biosim.run as run
+
 import pytest
 
 

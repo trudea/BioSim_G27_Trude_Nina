@@ -58,4 +58,3 @@ class Ocean(Landscape):
 class Mountain(Landscape):
     def __init__(self):
         super().__init__()
-

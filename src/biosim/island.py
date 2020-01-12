@@ -47,6 +47,7 @@ class Cell:
             fodder = self.tot_w_herbivores
 
         N = self.num_specimen(type(animal))
+        # N må være lowercase er en PEP-8 violation
         return fodder / ((N + 1) * animal.F)
 
 
@@ -94,7 +95,7 @@ class Island:
                     raise ValueError
 
     def get_propensity(self, animal, rel_abund):
-        
+
         """
 
         if type(cell) == Mountain or type(cell) == Ocean:
