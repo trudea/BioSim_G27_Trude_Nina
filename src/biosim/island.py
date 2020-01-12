@@ -11,201 +11,49 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 import numpy as np
 from math import exp
 import random
-
-
-class Landscape:
-    def __init__(self):
-        pass
-
-    def new_position(self):
-        #when animal moves, this gives new position
-        pass
-
-    def growing(self):
-        pass
-
-
-class Savannah(Landscape):
-    param_dict = {'f_max' : 300.0, 'alpha' : 0.3}
-
-    def __init__(self, param_dict=None):
-        super().__init__()
-        self.herbivores_in_cell = []
-        self.carnivores_in_cell = []
-        if param_dict is not None:
-            self.param_dict.update(param_dict)
-        for parameter in self.param_dict:
-            exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
-        self.f = self.f_max
-        # self.herbivores_in_cell = [first_herbivores[0], first_herbivores[1]]
-
-    def replenish(self):
-        self.f += self.alpha * (self.f_max - self.f)
-
-
-
-class Jungle(Landscape):
-    param_dict = {'f_max' : 800.0}
-
-    def __init__(self, param_dict=None):
-        super().__init__()
-        if param_dict is not None:
-            self.param_dict.update(param_dict)
-        for parameter in self.param_dict:
-            exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
-        self.f = self.f_max
-
-    def replenish(self):
-        self.f = self.f_max
-
-
-class Desert(Landscape):
-    def __init__(self):
-        super().__init__()
-
-
-class Ocean(Landscape):
-    def __init__(self):
-        super().__init__()
-
-
-class Mountain(Landscape):
-    def __init__(self):
-        super().__init__()
-
-
-class Animal:
-    parameters_set = False
-    def __init__(self, attribute_dict):
-        if not self.parameters_set:
-            for parameter in self.param_dict:
-                if parameter == 'lambda':
-                    self.lambdah = self.param_dict['lambda']
-                else:
-                    exec("self.%s = %s" % (
-                    parameter, self.param_dict[parameter]))
-            self.parameters_set = True
-        self.age = None
-        self.weight = None
-        if attribute_dict is not None:
-            if 'weight' in attribute_dict:
-                self.weight = attribute_dict['weight']
-            if 'age' in attribute_dict:
-                self.age = attribute_dict['age']
-        if self.age is None:
-            self.age = 0
-        if self.weight is None:
-            statistic_population = np.random.normal(self.param_dict['w_birth'],
-                                            self.param_dict['sigma_birth'],
-                                              1000) # lager ny statistisk populasjon for hver instance?
-            self.weight = np.random.choice(statistic_population)
-        q_plus = 1.0 / (1 + exp(self.param_dict['phi_age'] *
-                                (self.age - self.param_dict['a_half'])))
-        q_minus = 1.0 / (1 + exp(-self.param_dict['phi_weight'] *
-                                 (self.weight - self.param_dict['w_half'])))
-        self.phi = q_plus * q_minus
-    """
-        if not self.parameters_set:
-            self.set_parameters()
-    """
-    """
-
-    @classmethod
-    def set_parameters(cls, params=None):
-        for parameter in cls.param_dict:
-            # self.w_birth = default_param_dict[]
-            setattr(cls, parameter, cls.param_dict[parameter])
-
-        cls.parameters_set = True
-
-    """
-    def feeding(self, fodder):
-        self.weight += (self.beta * fodder)
-
-
-    def procreation(self):
-        pass
-
-    def migration(self):
-        pass
-
-    def aging(self):
-        self.age += 1
-
-    def weightloss(self):
-        self.weight -= (self.eta * self.weight) #test en gang per år
-
-
-    def check_if_dying(self):
-        # returnerer om dyret skal dø eller ikke
-        """else:
-                   probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
-                   self.phi = random.choices([1, 0], [probability, 1 - probability])
-                   if self.phi == 0:
-                       '''død'''"""
-        probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
-        if self.phi == 0 or round(random.random(), 3) >= probability:
-                return True
-        else:
-            return False
-
-
-class Herbivore(Animal):
-    param_dict = {'w_birth': 8.0,
-                  'sigma_birth': 1.5,
-                  'beta': 0.9,
-                  'eta': 0.05,
-                  'a_half': 40.0,
-                  'phi_age': 0.2,
-                  'w_half': 10.0,
-                  'phi_weight': 0.1,
-                  'mu': 0.25,
-                  'lambda': 1.0,
-                  'gamma': 0.2,
-                  'zeta': 3.5,
-                  'xi': 1.2,
-                  'omega': 0.4,
-                  'F': 10.0
-                  }
-
-    def __init__(self, attribute_dict=None):
-        super().__init__(attribute_dict)
-
-class Carnivore(Animal):
-    param_dict = {'w_birth': 6.0,
-                          'sigma_birth': 1.0,
-                          'beta': 0.75,
-                          'eta': 0.125,
-                          'a_half': 60.0,
-                          'phi_age': 0.4,
-                          'w_half': 4.0,
-                          'phi_weight': 0.4,
-                          'mu': 0.4,
-                          'lambda': 1.0,
-                          'gamma': 0.8,
-                          'zeta': 3.5,
-                          'xi': 1.1,
-                          'omega': 0.9,
-                          'F': 50.0,
-                          'DeltaPhiMax' : 10.0
-                          }
-
-    def __init__(self, attribute_dict=None):
-        super().__init__(attribute_dict)
-
-    def check_if_kills(self):
-        pass
+from landscapes import Savannah, Jungle, Ocean, Mountain, Desert
+from animals import Herbivore, Carnivore, bubble_sort_animals
 
 
 class Cell:
     land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M': Mountain,
                      'D': Desert}
+
+
     def __init__(self, y, x, letter):
         self.landscape = self.land_dict[letter]()
-        self.y = y
-        self.x = x
-        self.herb_pop = [] # instances av Herbivore i celle
-        self.carn_pop = [] # instances av Carnivore i celle
+        # self.y = y
+        # self.x = x
+        self.pos = (y, x) # using this
+        self.pop = []
+        self.tot_w_herbivores = sum([animal.weight for animal in self.pop if type(animal)==Herbivore])
+
+    def num_specimen(self, species):  # privat? burde kanskje være utenfor?
+        n = 0
+        for animal in self.pop:
+            if type(animal) == species:
+                n += 1
+        return n
+
+    def get_rel_abundance(self, animal): # er noe kluss med at fodder avhenger av art
+        if type(animal) == Herbivore:
+            fodder = self.landscape.f
+        if type(animal) == Carnivore:
+            fodder = self.tot_w_herbivores
+        N = self.num_specimen(type(animal))
+        return fodder / ((N + 1) * animal.F)
+
+class AdjacentCell(Cell):
+    total_propensity = 0
+    total_probability = 0
+    remembered_limit = 0
+
+    def __init__(self, y, x, letter):
+        super().__init__(y, x, letter)
+        self.propensity = None
+        self.probability = None
+        self.lower_limit = 0
+        self.upper_limit = 0
 
 class Island:
     land_dict = {'S': Savannah, 'J': Jungle,
@@ -236,6 +84,17 @@ class Island:
                 if element != 'O':
                     raise ValueError
 
+
+
+    def get_propensity(self, animal, rel_abund):
+        """
+        if type(cell) == Mountain or type(cell) == Ocean: # unødvendig fordi de ikke ble lagt til i adj-lista?
+            return 0
+
+        else:
+        """
+        return exp(animal.lambdah * rel_abund)
+
     def __init__(self, txt=None):
         if txt is None:
             txt = open('rossum.txt').read()
@@ -252,58 +111,56 @@ class Island:
                 island_line.append(Cell(y, x, letter))
             island_lines.append(island_line)
             island_line = []
-        self.island = np.array(island_lines)
+        self.map = np.array(island_lines)
 
     def place_animals(self, input_list):
         ani_dict = {'Herbivore': Herbivore, 'Carnivore': Carnivore}
         for placement_dict in input_list:
                 y, x = placement_dict['loc']
-                the_cell = self.island[y][x]
                 for individual in placement_dict['pop']:
-                    if individual['species'] == 'Herbivore':
-                        self.island[y][x].herb_pop.append(Herbivore(individual))
-                    elif individual['species'] == 'Carnivore':
-                        self.island[y][x].carn_pop.append(Carnivore(individual))
+                    self.map[y][x].pop.append(ani_dict[individual['species']](individual))
+
+    def remove_animal(self, cell, animal):
+        cell.pop.remove(animal)
+
+    def choose_new_cell(self, cell, animal):
+        AdjacentCell.total_propensity = 0
+        AdjacentCell.total_probability = 0
+        active = {Savannah: 'S', Jungle : 'J', Desert : 'D'}
+        # N = cell.num_specimen(type(animal))
+        adj_cells = []
+        y, x = cell.pos
+        possible_cells = [self.map[y-1][x], self.map[y+1][x], self.map[y][x-1], self.map[y][x+1]]
+        for element in possible_cells:
+            if type(element.landscape)==Ocean:
+                possible_cells.remove(element)
+            elif type(element.landscape) == Mountain:
+                possible_cells.remove(element)
+        if len(possible_cells) == 0:
+            return False
+        elif len(possible_cells) == 1:
+            return possible_cells[0]
+        total_propensity = 0
+        temp_dict = {}
+        for element in possible_cells:
+            rel_abund = element.get_rel_abundance(animal)
+            temp_dict[element] ={'propensity': exp(animal.lambdah * rel_abund)}
+        total_propensity = sum([temp_dict[element]['propensity'] for element in temp_dict])
+        keys = temp_dict.keys()
+        for key in keys:
+            temp_dict[key]['probability'] = temp_dict[key]['propensity'] / total_propensity
+        remembered_limit = 0
+        for key in keys:
+            temp_dict[key]['lower_limit'] = remembered_limit
+            temp_dict[key]['upper_limit'] = remembered_limit + temp_dict[key]['probability']
+            remembered_limit = temp_dict[key]['upper_limit']
+            # print('Lower: ', temp_dict[key]['lower_limit'], 'Upper: ', temp_dict[key]['upper_limit'])
+        number = round(random.random(), 7)
+        for key in keys:
+            if temp_dict[key]['lower_limit'] < number < temp_dict[key]['upper_limit']:
+                return key
 
 
-
-if __name__ == "__main__":
-    default_input = [{'loc': (3, 4), 'pop': [
-        {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
-        {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
-        {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]},
-                     {'loc': (4, 4),
-                      'pop': [
-                          {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
-                          {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
-                          {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
-
-
-
-    # c = Cell(0,0,'S')
-    # print(type(c.landscape).__name__)
-    i = Island()
-    i.place_animals(default_input)
-    print(i.island[4][4].carn_pop[1].weight)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def move_animal(self, old_cell, new_cell, animal):
+        new_cell.pop.append(animal)
+        old_cell.pop.remove(animal)
