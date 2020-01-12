@@ -75,18 +75,6 @@ class Island:
                 if element != 'O':
                     raise ValueError
 
-    def get_propensity(self, animal, rel_abund):
-
-        """
-
-        if type(cell) == Mountain or type(cell) == Ocean:
-        # unødvendig fordi de ikke ble lagt til i adj-lista?
-            return 0
-
-        else:
-        """
-        return exp(animal.lambdah * rel_abund)
-
     def __init__(self, txt=None):
         if txt is None:
             txt = open('rossum.txt').read()
