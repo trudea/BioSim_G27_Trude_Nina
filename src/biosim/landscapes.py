@@ -1,22 +1,8 @@
 # -*- coding: utf-8 -*-
 
-"""
-"""
-
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
-# -*- coding: utf-8 -*-
-
-"""
-"""
-
-__author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
-__email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
-
-import numpy as np
-from math import exp
-import random
 
 class Landscape:
     def __init__(self):
@@ -24,7 +10,7 @@ class Landscape:
 
 
 class Savannah(Landscape):
-    param_dict = {'f_max' : 300.0, 'alpha' : 0.3}
+    param_dict = {'f_max': 300.0, 'alpha': 0.3}
 
     def __init__(self, param_dict=None):
         super().__init__()
@@ -39,9 +25,8 @@ class Savannah(Landscape):
         self.f += self.alpha * (self.f_max - self.f)
 
 
-
 class Jungle(Landscape):
-    param_dict = {'f_max' : 800.0}
+    param_dict = {'f_max': 800.0}
 
     def __init__(self, param_dict=None):
         super().__init__()
@@ -69,4 +54,3 @@ class Ocean(Landscape):
 class Mountain(Landscape):
     def __init__(self):
         super().__init__()
-

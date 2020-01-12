@@ -1,48 +1,66 @@
-import BioSim_G27_Trude_Nina.src.biosim.island as bs
+
+import BioSim_G27_Trude_Nina.src.biosim.island as isl
+import BioSim_G27_Trude_Nina.src.biosim.animals as ani
+import BioSim_G27_Trude_Nina.src.biosim.landscapes as land
+import BioSim_G27_Trude_Nina.src.biosim.run as run
+
 import pytest
+
+
+def get_propensity(self, animal, rel_abund):
+    return exp(animal.lambdah * rel_abund)
+
+
+"""
+class AdjacentCell(Cell):
+    total_propensity = 0
+    total_probability = 0
+    remembered_limit = 0
+
+    def __init__(self, y, x, letter):
+        super().__init__(y, x, letter)
+        self.propensity = None
+        self.probability = None
+        self.lower_limit = 0
+        self.upper_limit = 0
+"""
 
 
 class TestMap:
     def test_line_amount(self):
         pass
 
+    def test_num_specimen(self):
+        pass
+
+    def test_choose_new_cell(self):
+        pass
+
 
 class Testanimal:
 
-    def test_get_position(self):
+    def test_move_check(self):
         pass
 
-    def test_place_animal(self):
-        input = [{'loc': (3, 4), 'pop': [
-            {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
-            {'species': 'Herbivore', 'age': 9, 'weight': 10.3}]}]
+    def test_check_procreation(self):
+        pass
 
-        i = bs.Island()
-        i.place_animals(input)
-        herbivore_list = i.island[3][4].herb.pop[1]
-        assert type(herbivore_list).__name__ == 'Herbivore'
-
-    def test_check_animal_in_cell(self):
+    def test_check_kills(self):
         pass
 
 
-    def test_move_animal(self):
+class TestRun:
+    def test_collective_replenishing(self):
         pass
 
-    def test_eat_herbivore(self):
+    def test_collective_feeding(self):
         pass
 
-    def test_eat_in_order_fitness(self):
+    def test_collective_procreation(self):
         pass
 
-    def test_animal_dead(self):
+    def test_run(self):
         pass
 
-    def test_parameter_change(self):
-        pass
-
-    def test_value_error_raised_placement_mountain_ocean(self):
-        pass
-
-    def test_die_order_fitness(self):
+    def test_one_cycle(self):
         pass
