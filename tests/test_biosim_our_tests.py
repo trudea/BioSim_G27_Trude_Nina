@@ -2,7 +2,10 @@
 
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
-import BioSim_G27_Trude_Nina.src.biosim.island as bs
+import BioSim_G27_Trude_Nina.src.biosim.island as isl
+import BioSim_G27_Trude_Nina.src.biosim.animals as ani
+import BioSim_G27_Trude_Nina.src.biosim.landscapes as land
+import BioSim_G27_Trude_Nina.src.biosim.run as run
 import pytest
 
 
@@ -10,32 +13,28 @@ class TestIsland:
 
     def test_constructor_default(self):
         """
-        A test to check if an instance of island class is created with map
-        input
+        A test to check if an instance of island class is created
+        without input
         """
-        rossum_string = 'OOOOOOOOOOOOOOOOOOOOO\nOSSSSSJJJJMMJJJJJJJOO' \
-                        '\nOSSSSSJJJJMMJJJJJJJOO\nOSSSSSJJJJMMJJJJJJJOO' \
-                        '\nOOSSJJJJJJJMMJJJJJJJO\nOOSSJJJJJJJMMJJJJJJJO' \
-                        '\nOOOOOOOSMMMMJJJJJJJJO\nOSSSSSJJJJMMJJJJJJJOO' \
-                        '\nOSSSSSSSSSMMJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO' \
-                        '\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO' \
-                        '\nOSSSSSDDDDDMMJJJJJOOO\nOSSSSSDDDDDJJJJOOOOOO' \
-                        '\nOOSSSDDDDDDJJOOOOOOOO\nOOSSSSDDDDDDJJOOOOOOO' \
-                        '\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSDDDDDDJJJJOOOOOO' \
-                        '\nOOSSSSDDDDDJJJOOOOOOO\nOOOSSSSJJJJJJJOOOOOOO' \
-                        '\nOOOSSSSSSOOOOOOOOOOOO\nOOOOOOOOOOOOOOOOOOOOO '
-        i = bs.Island(rossum_string)
-        print(i)
-        assert isinstance(i, bs.Island)
+        i = isl.Island()
+        assert isinstance(i, isl.Island)
+
+    def test_constructor_input(self):
+        """
+        A test to check if an instance of island class is created
+        with input
+        """
+        map = 'OOOOO\nOJJJO\nOOOOO'
+        i = isl.Island(map)
+        assert isinstance(i, isl.Island)
 
     def test_map_coordinate_instance(self):
         """
         A test to check if an instance of Island given initial coordinates
         return the true biome-letter.
         """
-
         map = 'OOOOO\nOJJJO\nOOOOO'
-        island = bs.Island(map)
+        island = isl.Island(map)
         assert island.map[0][0] == 'O'
 
     def test_map_ocean(self):
@@ -44,45 +43,48 @@ class TestIsland:
         tiles surrounding the island.
         """
         with pytest.raises(ValueError):
-            bs.Island('SSS\nOOO')
-            bs.Island('OOO\nOSS')
-            bs.Island('OOO\nOSO\nOSO')
+            isl.Island('SSS\nOOO')
+            isl.Island('OOO\nOSS')
+            isl.Island('OOO\nOSO\nOSO')
+
+
+class TestLandscapes:
 
     def test_jungle_instance(self):
         """
         Checks if an instance of jungle is created by providing a jungle tile
         """
-        jungle = bs.Jungle()
-        assert isinstance(jungle, bs.Jungle)
+        jungle = isl.Jungle()
+        assert isinstance(jungle, isl.Jungle)
 
     def test_desert_instance(self):
         """
         Checks if an instance of desert is created by providing a desert tile
         """
-        desert = bs.Desert()
-        assert isinstance(desert, bs.Desert)
+        desert = isl.Desert()
+        assert isinstance(desert, isl.Desert)
 
     def test_ocean(self):
         """
         Checks if an instance of ocean is created by providing an ocean tile
         """
-        ocean = bs.Ocean()
-        assert isinstance(ocean, bs.Ocean)
+        ocean = isl.Ocean()
+        assert isinstance(ocean, isl.Ocean)
 
     def test_mountain(self):
         """
         Checks if an instance of mountain is
         created by providing a mountain tile
         """
-        mountain = bs.Mountain()
-        assert isinstance(mountain, bs.Mountain)
+        mountain = isl.Mountain()
+        assert isinstance(mountain, isl.Mountain)
 
     def test_fodder_savannah(self):
         """
         A test that tests if an instance of the Savannah class, given a
         value under f_max replenishes itself (increases the f value)
         """
-        savannah = bs.Savannah()
+        savannah = isl.Savannah()
         savannah.f = 200
         savannah.replenish()
         assert savannah.f > 200
@@ -93,7 +95,7 @@ class TestIsland:
         under f_max replenishes itself to the given parameter
         f_max given to that instance of jungle.
         """
-        jungle = bs.Jungle()
+        jungle = isl.Jungle()
         jungle.f = 500
         jungle.replenish()
         assert jungle.f == jungle.param_dict['f_max']
@@ -103,23 +105,25 @@ class TestAnimal:
 
     def test_herbivore(self):
         """
-        Checks if instance of herbivore can be created
+        Checks if instance of herbivore can be created and is instance of
+        the animal class
         """
-        herbivore = bs.Herbivore(None)
-        assert isinstance(herbivore, bs.Herbivore)
+        herbivore = isl.Herbivore(None)
+        assert isinstance(herbivore, ani.Animal)
 
     def test_carnivore(self):
         """
-        Checks if instance of carnivore can be created
+        Checks if instance of carnivore can be created and is instance
+        of the animal class
         """
-        carnivore = bs.Carnivore(None)
-        assert isinstance(carnivore, bs.Carnivore)
+        carnivore = ani.Carnivore(None)
+        assert isinstance(carnivore, ani.Animal)
 
     def test_aging(self):
         """
         Checks if age of a given instance increases by call of instance.aging
         """
-        herbivore = bs.Herbivore(None)
+        herbivore = ani.Herbivore(None)
         age = herbivore.age
         herbivore.aging()
         assert herbivore.age > age
@@ -129,9 +133,9 @@ class TestAnimal:
         Checks if weight of an instance decreases by call of
         instance.weightloss()
         """
-        herbivore = bs.Herbivore(None)
+        herbivore = ani.Herbivore(None)
         weight = herbivore.weight
-        herbivore.weightloss()
+        herbivore.losing_weight()
         assert herbivore.weight < weight
 
     def test_herbivore_feeding(self):
@@ -140,8 +144,8 @@ class TestAnimal:
         instance.feeding(F)
         given initial parameter value F specific for that instance.
         """
-        herbivore = bs.Herbivore(None)
+        herbivore = ani.Herbivore(None)
         previous_weight = herbivore.weight
         feed = herbivore.param_dict['F']
-        herbivore.feeding(feed)
+        herbivore.gaining_weight(feed)
         assert previous_weight < herbivore.weight
