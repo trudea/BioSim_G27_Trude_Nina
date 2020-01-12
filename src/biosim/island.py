@@ -6,8 +6,6 @@
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
-
-# import animal.py
 import numpy as np
 from math import exp
 import random
@@ -21,17 +19,13 @@ class Cell:
 
     def __init__(self, y, x, letter):
         self.landscape = self.land_dict[letter]()
-        # self.y = y
-        # self.x = x
-        self.pos = (y, x)  # using this
+        self.pos = (y, x)
         self.pop = []
         self.tot_w_herbivores = \
             sum([animal.weight for animal in self.pop if type(animal)
                  == Herbivore])
 
-    def num_specimen(self, species):  # privat? burde kanskje være utenfor,
-        # ja vi trenger nok kun bare å telle antall specimen når vi lager
-        # grafen over populasjon - T
+    def num_specimen(self, species):
         n = 0
         for animal in self.pop:
             if type(animal) == species:
@@ -39,7 +33,7 @@ class Cell:
         return n
 
     def get_rel_abundance(self, animal):
-        # er noe kluss med at fodder avhenger av art
+
         if type(animal) == Herbivore:
             fodder = self.landscape.f
 
@@ -49,19 +43,6 @@ class Cell:
         N = self.num_specimen(type(animal))
         # N må være lowercase er en PEP-8 violation
         return fodder / ((N + 1) * animal.F)
-
-
-class AdjacentCell(Cell):
-    total_propensity = 0
-    total_probability = 0
-    remembered_limit = 0
-
-    def __init__(self, y, x, letter):
-        super().__init__(y, x, letter)
-        self.propensity = None
-        self.probability = None
-        self.lower_limit = 0
-        self.upper_limit = 0
 
 
 class Island:
