@@ -51,6 +51,13 @@ class TestIsland:
 
 class TestLandscapes:
 
+    def test_change_param_dict(self):
+        """
+        Checks if a change of parameters actually applies to class instance
+        """
+        jungle = isl.Jungle(param_dict={'f_max': 500})
+        assert jungle.param_dict['f_max'] is not 800
+
     def test_jungle_instance(self):
         """
         Checks if an instance of jungle is created by providing a jungle tile
@@ -160,9 +167,10 @@ class TestAnimal:
             {'species': 'Herbivore', 'age': 9, 'weight': 10.3}]}]
 
         i = isl.Island()
+        cell = isl.Cell(3, 4, 'S')
         i.place_animals(input)
         herbivore_list = i.map[3][4]
-        assert type(herbivore_list).__name__ == 'Herbivore'
+        assert cell.pop == 2
 
     def test_check_animal_in_cell(self):
         input_list = {'loc': (4, 3), 'pop': [{'species': 'Herbivore',
@@ -171,7 +179,7 @@ class TestAnimal:
         cell = isl.Cell(4, 3, 'S')
         island = isl.Island()
         island.place_animals(input_list)
-        assert hasattr(cell.pop, 'Herbivore')
+        assert cell.tot_w_herbivores == 1
 
     def test_move_animal(self):
         pass
