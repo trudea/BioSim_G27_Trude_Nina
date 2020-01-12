@@ -8,6 +8,7 @@ import BioSim_G27_Trude_Nina.src.biosim.landscapes as land
 import BioSim_G27_Trude_Nina.src.biosim.run as run
 import pytest
 
+# fiks fixtures for lettere koding
 
 class TestIsland:
 
@@ -149,3 +150,51 @@ class TestAnimal:
         feed = herbivore.param_dict['F']
         herbivore.gaining_weight(feed)
         assert previous_weight < herbivore.weight
+
+    def test_get_position(self):
+        pass
+
+    def test_place_animal(self):
+        input = [{'loc': (3, 4), 'pop': [
+            {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
+            {'species': 'Herbivore', 'age': 9, 'weight': 10.3}]}]
+
+        i = isl.Island()
+        i.place_animals(input)
+        herbivore_list = i.map[3][4]
+        assert type(herbivore_list).__name__ == 'Herbivore'
+
+    def test_check_animal_in_cell(self):
+        input_list = {'loc': (4, 3), 'pop': [{'species': 'Herbivore',
+                                              'age': 10,
+                                             'weight': 12.6}]}
+        cell = isl.Cell(4, 3, 'S')
+        island = isl.Island()
+        island.place_animals(input_list)
+        assert hasattr(cell.pop, 'Herbivore')
+
+    def test_move_animal(self):
+        pass
+
+    def test_eat_in_order_fitness(self):
+        pass
+
+    def test_animal_dead(self):
+        herbivore = ani.Herbivore()
+        # herbivore.phi = 0, skal faile hvis denne ikke er her. passer uansett
+        # må kunne plassere den
+        herbivore.check_if_dying()
+        assert hasattr(isl.Island, 'Herbivore') is False
+
+    def test_parameter_change(self):
+
+        pass
+
+    def test_value_error_raised_placement_mountain_ocean(self):
+        pass
+
+    def test_die_order_fitness(self):
+        pass
+
+class TestRun:
+    pass
