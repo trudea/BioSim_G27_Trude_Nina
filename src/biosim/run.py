@@ -7,10 +7,6 @@ __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 
-# import animal.py
-import numpy as np
-from math import exp
-import random
 from landscapes import Savannah, Jungle, Ocean, Mountain, Desert
 from animals import Herbivore, Carnivore, bubble_sort_animals
 from island import Island, Cell
@@ -74,10 +70,12 @@ class Run:
         species_dict = [Herbivore, Carnivore]
         for row in self.island.map:
             for cell in row:
+                # N må være lowercase, PEP-8 violation
                 N_dict = {Herbivore:
                           cell.num_specimen(Herbivore),
                           Carnivore: cell.num_specimen(Carnivore)}
                 for animal in cell.pop:
+                    # N lowercase, PEP-8 coding style violation
                     N = N_dict[type(animal)]
                     if N >= 2:
                         if animal.check_if_procreates(N):
@@ -132,7 +130,7 @@ class Run:
         if animal.check_if_dying():
             self.island.remove_animal(cell, animal)
 
-    def collective_action(self, myfunc):
+    def do_collectively(self, myfunc):
         for row in self.island.map:
             for cell in row:
                 for animal in cell.pop:
@@ -143,13 +141,13 @@ class Run:
         self.collective_feeding()
         self.collective_procreation()
         # self.collective_migration()
-        self.collective_action(self.migration)
+        self.do_collectively(self.migration)
         # self.collective_aging()
-        self.collective_action(self.aging)
+        self.do_collectively(self.aging)
         # self.collective_weightloss()
-        self.collective_action(self.weightloss)
+        self.do_collectively(self.weightloss)
         # self.collective_dying()
-        self.collective_action(self.dying)
+        self.do_collectively(self.dying)
 
     def run(self):
         years = 0

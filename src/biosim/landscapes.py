@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import numpy as np
-from math import exp
-import random
-
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
