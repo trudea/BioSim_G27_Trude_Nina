@@ -7,9 +7,9 @@ __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 
-from landscapes import Savannah, Jungle, Ocean, Mountain, Desert
-from animals import Herbivore, Carnivore, bubble_sort_animals
-from island import Island, Cell
+from .landscapes import Savannah, Jungle, Ocean, Mountain, Desert
+from .animals import Herbivore, Carnivore, bubble_sort_animals
+from .island import Island, Cell
 
 
 class Run:
