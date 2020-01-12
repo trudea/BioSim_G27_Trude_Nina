@@ -15,6 +15,7 @@ from landscapes import Savannah, Jungle, Ocean, Mountain, Desert
 from animals import Herbivore, Carnivore, bubble_sort_animals
 from island import Island, Cell
 
+
 class Run:
     default_input = [{'loc': (3, 4), 'pop': [
         {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
@@ -45,41 +46,45 @@ class Run:
         for row in self.island.map:
             for cell in row:
                 if type(cell) in active and len(cell.pop) > 0:
-                    cell.pop = self.bubble_sort_animals(cell.pop)  # sorterer alle
-                    # dyrene etter fitness, men bare å passe på at vi velger ut et species når vi kaller
+                    cell.pop = self.bubble_sort_animals(cell.pop)
+                    # sorterer alle
+                    # dyrene etter fitness, men bare å passe på
+                    # at vi velger ut et species når vi kaller
+
                     for animal in cell.pop:
                         if type(animal) == Herbivore:
-                            cell.landscape.f = animal.weightgain_and_fodder_left()
+                            cell.landscape.f = \
+                                animal.weightgain_and_fodder_left()
+
                     for animal in cell.pop:
                         if type(animal) == Carnivore:
                             eaten = 0
                             for other_animal in cell.pop:
-                                # unngår while for at ikke skal gjentas selv om carn ikke mett
+                                # unngår while for at
+                                # ikke skal gjentas selv om carn ikke mett
                                 if eaten < animal.F and type(
                                         other_animal) == Herbivore:
                                     if animal.check_if_kills(other_animal):
-                                        animal.gaining_weight(other_animal.weight)
+                                        animal.gaining_weight(
+                                            other_animal.weight)
                                         animal.evaluate_fitness()
                                         self.remove_animal(cell, other_animal)
-
-
-
 
     def collective_procreation(self):
         species_dict = [Herbivore, Carnivore]
         for row in self.island.map:
             for cell in row:
                 N_dict = {Herbivore:
-                              cell.num_specimen(Herbivore),
+                          cell.num_specimen(Herbivore),
                           Carnivore: cell.num_specimen(Carnivore)}
                 for animal in cell.pop:
                     N = N_dict[type(animal)]
                     if N >= 2:
-                            if animal.check_if_procreates(N):
-                                newborn = cell.pop.append(type(animal)())
-                                if newborn.weight < animal.weight:
-                                    cell.pop.append(newborn)
-                                    animal.weight -= animal.zeta * newborn.weight
+                        if animal.check_if_procreates(N):
+                            newborn = cell.pop.append(type(animal)())
+                            if newborn.weight < animal.weight:
+                                cell.pop.append(newborn)
+                                animal.weight -= animal.zeta * newborn.weight
 
     """
     def collective_migration(self):
@@ -139,19 +144,19 @@ class Run:
         self.collective_procreation()
         # self.collective_migration()
         self.collective_action(self.migration)
-        #self.collective_aging()
+        # self.collective_aging()
         self.collective_action(self.aging)
-        #self.collective_weightloss()
+        # self.collective_weightloss()
         self.collective_action(self.weightloss)
-        #self.collective_dying()
+        # self.collective_dying()
         self.collective_action(self.dying)
-
 
     def run(self):
         years = 0
         while(years < self.desired_years):
             self.one_cycle()
             years += 1
+
 
 if __name__ == "__main__":
     run = Run()
