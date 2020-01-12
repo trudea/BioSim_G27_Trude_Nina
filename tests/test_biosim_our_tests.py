@@ -35,7 +35,7 @@ class TestIsland:
         """
         map = 'OOOOO\nOJJJO\nOOOOO'
         island = isl.Island(map)
-        assert island.map[0][0] == 'O'
+        assert type(island.map[0][0].landscape).__name__ == 'Ocean'
 
     def test_map_ocean(self):
         """
