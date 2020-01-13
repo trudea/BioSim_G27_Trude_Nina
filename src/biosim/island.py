@@ -7,8 +7,6 @@ __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 import numpy as np
-from math import exp
-import random
 from .landscapes import Savannah, Jungle, Ocean, Mountain, Desert
 from .animals import Herbivore, Carnivore
 
@@ -16,23 +14,6 @@ from .animals import Herbivore, Carnivore
 class Island:
     land_dict = {'S': Savannah, 'J': Jungle,
                  'O': Ocean, 'M': Mountain, 'D': Desert}
-
-    def string_to_array(self, txt):
-        # bør kanskje importeres
-        if txt[-1] is not "\n":
-            txt += "\n"
-        line, lines = [], []
-        y, x = 0, 0
-        for letter in txt:
-            if letter in self.land_dict:
-                line.append(letter)
-                x += 1
-            if letter == "\n":
-                lines.append(line)
-                line = []
-                y += 1
-                x = 0
-        return np.asarray(lines)
 
     def str_to_dict(self, txt):
         txt = txt.split('\n')
@@ -42,7 +23,7 @@ class Island:
         x = 0
         dict = {}
         for row in txt:
-            x=0
+            x = 0
             for letter in row:
                 dict[(y, x)] = self.land_dict[letter]()
                 x += 1
@@ -60,27 +41,10 @@ class Island:
 
     def __init__(self, txt=None):
         self.num_animals = 0
-        self.num_animals_per_species = {'Herbivore' : 0, 'Carnivore': 0}
+        self.num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
         if txt is None:
-            txt = open('rossum.txt').read() # med \n som siste argument
-        #self.map = self.string_to_array(txt)  # array of one-letter-strings
-        self.map = self.str_to_dict(txt) # DICTIONARY
-
-
-
-        # self.check_edges()
-        # island_line = []
-        # island_lines = []
-        """
-        for y, line in enumerate(self.map):
-            for x, letter in enumerate(line):
-
-                island_line.append(self.land_dict[letter]())
-            island_lines.append(island_line)
-            island_line = []
-            """
-        #self.map = np.array(island_lines)
-
+            txt = open('rossum.txt').read()  # med \n som siste argument
+        self.map = self.str_to_dict(txt)
 
     def all_cells(self, myfunc):
         for row in self.map:
@@ -97,8 +61,6 @@ class Island:
                 for animal in cell.pop:
                     myfunc(animal)
 
-
-
     def place_animals(self, input_list):
         ani_dict = {'Herbivore': Herbivore, 'Carnivore': Carnivore}
 
@@ -109,19 +71,18 @@ class Island:
                 self.map[pos].pop.append(new_animal)
                 self.map[(pos)].tot_w_herbivores += new_animal.weight
 
-
     def remove_animal(self, cell, animal):
         cell.pop.remove(animal)
 
     def move_animal(self, old_cell, new_cell, animal):
         new_cell.pop.append(animal)
-        old_cell.pop.remove(animal) # use filtering?
+        old_cell.pop.remove(animal)  # use filtering?
 
     def migration(self):
         copy = self.map
         for pos in self.map:
             for animal in self.map[pos].pop:
-                if animal.check_if_moves: # endre navn slik at animal.moves?
+                if animal.check_if_moves:  # endre navn slik at animal.moves?
                     new_cell = self.choose_new_pos(pos, animal)
                     new_cell.pop.append(animal)
                     self.map[pos].pop.remove(animal)
@@ -136,7 +97,8 @@ class Island:
         total_propensity = sum([pos.propensity for pos in map_list])
         for pos in map_list:
             pos.likelihood = pos.propensity / total_propensity
-        choices = np.random.choice(map_list, 1000, p=[pos.likelihood for pos in map_list])
+        choices = np.random.choice(map_list, 1000, p=[pos.likelihood for pos
+                                                      in map_list])
         chosen_cell = np.random.choice(choices)
         for candidate in map_list:
             candidate.rel_abundance = None
@@ -145,10 +107,65 @@ class Island:
 
     def update_num_animals(self):
         self.num_animals = 0
-        self.num_animals_per_species = {'Herbivore' : 0, 'Carnivore' : 0}
+        self.num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
 
         for cell in self.map.values():
             cell.update_num_animals()
             self.num_animals += cell.num_animals
             for species in self.num_animals_per_species:
-                self.num_animals_per_species[species] += cell.num_animals_per_species[species]
+                self.num_animals_per_species[species] +=\
+                    cell.num_animals_per_species[species]
+
+    def feeding(self):
+        for cell in self.map.values():
+            cell.pop = sorted(cell.pop, key=lambda x: getattr(x, 'phi'))
+            for animal in cell.pop:
+                if type(animal) == Herbivore:
+                    cell.f = \
+                        animal.weightgain_and_fodder_left(cell.f)
+
+            for animal in cell.pop:
+                if type(animal) == Carnivore:
+                    eaten = 0
+                    copy = cell.pop
+                    for other_animal in copy:  # use filtering
+                        if eaten < animal.F and type(
+                                other_animal) == Herbivore:
+                            if animal.check_if_kills(other_animal):
+                                animal.gaining_weight(
+                                    other_animal.weight)
+                                animal.evaluate_fitness()
+                                self.remove_animal(cell,
+                                                   other_animal)
+
+    def procreation(self):
+        # species_dict = [Herbivore, Carnivore]
+        for cell in self.map.values():
+            N_dict = {Herbivore:
+                      cell.num_specimen(Herbivore),
+                      Carnivore: cell.num_specimen(Carnivore)}
+            for animal in cell.pop:
+                # N lowercase, PEP-8 coding style violation
+                N = N_dict[type(animal)]
+                if N >= 2:
+                    if animal.check_if_procreates(N):
+                        newborn = cell.pop.append(type(animal)())
+                        if newborn.weight < animal.weight:
+                            cell.pop.append(newborn)
+                            animal.weight -= animal.zeta * newborn.weight
+
+    def aging(self):
+        for cell in self.map.values():
+            for animal in cell.pop:
+                animal.age += 1
+
+    def weightloss(self):
+        for cell in self.map.values():
+            for animal in cell.pop:
+                animal.losing_weight()
+
+    def dying(self):
+        for cell in self.map.values():
+            for animal in cell.pop:
+                if animal.check_if_dying():
+                    self.remove_animal(cell, animal)

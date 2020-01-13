@@ -6,6 +6,7 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 from math import exp
 from .animals import Herbivore, Carnivore
 
+
 class Landscape_cell:
     def __init__(self):
         self.f = 0
@@ -15,7 +16,7 @@ class Landscape_cell:
             sum([animal.weight for animal in self.pop if type(animal)
                  == Herbivore])
         self.num_animals = 0
-        self.num_animals_per_species = {'Herbivore' : 0, 'Carnivore' : 0}
+        self.num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
         self.rel_abundance = None
         self.propensity = None
         self.likelihood = None
@@ -45,7 +46,6 @@ class Landscape_cell:
         else:
             self.propensity = exp(animal.lambdah * self.rel_abundance)
 
-
     def update_num_animals(self):
         for animal in self.pop:
             self.num_animals_per_species[type(animal).__name__] += 1
@@ -59,8 +59,9 @@ class Landscape_cell:
         for animal in self.pop:
             if animal.check_if_moves:
                 new_cell = self.choose_new_cell(animal)
-                moving.append({'loc': new_cell, 'pop': [{'species': type(animal).__name__, 'weight': animal.weight, 'age': animal.age}]})
-
+                moving.append({'loc': new_cell, 'pop': \
+                    [{'species': type(animal).__name__,
+                      'weight': animal.weight, 'age': animal.age}]})
 
 
 class Savannah(Landscape_cell):
