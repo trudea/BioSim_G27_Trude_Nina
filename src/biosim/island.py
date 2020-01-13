@@ -9,8 +9,8 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 import numpy as np
 from math import exp
 import random
-from landscapes import Savannah, Jungle, Ocean, Mountain, Desert
-from animals import Herbivore, Carnivore, bubble_sort_animals
+from .landscapes import Savannah, Jungle, Ocean, Mountain, Desert
+from .animals import Herbivore, Carnivore, bubble_sort_animals
 
 
 class Cell:
@@ -110,7 +110,7 @@ class Island:
         possible_cells = [self.map[y-1][x], self.map[y+1][x], self.map[y][x-1],
                           self.map[y][x+1]]
         for element in possible_cells:
-            if type(element.landscape) == Ocean:
+            if type(element.landscape) == Ocean: # use filtering
                 possible_cells.remove(element)
             elif type(element.landscape) == Mountain:
                 possible_cells.remove(element)
@@ -146,4 +146,4 @@ class Island:
 
     def move_animal(self, old_cell, new_cell, animal):
         new_cell.pop.append(animal)
-        old_cell.pop.remove(animal)
+        old_cell.pop.remove(animal) # use filtering?

@@ -2,10 +2,10 @@
 
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
-import BioSim_G27_Trude_Nina.src.biosim.island as isl
-import BioSim_G27_Trude_Nina.src.biosim.animals as ani
-import BioSim_G27_Trude_Nina.src.biosim.landscapes as land
-import BioSim_G27_Trude_Nina.src.biosim.run as run
+import biosim.island as isl
+import biosim.animals as ani
+import biosim.landscapes as land
+import biosim.run as run
 import pytest
 import random
 

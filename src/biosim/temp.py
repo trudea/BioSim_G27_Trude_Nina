@@ -1,9 +1,9 @@
 from math import exp
 import random
 import numpy as np
-from animals import Herbivore, Carnivore
-from landscapes import Savannah, Jungle, Mountain, Desert, Ocean
-from island import Island, Cell
+from .animals import Herbivore, Carnivore
+from .landscapes import Savannah, Jungle, Mountain, Desert, Ocean
+from .island import Island, Cell
 
 temp = {'banan': 1, 'eple': 2}
 
