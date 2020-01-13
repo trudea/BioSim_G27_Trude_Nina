@@ -3,10 +3,13 @@
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
+from math import exp
 from .animals import Herbivore, Carnivore
 
 class Landscape_cell:
     def __init__(self):
+        self.f = 0
+        self.num_animals = 0
         self.pop = []
         self.tot_w_herbivores = \
             sum([animal.weight for animal in self.pop if type(animal)
@@ -24,19 +27,24 @@ class Landscape_cell:
                 n += 1
         return n
 
-    def get_rel_abundance(self, animaltype):
+    def get_rel_abundance(self, animal):
+        if type(animal) == Herbivore:
+            fodder = self.f
 
-        if animaltype == Herbivore:
-            fodder = self.landscape.f
-
-        if animaltype == Carnivore:
+        if type(animal) == Carnivore:
             fodder = self.tot_w_herbivores
 
-        n = self.num_specimen(animaltype)
-        return fodder / ((n + 1) * animaltype.paramdict['F'])
+        n = self.num_specimen(type(animal))
+        self.rel_abundance = fodder / ((n + 1) * animal.F)
 
-    def get_position(self):
-        pass
+    def get_propensity(self, animal):
+        if type(self) == Ocean:
+            self.propensity = 0
+        elif type(self) == Mountain:
+            self.propensity = 0
+        else:
+            self.propensity = exp(animal.lambdah * self.rel_abundance)
+
 
     def update_num_animals(self):
         for animal in self.pop:

@@ -57,21 +57,19 @@ class Run:
 
     def collective_procreation(self):
         species_dict = [Herbivore, Carnivore]
-        for row in self.island.map:
-            for cell in row:
-                # N må være lowercase, PEP-8 violation
-                N_dict = {Herbivore:
-                          cell.num_specimen(Herbivore),
-                          Carnivore: cell.num_specimen(Carnivore)}
-                for animal in cell.pop:
-                    # N lowercase, PEP-8 coding style violation
-                    N = N_dict[type(animal)]
-                    if N >= 2:
-                        if animal.check_if_procreates(N):
-                            newborn = cell.pop.append(type(animal)())
-                            if newborn.weight < animal.weight:
-                                cell.pop.append(newborn)
-                                animal.weight -= animal.zeta * newborn.weight
+        for pos in self.island.map:
+            N_dict = {Herbivore:
+                      self.island.map[pos].num_specimen(Herbivore),
+                      Carnivore: self.island.map[pos].num_specimen(Carnivore)}
+            for animal in self.island.map[pos].pop:
+                # N lowercase, PEP-8 coding style violation
+                N = N_dict[type(animal)]
+                if N >= 2:
+                    if animal.check_if_procreates(N):
+                        newborn = cell.pop.append(type(animal)())
+                        if newborn.weight < animal.weight:
+                            cell.pop.append(newborn)
+                            animal.weight -= animal.zeta * newborn.weight
 
     """
     def collective_migration(self):
@@ -117,8 +115,7 @@ class Run:
             self.island.remove_animal(cell, animal)
 
     def do_collectively(self, myfunc):
-        for row in self.island.map:
-            for cell in row:
+        for cell in self.island.map.values():
                 for animal in cell.pop:
                     myfunc(animal, cell)
 
@@ -136,6 +133,7 @@ class Run:
         self.do_collectively(self.weightloss)
         # self.collective_dying()
         self.do_collectively(self.dying)
+
         self.island.update_num_animals()
 
     def run(self):
