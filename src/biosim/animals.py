@@ -70,12 +70,17 @@ class Animal:
 
     def aging(self):
         self.age += 1
+        self.evaluate_fitness()
 
     def gaining_weight(self, intake_weight):
         self.weight += (self.beta * intake_weight)
+        self.evaluate_fitness()
+
 
     def losing_weight(self):
         self.weight -= (self.eta * self.weight)
+        self.evaluate_fitness()
+
 
     def check_if_dying(self):
         # returnerer om dyret skal dø eller ikke

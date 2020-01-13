@@ -42,8 +42,7 @@ class Run:
         for row in self.island.map:
             for cell in row:
                 if type(cell) in active and len(cell.pop) > 0:
-                    #cell.pop = self.bubble_sort_animals(cell.pop)
-                    cell.pop = sorted(cell.pop, key= lambda x: getattr(x, 'phi'))
+                    cell.pop = sorted(cell.pop, key = lambda x: getattr(x, 'phi'))
                     for animal in cell.pop:
                         if type(animal) == Herbivore:
                             cell.landscape.f = \
@@ -52,9 +51,8 @@ class Run:
                     for animal in cell.pop:
                         if type(animal) == Carnivore:
                             eaten = 0
-                            for other_animal in cell.pop:
-                                # unngår while for at
-                                # ikke skal gjentas selv om carn ikke mett
+                            copy = cell.pop
+                            for other_animal in copy: # use filtering
                                 if eaten < animal.F and type(
                                         other_animal) == Herbivore:
                                     if animal.check_if_kills(other_animal):
