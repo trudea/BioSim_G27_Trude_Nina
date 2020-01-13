@@ -42,7 +42,8 @@ class Run:
         for row in self.island.map:
             for cell in row:
                 if type(cell) in active and len(cell.pop) > 0:
-                    cell.pop = self.bubble_sort_animals(cell.pop)
+                    #cell.pop = self.bubble_sort_animals(cell.pop)
+                    cell.pop = sorted(cell.pop, key= lambda x: getattr(x, 'phi'))
                     for animal in cell.pop:
                         if type(animal) == Herbivore:
                             cell.landscape.f = \
@@ -144,6 +145,7 @@ class Run:
         self.do_collectively(self.weightloss)
         # self.collective_dying()
         self.do_collectively(self.dying)
+        self.island.update_num_animals()
 
     def run(self):
         years = 0
@@ -155,6 +157,11 @@ class Run:
 if __name__ == "__main__":
     run = Run()
     run.run()
+    print(run.island.num_animals)
+    print(run.island.num_animals_per_species['Herbivore'])
+    print(run.island.num_animals_per_species['Carnivore'])
+
+
 
 
 
