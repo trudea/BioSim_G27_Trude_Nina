@@ -2,10 +2,10 @@
 
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
-import BioSim_G27_Trude_Nina.src.biosim.island as isl
-import BioSim_G27_Trude_Nina.src.biosim.animals as ani
-import BioSim_G27_Trude_Nina.src.biosim.landscapes as land
-import BioSim_G27_Trude_Nina.src.biosim.run as run
+import biosim.island as isl
+import biosim.animals as ani
+import biosim.landscapes as land
+import biosim.run as run
 import pytest
 import random
 
@@ -58,11 +58,12 @@ class TestLandscapes:
         Checks if a change of parameters actually applies to class instance
         and replaces standard values
         """
+        original_dict = land.Savannah.param_dict.copy()
         jungle = land.Jungle(param_dict={'f_max': 500})
         savannah = land.Savannah(param_dict={'f_max': 200})
         assert jungle.param_dict['f_max'] is not 800 \
             and savannah.param_dict['f_max'] is not 300
-
+        land.Savannah.param_dict = original_dict
     def test_jungle_instance(self):
         """
         Checks if an instance of jungle is created by providing a jungle tile
@@ -97,10 +98,10 @@ class TestLandscapes:
         A test that tests if an instance of the Savannah class, given a
         value under f_max replenishes itself (increases the f value)
         """
-        savannah = land.Savannah()
-        savannah.f = 200
-        savannah.replenish()
-        assert savannah.f > 200
+        s = land.Savannah()
+        s.f = 200.0
+        s.replenish()
+        assert s.f > 200.0
 
     def test_fodder_jungle(self):
         """
@@ -167,24 +168,24 @@ class TestAnimal:
         pass
 
     def test_place_animal(self):
-        input = [{'loc': (3, 4), 'pop': [
+        input = [{'loc': (4, 4), 'pop': [
             {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
             {'species': 'Herbivore', 'age': 9, 'weight': 10.3}]}]
 
         i = isl.Island()
-        cell = isl.Cell(3, 4, 'S')
+        c = isl.Cell(4, 4, 'S')
         i.place_animals(input)
-        herbivore_list = i.map[3][4]
-        assert cell.pop == 2
+        herbivore_list = i.map[4][4]
+        assert len(herbivore_list.pop) == 2
 
-    def test_check_animal_in_cell(self):
-        input_list = {'loc': (4, 3), 'pop': [{'species': 'Herbivore',
+    def test_tot_w_herbivores(self):
+        input_list =[{'loc': (4, 3), 'pop': [{'species': 'Herbivore',
                                               'age': 10,
-                                             'weight': 12.6}]}
-        cell = isl.Cell(4, 3, 'S')
-        island = isl.Island()
-        island.place_animals(input_list)
-        assert cell.tot_w_herbivores == 1
+                                             'weight': 12.6}]}]
+        i = isl.Island()
+        i.place_animals(input_list)
+        c = i.map[4][3]
+        assert c.tot_w_herbivores == 12.6
 
     def test_move_animal(self):
         pass
@@ -201,11 +202,11 @@ class TestAnimal:
 
     def test_little_fodder(self):
         herbivore = ani.Herbivore()
-        herbivore_weight_if_not_limited = (herbivore.weight +
-                                           herbivore.param_dict['F'])
+        herbivore_weight_if_not_limited = (herbivore.weight +herbivore.beta *
+                                           herbivore.F)
         savannah = land.Savannah()
-        savannah.f = random.randint(0, (herbivore.param_dict['F'] - 1))
-        herbivore.weightgain_and_fodder_left(savannah)
+        savannah.f = random.randint(0, (herbivore.F - 1))
+        herbivore.weightgain_and_fodder_left(savannah.f)
         assert herbivore.weight < herbivore_weight_if_not_limited
 
     def test_parameter_change(self):

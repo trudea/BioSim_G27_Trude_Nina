@@ -22,4 +22,15 @@ herman = Herbivore()
 c.pop.append(herman)
 i.choose_new_cell(c, herman)
 carl = Carnivore()
-print(carl.check_if_kills(herman))
+
+
+input = [{'loc': (3, 4), 'pop': [
+            {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
+            {'species': 'Herbivore', 'age': 9, 'weight': 10.3}]}]
+i.place_animals(input)
+c = i.map[3][4]
+
+
+
+
+
