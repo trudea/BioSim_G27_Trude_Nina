@@ -13,6 +13,9 @@ class Landscape_cell:
                  == Herbivore])
         self.num_animals = 0
         self.num_animals_per_species = {'Herbivore' : 0, 'Carnivore' : 0}
+        self.rel_abundance = None
+        self.propensity = None
+        self.likelihood = None
 
     def num_specimen(self, species):
         n = 0
@@ -21,16 +24,16 @@ class Landscape_cell:
                 n += 1
         return n
 
-    def get_rel_abundance(self, animal):
+    def get_rel_abundance(self, animaltype):
 
-        if type(animal) == Herbivore:
+        if animaltype == Herbivore:
             fodder = self.landscape.f
 
-        if type(animal) == Carnivore:
+        if animaltype == Carnivore:
             fodder = self.tot_w_herbivores
 
-        n = self.num_specimen(type(animal))
-        return fodder / ((n + 1) * animal.F)
+        n = self.num_specimen(animaltype)
+        return fodder / ((n + 1) * animaltype.paramdict['F'])
 
     def get_position(self):
         pass

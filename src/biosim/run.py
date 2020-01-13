@@ -129,7 +129,7 @@ class Run:
         self.collective_procreation()
         # self.collective_migration()
         #self.do_collectively(self.migration)
-        self.island.all_migrates()
+        self.island.migration()
         # self.collective_aging()
         self.do_collectively(self.aging)
         # self.collective_weightloss()

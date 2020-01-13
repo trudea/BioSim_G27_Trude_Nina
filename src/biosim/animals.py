@@ -184,7 +184,7 @@ class Carnivore(Animal):
         if self.phi < herbivore.phi:
             return False
         elif 0 < self.phi - herbivore.phi < 1:
-            probability = round((self.phi - herbivore.phi) / self.DeltaPhiMax, 7)
+            probability = (self.phi - herbivore.phi) / self.DeltaPhiMax
             if round(random.random(), 7) <= probability:
                 return True
             else:
