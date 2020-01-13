@@ -2,14 +2,15 @@
 
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
-import biosim.island as isl
-import biosim.animals as ani
-import biosim.landscapes as land
-import biosim.run as run
+import BioSim_G27_Trude_Nina.src.biosim.island as isl
+import BioSim_G27_Trude_Nina.src.biosim.animals as ani
+import BioSim_G27_Trude_Nina.src.biosim.landscapes as land
+import BioSim_G27_Trude_Nina.src.biosim.run as run
 import pytest
 import random
 
 # fiks fixtures for lettere koding
+
 
 class TestIsland:
 
@@ -55,9 +56,10 @@ class TestLandscapes:
     def test_change_param_dict(self):
         """
         Checks if a change of parameters actually applies to class instance
+        and replaces standard values
         """
-        jungle = isl.Jungle(param_dict={'f_max': 500})
-        savannah = isl.Savannah(param_dict={'f_max': 200})
+        jungle = land.Jungle(param_dict={'f_max': 500})
+        savannah = land.Savannah(param_dict={'f_max': 200})
         assert jungle.param_dict['f_max'] is not 800 \
             and savannah.param_dict['f_max'] is not 300
 
@@ -65,37 +67,37 @@ class TestLandscapes:
         """
         Checks if an instance of jungle is created by providing a jungle tile
         """
-        jungle = isl.Jungle()
-        assert isinstance(jungle, isl.Jungle)
+        jungle = land.Jungle()
+        assert isinstance(jungle, land.Jungle)
 
     def test_desert_instance(self):
         """
         Checks if an instance of desert is created by providing a desert tile
         """
-        desert = isl.Desert()
-        assert isinstance(desert, isl.Desert)
+        desert = land.Desert()
+        assert isinstance(desert, land.Desert)
 
     def test_ocean(self):
         """
         Checks if an instance of ocean is created by providing an ocean tile
         """
-        ocean = isl.Ocean()
-        assert isinstance(ocean, isl.Ocean)
+        ocean = land.Ocean()
+        assert isinstance(ocean, land.Ocean)
 
     def test_mountain(self):
         """
         Checks if an instance of mountain is
         created by providing a mountain tile
         """
-        mountain = isl.Mountain()
-        assert isinstance(mountain, isl.Mountain)
+        mountain = land.Mountain()
+        assert isinstance(mountain, land.Mountain)
 
     def test_fodder_savannah(self):
         """
         A test that tests if an instance of the Savannah class, given a
         value under f_max replenishes itself (increases the f value)
         """
-        savannah = isl.Savannah()
+        savannah = land.Savannah()
         savannah.f = 200
         savannah.replenish()
         assert savannah.f > 200
@@ -106,7 +108,7 @@ class TestLandscapes:
         under f_max replenishes itself to the given parameter
         f_max given to that instance of jungle.
         """
-        jungle = isl.Jungle()
+        jungle = land.Jungle()
         jungle.f = 500
         jungle.replenish()
         assert jungle.f == jungle.param_dict['f_max']
@@ -119,7 +121,7 @@ class TestAnimal:
         Checks if instance of herbivore can be created and is instance of
         the animal class
         """
-        herbivore = isl.Herbivore(None)
+        herbivore = ani.Herbivore(None)
         assert isinstance(herbivore, ani.Animal)
 
     def test_carnivore(self):
