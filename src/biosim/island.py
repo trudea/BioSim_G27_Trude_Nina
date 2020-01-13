@@ -17,6 +17,7 @@ class Cell:
     land_dict = {'S': Savannah, 'J': Jungle,
                  'O': Ocean, 'M': Mountain, 'D': Desert}
 
+
     def __init__(self, y, x, letter):
         self.landscape = self.land_dict[letter]()
         self.pos = (y, x)
@@ -40,9 +41,9 @@ class Cell:
         if type(animal) == Carnivore:
             fodder = self.tot_w_herbivores
 
-        N = self.num_specimen(type(animal))
+        n = self.num_specimen(type(animal))
         # N må være lowercase er en PEP-8 violation
-        return fodder / ((N + 1) * animal.F)
+        return fodder / ((n + 1) * animal.F)
 
 
 class Island:
@@ -99,8 +100,10 @@ class Island:
         for placement_dict in input_list:
             y, x = placement_dict['loc']
             for individual in placement_dict['pop']:
-                self.map[y][x].pop.append(ani_dict[individual['species']](
-                    individual))
+                new_animal = ani_dict[individual['species']](individual)
+                self.map[y][x].pop.append(new_animal)
+                self.map[y][x].tot_w_herbivores += new_animal.weight
+
 
     def remove_animal(self, cell, animal):
         cell.pop.remove(animal)

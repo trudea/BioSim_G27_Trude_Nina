@@ -21,7 +21,7 @@ class Savannah(Landscape):
         self.f = self.f_max
 
     def replenish(self):
-        self.f += self.alpha * (self.f_max - self.f)
+        self.f = self.alpha * (self.f_max - self.f) + self.f
 
 
 class Jungle(Landscape):
