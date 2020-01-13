@@ -1,12 +1,12 @@
 
-import BioSim_G27_Trude_Nina.src.biosim.island as isl
-import BioSim_G27_Trude_Nina.src.biosim.animals as ani
-import BioSim_G27_Trude_Nina.src.biosim.landscapes as land
-import BioSim_G27_Trude_Nina.src.biosim.run as run
+import biosim.island as isl
+import biosim.animals as ani
+import biosim.landscapes as land
+import biosim.run as run
 
 import pytest
 
-
+# keyword argument sorted
 def get_propensity(self, animal, rel_abund):
     return exp(animal.lambdah * rel_abund)
 
