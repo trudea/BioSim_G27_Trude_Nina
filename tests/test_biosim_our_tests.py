@@ -2,14 +2,21 @@
 
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
-import biosim.island as isl
-import biosim.animals as ani
-import biosim.landscapes as land
-import biosim.run as run
+import BioSim_G27_Trude_Nina.src.biosim.island as isl
+import BioSim_G27_Trude_Nina.src.biosim.animals as ani
+import BioSim_G27_Trude_Nina.src.biosim.landscapes as land
+import BioSim_G27_Trude_Nina.src.biosim.run as run
 import pytest
 import random
 
 # fiks fixtures for lettere koding
+
+
+@pytest.fixture()
+def input_list():
+    return [{'loc': (2, 2), 'pop': [{'species': 'Herbivore',
+                              'age': 10,
+                              'weight': 12.6}]}]
 
 
 class TestIsland:
@@ -165,7 +172,10 @@ class TestAnimal:
         assert previous_weight < herbivore.weight
 
     def test_get_position(self):
-        pass
+        connie = ani.Carnivore()
+        cell_example = isl.Cell(2, 2, 'D')
+        cell_example.pop.append(connie)
+        assert connie in cell_example.pop
 
     def test_place_animal(self):
         input = [{'loc': (4, 4), 'pop': [
@@ -187,27 +197,65 @@ class TestAnimal:
         c = i.map[4][3]
         assert c.tot_w_herbivores == 12.6
 
+    def test_move_check(self):
+        """
+        A test that ensures that the boolean check_if_animal_moves behaves
+        accordingly
+        """
+        random.seed(1)
+        herb = ani.Herbivore()
+        herb.phi = 0 # asserts probability of moving is 0
+        assert herb.check_if_animal_moves() is False
+
     def test_move_animal(self):
-        pass
+        random.seed(1)
+        herb = ani.Herbivore()
+        herb.phi = 1
+        cell1 = isl.Cell(2, 2, 'S')
+        cell1.pop.append(herb)
+        cell2 = isl.Cell(3, 2, 'J')
+        isl.Island().move_animal(cell1, cell2, herb)
+        assert len(cell1.pop) == 0 \
+            and len(cell2.pop) == 1
 
     def test_eat_in_order_fitness(self):
-        pass
+        herbert, halvor = ani.Herbivore(), ani.Herbivore()
+        herbert.phi, halvor.phi, herbert.weight, halvor.weight\
+            = 0.5, 0.7, 10, 10
+        savannah = isl.Savannah()
+        savannah.f = 5
+        run.collective_feeding()
+
+        assert herbert.weight > halvor.weight
+
+    def test_check_kills(self):
+        random.seed(999)
+        carnie = ani.Carnivore()
+        herbie = ani.Herbivore
+        carnie.phi, herbie.phi = 1, 0.3
+        assert carnie.check_if_kills(herbie) is False
 
     def test_animal_dead(self):
         herbivore = ani.Herbivore()
-        # herbivore.phi = 0, skal faile hvis denne ikke er her. passer uansett
-        # må kunne plassere den
-        herbivore.check_if_dying()
-        assert hasattr(isl.Island, 'Herbivore') is False
+        herbivore.phi = 0
+        cell = isl.Cell(2, 2, 'S')
+        cell.pop.append(herbivore)
+        assert herbivore.check_if_dying() is True
 
     def test_little_fodder(self):
         herbivore = ani.Herbivore()
-        herbivore_weight_if_not_limited = (herbivore.weight +herbivore.beta *
+        herbivore_weight_if_not_limited = (herbivore.weight + herbivore.beta *
                                            herbivore.F)
         savannah = land.Savannah()
         savannah.f = random.randint(0, (herbivore.F - 1))
         herbivore.weightgain_and_fodder_left(savannah.f)
         assert herbivore.weight < herbivore_weight_if_not_limited
+
+    def test_check_procreation(self):
+        random.seed(999)
+        carnivore1, carnivore2 = ani.Carnivore(), ani.Carnivore()
+        carnivore1.weight, carnivore1.phi = 30, 1
+        assert carnivore1.check_if_procreates(90) is True
 
     def test_parameter_change(self):
 
