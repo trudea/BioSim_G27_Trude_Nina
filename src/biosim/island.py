@@ -13,39 +13,6 @@ from .landscapes import Savannah, Jungle, Ocean, Mountain, Desert
 from .animals import Herbivore, Carnivore, bubble_sort_animals
 
 
-class Cell:
-    land_dict = {'S': Savannah, 'J': Jungle,
-                 'O': Ocean, 'M': Mountain, 'D': Desert}
-
-
-    def __init__(self, y, x, letter):
-        self.landscape = self.land_dict[letter]()
-        self.pos = (y, x)
-        self.pop = []
-        self.tot_w_herbivores = \
-            sum([animal.weight for animal in self.pop if type(animal)
-                 == Herbivore])
-
-    def num_specimen(self, species):
-        n = 0
-        for animal in self.pop:
-            if type(animal) == species:
-                n += 1
-        return n
-
-    def get_rel_abundance(self, animal):
-
-        if type(animal) == Herbivore:
-            fodder = self.landscape.f
-
-        if type(animal) == Carnivore:
-            fodder = self.tot_w_herbivores
-
-        n = self.num_specimen(type(animal))
-        # N må være lowercase er en PEP-8 violation
-        return fodder / ((n + 1) * animal.F)
-
-
 class Island:
     land_dict = {'S': Savannah, 'J': Jungle,
                  'O': Ocean, 'M': Mountain, 'D': Desert}
@@ -91,10 +58,29 @@ class Island:
         island_lines = []
         for y, line in enumerate(self.map):
             for x, letter in enumerate(line):
-                island_line.append(Cell(y, x, letter))
+
+                island_line.append(self.land_dict[letter]())
             island_lines.append(island_line)
             island_line = []
         self.map = np.array(island_lines)
+
+    def all_cells(self, myfunc):
+        for row in self.map:
+            for cell in row:
+                cell.myfunc()
+
+    def replenish_all(self):
+        for row in self.map:
+            for cell in row:
+                cell.replenish
+
+    def all_animals(self, myfunc):
+        for row in self.island.map:
+            for cell in row:
+                for animal in cell.pop:
+                    myfunc(animal)
+
+
 
     def place_animals(self, input_list):
         ani_dict = {'Herbivore': Herbivore, 'Carnivore': Carnivore}
@@ -110,52 +96,59 @@ class Island:
     def remove_animal(self, cell, animal):
         cell.pop.remove(animal)
 
-    def choose_new_cell(self, cell, animal):
-        y, x = cell.pos
-        possible_cells = [self.map[y-1][x], self.map[y+1][x], self.map[y][x-1],
-                          self.map[y][x+1]]
-        for element in possible_cells:
-            if type(element.landscape) == Ocean: # use filtering
-                possible_cells.remove(element)
-            elif type(element.landscape) == Mountain:
-                possible_cells.remove(element)
-        if len(possible_cells) == 0:
-            return False
-        elif len(possible_cells) == 1:
-            return possible_cells[0]
-        temp_dict = {}
-        for element in possible_cells:
-            rel_abund = element.get_rel_abundance(animal)
-            temp_dict[element] = \
-                {'propensity': exp(animal.lambdah * rel_abund)}
-        total_propensity = \
-            sum([temp_dict[element]['propensity'] for element in temp_dict])
-        keys = temp_dict.keys()
-
-        for key in keys:
-            temp_dict[key]['probability'] = \
-                temp_dict[key]['propensity'] / total_propensity
-        remembered_limit = 0
-
-        for key in keys:
-            temp_dict[key]['lower_limit'] = remembered_limit
-            temp_dict[key]['upper_limit'] =\
-                remembered_limit + temp_dict[key]['probability']
-            remembered_limit = temp_dict[key]['upper_limit']
-
-        number = round(random.random(), 7)
-        for key in keys:
-            if temp_dict[key]['lower_limit'] < \
-                    number < temp_dict[key]['upper_limit']:
-                return key
-
     def move_animal(self, old_cell, new_cell, animal):
         new_cell.pop.append(animal)
         old_cell.pop.remove(animal) # use filtering?
 
-    def update_num_animals(self):
-        for row in self.map:
-            for cell in row:
+    def migration(sef):
+        moving_animals = [] # evt dictionary
+        for y, row in enumerate(self.map):
+            for x, cell in enumerate(row):
                 for animal in cell.pop:
-                    self.num_animals_per_species[type(animal).__name__] += 1
-                    self.num_animals += 1
+                    if animal.check_if_moves: # endre navn slik at animal.moves?
+                        new_cell = choose_new_cell(y, x)
+                        moving_animals.append(animal, )
+                moving_animals.append(cell.migration()) # returnerer liste av dictionaries av dyr som vil ut av cellen, med nye posisjoner
+        place_animals(moving_animals)
+
+
+     def choose_new_cell(y, x, animal):
+            #y, x = cell.get_position() # beste
+            y, x = self.get_position()
+            possible_cells = [self.map[y-1][x], self.map[y+1][x], self.map[y][x-1],
+                              self.map[y][x+1]]
+            for element in possible_cells:
+                if type(element.landscape) == Ocean: # use filtering
+                    possible_cells.remove(element)
+                elif type(element.landscape) == Mountain:
+                    possible_cells.remove(element)
+            if len(possible_cells) == 0:
+                return False
+            elif len(possible_cells) == 1:
+                return possible_cells[0]
+            temp_dict = {}
+            for element in possible_cells:
+                rel_abund = element.get_rel_abundance(animal)
+                temp_dict[element] = \
+                    {'propensity': exp(animal.lambdah * rel_abund)}
+            total_propensity = \
+                sum([temp_dict[element]['propensity'] for element in temp_dict])
+            keys = temp_dict.keys()
+
+            for key in keys:
+                temp_dict[key]['probability'] = \
+                    temp_dict[key]['propensity'] / total_propensity
+            remembered_limit = 0
+
+            for key in keys:
+                temp_dict[key]['lower_limit'] = remembered_limit
+                temp_dict[key]['upper_limit'] =\
+                    remembered_limit + temp_dict[key]['probability']
+                remembered_limit = temp_dict[key]['upper_limit']
+
+            number = round(random.random(), 7)
+            for key in keys:
+                if temp_dict[key]['lower_limit'] < \
+                        number < temp_dict[key]['upper_limit']:
+                    return key
+

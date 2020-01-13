@@ -105,14 +105,14 @@ class Animal:
         probability = self.gamma * self.phi * (N - 1)
         if probability > 1:
             probability = 1
-        if round(random.random(), 7) <= probability:
+        if random.random() <= probability:
             return True
         else:
             return False
 
-    def check_if_animal_moves(self):
+    def check_if_moves(self):
         probability = self.mu * self.phi
-        if round(random.random(), 7) <= probability:
+        if random.random() <= probability:
             return True
         else:
             return False
@@ -191,12 +191,3 @@ class Carnivore(Animal):
                 return False
         else:
             return False
-
-def bubble_sort_animals(original_order):
-    # tar inn liste av instances, skal ta in liste med...
-    copy = list(original_order)
-    for i in range(len(copy) - 1):
-        for j in range(len(copy) - i - 1):
-            if copy[j].phi < copy[j + 1].phi:
-                copy[j], copy[j + 1] = copy[j + 1], copy[j]
-    return copy

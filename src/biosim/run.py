@@ -9,7 +9,7 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
 from src.biosim.animals import Herbivore, Carnivore
-from src.biosim.island import Island, Cell
+from src.biosim.island import Island
 
 
 class Run:
@@ -31,22 +31,16 @@ class Run:
         self.island = Island()
         self.island.place_animals(input)
 
-    def collective_replenishing(self):
-        for row in self.island.map:
-            for cell in row:
-                if type(cell) == Savannah or type(cell) == Jungle:
-                    cell.landscape.replenish()
-
     def collective_feeding(self):
         active = [Savannah, Jungle, Desert]
         for row in self.island.map:
             for cell in row:
                 if type(cell) in active and len(cell.pop) > 0:
-                    cell.pop = sorted(cell.pop, key = lambda x: getattr(x, 'phi'))
+                    cell.pop = sorted(cell.pop, key=lambda x: getattr(x, 'phi'))
                     for animal in cell.pop:
                         if type(animal) == Herbivore:
-                            cell.landscape.f = \
-                                animal.weightgain_and_fodder_left()
+                            cell.f = \
+                                animal.weightgain_and_fodder_left(cell.f)
 
                     for animal in cell.pop:
                         if type(animal) == Carnivore:
@@ -110,10 +104,7 @@ class Run:
                         
     """
 
-    def migration(self, animal, cell):
-        if animal.check_if_animal_moves:
-            new_cell = self.island.choose_new_cell(cell, animal)
-            self.island.move_animal(cell, new_cell, animal)
+
 
     def aging(self, animal, cell):
         animal.aging()
@@ -131,12 +122,14 @@ class Run:
                 for animal in cell.pop:
                     myfunc(animal, cell)
 
+
     def one_cycle(self):
-        self.collective_replenishing()
+        self.island.replenish_all()
         self.collective_feeding()
         self.collective_procreation()
         # self.collective_migration()
-        self.do_collectively(self.migration)
+        #self.do_collectively(self.migration)
+        self.island.all_migrates()
         # self.collective_aging()
         self.do_collectively(self.aging)
         # self.collective_weightloss()
