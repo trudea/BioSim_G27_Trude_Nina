@@ -1,10 +1,11 @@
 
-import biosim.island as isl
-import biosim.animals as ani
-import biosim.landscapes as land
-import biosim.run as run
-
+import BioSim_G27_Trude_Nina.src.biosim.island as isl
+import BioSim_G27_Trude_Nina.src.biosim.animals as ani
+import BioSim_G27_Trude_Nina.src.biosim.landscapes as land
+import BioSim_G27_Trude_Nina.src.biosim.run as run
 import pytest
+import random
+
 
 # keyword argument sorted
 def get_propensity(self, animal, rel_abund):
@@ -34,19 +35,12 @@ class TestMap:
         pass
 
     def test_choose_new_cell(self):
+
         pass
 
 
 class Testanimal:
-
-    def test_move_check(self):
-        pass
-
-    def test_check_procreation(self):
-        pass
-
-    def test_check_kills(self):
-        pass
+    pass
 
 
 class TestRun:
@@ -64,3 +58,12 @@ class TestRun:
 
     def test_one_cycle(self):
         pass
+
+if __name__ == "__main__":
+    cell = isl.Cell(3, 3, 'S')
+    island = isl.Island()
+    carnivore1, carnivore2 = ani.Carnivore(), ani.Carnivore()
+    carnivore1.weight, carnivore1.phi = 15, 1
+    carnivore2.weight, carnivore2.phi = 15, 1
+    cell.pop.append([carnivore1, carnivore2])
+    print(cell.pop)
