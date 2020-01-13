@@ -31,6 +31,12 @@ i.place_animals(input)
 c = i.map[3][4]
 
 
-
-
-
+herman = Herbivore({'age' : 9})
+hermine = Herbivore({'age': 7})
+herbert = Herbivore({'age' : 1})
+pop = [herman, hermine, herbert]
+for i in pop:
+    print(i.age)
+pop = sorted(pop, key=lambda x: getattr(x, 'age'))
+for i in pop:
+    print(i.age)

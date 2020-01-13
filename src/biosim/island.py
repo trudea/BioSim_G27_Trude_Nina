@@ -77,6 +77,8 @@ class Island:
                     raise ValueError
 
     def __init__(self, txt=None):
+        self.num_animals = 0
+        self.num_animals_per_species = {'Herbivore' : 0, 'Carnivore': 0}
         if txt is None:
             txt = open('rossum.txt').read()
             if txt[-1] == "\n":
@@ -150,3 +152,10 @@ class Island:
     def move_animal(self, old_cell, new_cell, animal):
         new_cell.pop.append(animal)
         old_cell.pop.remove(animal) # use filtering?
+
+    def update_num_animals(self):
+        for row in self.map:
+            for cell in row:
+                for animal in cell.pop:
+                    self.num_animals_per_species[type(animal).__name__] += 1
+                    self.num_animals += 1
