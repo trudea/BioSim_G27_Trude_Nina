@@ -145,10 +145,9 @@ class Island:
                       cell.num_specimen(Herbivore),
                       Carnivore: cell.num_specimen(Carnivore)}
             for animal in cell.pop:
-                # N lowercase, PEP-8 coding style violation
-                N = N_dict[type(animal)]
-                if N >= 2:
-                    if animal.check_if_procreates(N):
+                n = N_dict[type(animal)]
+                if n >= 2:
+                    if animal.check_if_procreates(n):
                         newborn = cell.pop.append(type(animal)())
                         if newborn.weight < animal.weight:
                             cell.pop.append(newborn)
