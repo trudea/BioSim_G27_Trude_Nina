@@ -7,7 +7,7 @@ from math import exp
 from .animals import Herbivore, Carnivore
 
 
-class Landscape_cell:
+class LandscapeCell:
     def __init__(self):
         self.f = 0
         self.num_animals = 0
@@ -64,7 +64,7 @@ class Landscape_cell:
                       'weight': animal.weight, 'age': animal.age}]})
 
 
-class Savannah(Landscape_cell):
+class Savannah(LandscapeCell):
     param_dict = {'f_max': 300.0, 'alpha': 0.3}
 
     def __init__(self, param_dict=None):
@@ -79,7 +79,7 @@ class Savannah(Landscape_cell):
         self.f = self.alpha * (self.f_max - self.f) + self.f
 
 
-class Jungle(Landscape_cell):
+class Jungle(LandscapeCell):
     param_dict = {'f_max': 800.0}
 
     def __init__(self, param_dict=None):
@@ -94,17 +94,17 @@ class Jungle(Landscape_cell):
         self.f = self.f_max
 
 
-class Desert(Landscape_cell):
+class Desert(LandscapeCell):
     def __init__(self):
         super().__init__()
         self.f = 0
 
 
-class Ocean(Landscape_cell):
+class Ocean(LandscapeCell):
     def __init__(self):
         super().__init__()
 
 
-class Mountain(Landscape_cell):
+class Mountain(LandscapeCell):
     def __init__(self):
         super().__init__()
