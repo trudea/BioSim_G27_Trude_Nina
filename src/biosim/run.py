@@ -68,6 +68,7 @@ if __name__ == "__main__":
         {'species': 'Herbivore', 'age': 14, 'weight': 50.3},
         {'species': 'Herbivore', 'age': 5, 'weight': 36.1}]}]
 
-    run = Run(10, animals, map)
+    # run = Run(10, animals, map)
+    run = Run()
     run.run()
     print(run.num_animals_results)
