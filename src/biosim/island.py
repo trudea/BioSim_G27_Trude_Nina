@@ -12,15 +12,25 @@ from .animals import Herbivore, Carnivore
 
 
 class Island:
+    # ta høyde for store og små bokstaver
     land_dict = {'S': Savannah, 'J': Jungle,
                  'O': Ocean, 'M': Mountain, 'D': Desert}
 
     def str_to_dict(self, txt):
+        # burde ha check_edges som en egen funksjon?
         txt = txt.split('\n')
         if txt[-1] == '\n':
             txt = txt.pop()
+        # print(type(txt))
+        # print(txt[-1])
+        edges = txt[0] + txt[-1]
+        #print((edges))
+        #edges.append(txt[])
+        for letter in txt[0]:
+            if letter != 'O':
+                raise ValueError
+
         y = 0
-        x = 0
         dict = {}
         for row in txt:
             x = 0
@@ -69,7 +79,7 @@ class Island:
             for individual in placement_dict['pop']:
                 new_animal = ani_dict[individual['species']](individual) # bruke exec?
                 self.map[pos].pop.append(new_animal)
-                self.map[(pos)].tot_w_herbivores += new_animal.weight
+                self.map[pos].tot_w_herbivores += new_animal.weight
 
     def remove_animal(self, cell, animal):
         cell.pop.remove(animal)
@@ -91,14 +101,15 @@ class Island:
         y, x = position
         list = [(y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)]
         map_list = [self.map[element] for element in list]
-        for pos in map_list:
-            pos.get_rel_abundance(animal)
-            pos.get_propensity(animal)
-        total_propensity = sum([pos.propensity for pos in map_list])
-        for pos in map_list:
-            pos.likelihood = pos.propensity / total_propensity
-        choices = np.random.choice(map_list, 1000, p=[pos.likelihood for pos
+        for cell in map_list:
+            cell.get_rel_abundance(animal)
+            cell.get_propensity(animal)
+        total_propensity = sum([cell.propensity for cell in map_list])
+        for cell in map_list:
+            cell.likelihood = cell.propensity / total_propensity
+        choices = np.random.choice(map_list, 1000, p=[cell.likelihood for cell
                                                       in map_list])
+        # bør bruke random.random() og intervaller likevel
         chosen_cell = np.random.choice(choices)
         for candidate in map_list:
             candidate.rel_abundance = None
@@ -138,20 +149,12 @@ class Island:
                                 self.remove_animal(cell,
                                                    other_animal)
 
-    def procreation(self):
+    def collective_procreation(self):
+        # bør flyttes til celle?
         # species_dict = [Herbivore, Carnivore]
         for cell in self.map.values():
-            N_dict = {Herbivore:
-                      cell.num_specimen(Herbivore),
-                      Carnivore: cell.num_specimen(Carnivore)}
-            for animal in cell.pop:
-                n = N_dict[type(animal)]
-                if n >= 2:
-                    if animal.check_if_procreates(n):
-                        newborn = cell.pop.append(type(animal)())
-                        if newborn.weight < animal.weight:
-                            cell.pop.append(newborn)
-                            animal.weight -= animal.zeta * newborn.weight
+            cell.procreation()
+
 
     def aging(self):
         for cell in self.map.values():

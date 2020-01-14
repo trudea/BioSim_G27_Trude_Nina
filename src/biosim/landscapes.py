@@ -26,6 +26,7 @@ class LandscapeCell:
         for animal in self.pop:
             if type(animal) == species:
                 n += 1
+        # print(n)
         return n
 
     def get_rel_abundance(self, animal):
@@ -62,6 +63,19 @@ class LandscapeCell:
                 moving.append({'loc': new_cell, 'pop': \
                     [{'species': type(animal).__name__,
                       'weight': animal.weight, 'age': animal.age}]})
+
+    def procreation(self):
+        N_dict = {Herbivore: self.num_specimen(Herbivore),
+                  Carnivore: self.num_specimen(Carnivore)}
+        copy = self.pop
+        for animal in copy:
+            n = N_dict[type(animal)]
+            if n >= 2:
+                if animal.check_if_procreates(n):
+                    newborn = type(animal)()
+                    if newborn.weight < animal.weight:
+                        self.pop.append(newborn)
+                        animal.weight -= animal.zeta * newborn.weight
 
 
 class Savannah(LandscapeCell):
