@@ -73,15 +73,15 @@ class Island:
 
     def remove_animal(self, cell, animal):
         cell.pop.remove(animal)
-
+    """
     def move_animal(self, old_cell, new_cell, animal):
         new_cell.pop.append(animal)
         old_cell.pop.remove(animal)  # use filtering?
-
+    """
     def migration(self):
         copy = self.map
-        for pos in self.map:
-            for animal in self.map[pos].pop:
+        for pos in copy:
+            for animal in copy[pos].pop:
                 if animal.check_if_moves:  # endre navn slik at animal.moves?
                     new_cell = self.choose_new_pos(pos, animal)
                     new_cell.pop.append(animal)
