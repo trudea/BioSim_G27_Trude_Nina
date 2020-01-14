@@ -174,8 +174,9 @@ class TestAnimal:
 
     def test_get_position(self):
         connie = ani.Carnivore()
-        isl.Island().map[4, 3].pop.append(connie)
-        assert connie in isl.Island().map[4, 3].pop
+        cell = isl.Island().map[4, 3]
+        cell.pop.append(connie)
+        assert connie in cell.pop
 
     def test_place_animal(self):
         input = [{'loc': (4, 4), 'pop': [
@@ -206,10 +207,11 @@ class TestAnimal:
         herb.phi = 0  # asserts probability of moving is 0
         assert ani.Animal.check_if_moves(herb) is False
 
-    def test_move_animal(self):
+    def test_migration(self):
         herb, herb.phi = ani.Herbivore(), 1
         cell1, cell2 = land.Savannah(), land.Jungle()
-        isl.Island().move_animal(cell1, cell2, herb)
+        cell1.pop.append(herb)
+        isl.Island().migration()
         assert len(cell1.pop) == 0 \
             and len(cell2.pop) == 1
 
@@ -248,9 +250,9 @@ class TestAnimal:
 
     def test_check_procreation(self):
         random.seed(999)
-        carnivore1, carnivore2 = ani.Carnivore(), ani.Carnivore()
-        carnivore1.weight, carnivore1.phi = 30, 1
-        assert carnivore1.check_if_procreates(90) is True
+        carnivore = ani.Carnivore()
+        carnivore.weight = 30
+        assert carnivore.check_if_procreates(90) is True
 
     def test_parameter_change(self):
         conn = ani.Carnivore()
