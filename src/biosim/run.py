@@ -8,8 +8,9 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 
 #  from src.biosim.island import Island
-from BioSim_G27_Trude_Nina.src.biosim.island import Island
-import matplotlib
+from biosim.island import Island
+
+import matplotlib.pyplot as plt
 
 
 class Run:
@@ -59,12 +60,18 @@ class Run:
 
 
 if __name__ == "__main__":
-    run = Run()
+    """ run = Run()
     run.run()
     print(run.island.num_animals)
     # print(run.island.num_animals_per_species['Herbivore'])
     # print(run.island.num_animals_per_species['Carnivore'])
     print(run.num_animals_results)
     print(run.per_species_results)
-
-
+    """
+    run = Run(1000)
+    run.run()
+    print(run.num_animals_results)
+    plt.plot([x for x in range(1000)], [i for i in run.num_animals_results])
+    plt.plot([x for x in range(len(run.per_species_results))],
+             [i for i in range(len()) run.per_species_results[0][i]])
+    plt.show()
