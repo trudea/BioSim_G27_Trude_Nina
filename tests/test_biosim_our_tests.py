@@ -15,8 +15,8 @@ import random
 @pytest.fixture()
 def input_list():
     return [{'loc': (2, 2), 'pop': [{'species': 'Herbivore',
-                              'age': 10,
-                              'weight': 12.6}]}]
+                                    'age': 10,
+                                     'weight': 12.6}]}]
 
 
 class TestIsland:
@@ -45,7 +45,7 @@ class TestIsland:
         """
         map = 'OOOOO\nOJJJO\nOOOOO'
         island = isl.Island(map)
-        assert type(island.map[0][0].landscape).__name__ == 'Ocean'
+        assert type(island.map[0, 0]).__name__ == 'Ocean'
 
     def test_map_ocean(self):
         """
@@ -53,9 +53,9 @@ class TestIsland:
         tiles surrounding the island.
         """
         with pytest.raises(ValueError):
-            isl.Island('SSS\nOOO')
-            isl.Island('OOO\nOSS')
-            isl.Island('OOO\nOSO\nOSO')
+            isl.Island('SSS\nOOO') and \
+                isl.Island('OOO\nOSS') and \
+                isl.Island('OOO\nOSO\nOSO')
 
 
 class TestLandscapes:
@@ -71,6 +71,7 @@ class TestLandscapes:
         assert jungle.param_dict['f_max'] is not 800 \
             and savannah.param_dict['f_max'] is not 300
         land.Savannah.param_dict = original_dict
+
     def test_jungle_instance(self):
         """
         Checks if an instance of jungle is created by providing a jungle tile
@@ -173,9 +174,8 @@ class TestAnimal:
 
     def test_get_position(self):
         connie = ani.Carnivore()
-        cell_example = isl.Cell(2, 2, 'D')
-        cell_example.pop.append(connie)
-        assert connie in cell_example.pop
+        isl.Island().map[4, 3].pop.append(connie)
+        assert connie in isl.Island().map[4, 3].pop
 
     def test_place_animal(self):
         input = [{'loc': (4, 4), 'pop': [
@@ -183,9 +183,8 @@ class TestAnimal:
             {'species': 'Herbivore', 'age': 9, 'weight': 10.3}]}]
 
         i = isl.Island()
-        c = isl.Cell(4, 4, 'S')
         i.place_animals(input)
-        herbivore_list = i.map[4][4]
+        herbivore_list = i.map[4, 4]
         assert len(herbivore_list.pop) == 2
 
     def test_tot_w_herbivores(self):
@@ -194,7 +193,7 @@ class TestAnimal:
                                              'weight': 12.6}]}]
         i = isl.Island()
         i.place_animals(input_list)
-        c = i.map[4][3]
+        c = i.map[4, 3]
         assert c.tot_w_herbivores == 12.6
 
     def test_move_check(self):
@@ -204,16 +203,12 @@ class TestAnimal:
         """
         random.seed(1)
         herb = ani.Herbivore()
-        herb.phi = 0 # asserts probability of moving is 0
-        assert herb.check_if_animal_moves() is False
+        herb.phi = 0  # asserts probability of moving is 0
+        assert ani.Animal.check_if_moves(herb) is False
 
     def test_move_animal(self):
-        random.seed(1)
-        herb = ani.Herbivore()
-        herb.phi = 1
-        cell1 = isl.Cell(2, 2, 'S')
-        cell1.pop.append(herb)
-        cell2 = isl.Cell(3, 2, 'J')
+        herb, herb.phi = ani.Herbivore(), 1
+        cell1, cell2 = land.Savannah(), land.Jungle()
         isl.Island().move_animal(cell1, cell2, herb)
         assert len(cell1.pop) == 0 \
             and len(cell2.pop) == 1
@@ -222,23 +217,23 @@ class TestAnimal:
         herbert, halvor = ani.Herbivore(), ani.Herbivore()
         herbert.phi, halvor.phi, herbert.weight, halvor.weight\
             = 0.5, 0.7, 10, 10
-        savannah = isl.Savannah()
-        savannah.f = 5
-        run.collective_feeding()
-
+        cell = isl.Island().map[3, 2]
+        cell.pop.append(herbert), cell.pop.append(halvor)
+        cell.f = (herbert.param_dict["F"] - 1)
+        isl.Island.feeding(isl.Island())
         assert herbert.weight > halvor.weight
 
     def test_check_kills(self):
         random.seed(999)
         carnie = ani.Carnivore()
         herbie = ani.Herbivore
-        carnie.phi, herbie.phi = 1, 0.3
+        carnie.phi, herbie.phi = 1, 1
         assert carnie.check_if_kills(herbie) is False
 
     def test_animal_dead(self):
         herbivore = ani.Herbivore()
         herbivore.phi = 0
-        cell = isl.Cell(2, 2, 'S')
+        cell = isl.Island().map[1, 1]
         cell.pop.append(herbivore)
         assert herbivore.check_if_dying() is True
 
@@ -258,14 +253,22 @@ class TestAnimal:
         assert carnivore1.check_if_procreates(90) is True
 
     def test_parameter_change(self):
-
-        pass
+        conn = ani.Carnivore()
+        old_parameter = ani.Carnivore.param_dict["w_birth"]
+        conn.param_dict["w_birth"] = 10
+        assert ani.Carnivore.param_dict["w_birth"] > old_parameter
 
     def test_value_error_raised_placement_mountain_ocean(self):
+        cell_mountain = land.Mountain()
+        cell_ocean = land.Ocean()
+        with pytest.raises(ValueError):
+            cell_mountain.pop.append(ani.Herbivore) and \
+                cell_ocean.pop.append(ani.Herbivore)
+
+    def test_kill_order_fitness(self):
+
         pass
 
-    def test_die_order_fitness(self):
-        pass
 
 class TestRun:
     pass
