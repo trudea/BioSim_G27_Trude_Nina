@@ -15,6 +15,7 @@ class Island:
     # ta høyde for store og små bokstaver
     land_dict = {'S': Savannah, 'J': Jungle,
                  'O': Ocean, 'M': Mountain, 'D': Desert}
+    ani_dict = {}
 
     def str_to_dict(self, txt):
         # burde ha check_edges som en egen funksjon?
@@ -77,8 +78,14 @@ class Island:
         for placement_dict in input_list:
             pos = placement_dict['loc']
             for individual in placement_dict['pop']:
-                new_animal = ani_dict[individual['species']](individual) # bruke exec?
-                self.map[pos].pop.append(new_animal)
+                if individual['species'] not in self.map[pos].pop:
+                    self.map[pos].pop[individual['species']] = []
+                    x = individual['species']
+                    y = exec(x)(individual)
+                    print(animalclass)
+                    new_animal = animalclass(individual)
+                # new_animal = ani_dict[individual['species']](individual) # bruke exec?
+                self.map[pos].pop[individual['species']].append(new_animal)
                 self.map[pos].tot_w_herbivores += new_animal.weight
 
     def remove_animal(self, cell, animal):
@@ -148,6 +155,9 @@ class Island:
                                 animal.evaluate_fitness()
                                 self.remove_animal(cell,
                                                    other_animal)
+                                self.num_animals -= 1
+                                self.num_animals_per_species[type(
+                                    other_animal)] -= 1
 
     def collective_procreation(self):
         # bør flyttes til celle?
@@ -171,3 +181,5 @@ class Island:
             for animal in cell.pop:
                 if animal.check_if_dying():
                     self.remove_animal(cell, animal)
+                    self.num_animals -= 1
+                    self.num_animals_per_species[str(type(animal))] -= 1

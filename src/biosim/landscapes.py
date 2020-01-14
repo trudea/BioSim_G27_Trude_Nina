@@ -11,7 +11,7 @@ class LandscapeCell:
     def __init__(self):
         self.f = 0
         self.num_animals = 0
-        self.pop = []
+        self.pop = {}
         self.tot_w_herbivores = \
             sum([animal.weight for animal in self.pop if type(animal)
                  == Herbivore])
@@ -67,6 +67,7 @@ class LandscapeCell:
     def procreation(self):
         N_dict = {Herbivore: self.num_specimen(Herbivore),
                   Carnivore: self.num_specimen(Carnivore)}
+        newborns = 0
         copy = self.pop
         for animal in copy:
             n = N_dict[type(animal)]
@@ -76,6 +77,8 @@ class LandscapeCell:
                     if newborn.weight < animal.weight:
                         self.pop.append(newborn)
                         animal.weight -= animal.zeta * newborn.weight
+                        newborns += 1
+        return newborns
 
 
 class Savannah(LandscapeCell):
