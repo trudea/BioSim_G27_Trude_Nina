@@ -76,43 +76,31 @@ class Animal:
         self.weight += (self.beta * intake_weight)
         self.evaluate_fitness()
 
-
     def losing_weight(self):
         self.weight -= (self.eta * self.weight)
         self.evaluate_fitness()
 
-
     def check_if_dying(self):
-        # returnerer om dyret skal dø eller ikke
-        """else:
-                   probability = round(self.param_dict['omega'] *
-                   (1 - self.phi), 3)
-                   self.phi = random.choices([1, 0], [probability,
-                    1 - probability])
-                   if self.phi == 0:
-                       '''død'''"""
         probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
         if self.phi == 0 or round(random.random(), 3) <= probability:
-            # riktig ulikhet?
             return True
         else:
             return False
 
-    def check_if_procreates(self, N):
-        # N må være liten n, er en PEP-8 violation
+    def check_if_procreates(self, n):
         if self.weight < self.zeta * (self.w_birth + self.sigma_birth):
             return False
-        probability = self.gamma * self.phi * (N - 1)
+        probability = self.gamma * self.phi * (n - 1)
         if probability > 1:
             probability = 1
-        if round(random.random(), 7) <= probability:
+        if random.random() <= probability:
             return True
         else:
             return False
 
-    def check_if_animal_moves(self):
+    def check_if_moves(self):
         probability = self.mu * self.phi
-        if round(random.random(), 7) <= probability:
+        if random.random() <= probability:
             return True
         else:
             return False
@@ -140,9 +128,6 @@ class Herbivore(Animal):
         super().__init__(attribute_dict)
 
     def weightgain_and_fodder_left(self, available_fodder):
-
-        # bør endre remaining_fodder til return
-        # bør flyttes ut av dyreklasse og inn i feks island klasse
 
         if available_fodder >= self.F:
             fodder_eaten = self.F
@@ -184,19 +169,10 @@ class Carnivore(Animal):
         if self.phi < herbivore.phi:
             return False
         elif 0 < self.phi - herbivore.phi < 1:
-            probability = round((self.phi - herbivore.phi) / self.DeltaPhiMax, 7)
+            probability = (self.phi - herbivore.phi) / self.DeltaPhiMax
             if round(random.random(), 7) <= probability:
                 return True
             else:
                 return False
         else:
             return False
-
-def bubble_sort_animals(original_order):
-    # tar inn liste av instances, skal ta in liste med...
-    copy = list(original_order)
-    for i in range(len(copy) - 1):
-        for j in range(len(copy) - i - 1):
-            if copy[j].phi < copy[j + 1].phi:
-                copy[j], copy[j + 1] = copy[j + 1], copy[j]
-    return copy
