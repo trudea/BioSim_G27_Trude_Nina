@@ -7,7 +7,9 @@ __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 
-from src.biosim.island import Island
+#  from src.biosim.island import Island
+from BioSim_G27_Trude_Nina.src.biosim.island import Island
+import matplotlib
 
 
 class Run:
@@ -38,7 +40,6 @@ class Run:
 
     def one_cycle(self):
         self.island.replenish_all()
-        self.island.replenish()
         self.island.feeding()
         self.island.procreation()
         self.island.migration()
@@ -65,4 +66,5 @@ if __name__ == "__main__":
     # print(run.island.num_animals_per_species['Carnivore'])
     print(run.num_animals_results)
     print(run.per_species_results)
+
 
