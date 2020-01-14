@@ -38,6 +38,7 @@ class Run:
 
     def one_cycle(self):
         self.island.replenish_all()
+        self.island.replenish()
         self.island.feeding()
         self.island.procreation()
         self.island.migration()
@@ -62,5 +63,6 @@ if __name__ == "__main__":
     print(run.island.num_animals)
     # print(run.island.num_animals_per_species['Herbivore'])
     # print(run.island.num_animals_per_species['Carnivore'])
-    print(run.island.num_animals)
+    print(run.num_animals_results)
+    print(run.per_species_results)
 
