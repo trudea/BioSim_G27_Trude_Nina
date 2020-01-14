@@ -24,6 +24,8 @@ class Run:
     def __init__(self, desired_years=10, input=None):
         self.desired_years = desired_years
         self.years_run = 0
+        self.num_animals_results = []
+        self.per_species_results = []
         if input is None:
             input = self.default_input
         self.island = Island()
@@ -44,6 +46,8 @@ class Run:
         self.island.dying()
         self.island.update_num_animals()
         # kan flyttes inn i dying hvis ikke myfunc
+        self.num_animals_results.append(self.island.num_animals)
+        self.per_species_results.append(self.island.num_animals_per_species)
 
     def run(self):
         years = 0
@@ -56,29 +60,7 @@ if __name__ == "__main__":
     run = Run()
     run.run()
     print(run.island.num_animals)
-    print(run.island.num_animals_per_species['Herbivore'])
-    print(run.island.num_animals_per_species['Carnivore'])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    # print(run.island.num_animals_per_species['Herbivore'])
+    # print(run.island.num_animals_per_species['Carnivore'])
+    print(run.island.num_animals)
 
