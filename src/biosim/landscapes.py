@@ -65,19 +65,10 @@ class LandscapeCell:
             species = sorted(self.pop[species],
                              key=lambda x: getattr(x, 'phi'))
         for herbivore in self.pop['Herbivore']:
-            self.f = herbivore.weightgain_and_fodder_left(self.f)
+            #self.f = herbivore.weightgain_and_fodder_left(self.f)
+            herbivore.feeding(self)
         for carnivore in self.pop['Carnivore']:
-            eaten = 0
-            copy = self.pop['Herbivore']
-            for prey in copy:  # use filtering
-                if eaten < carnivore.F:
-                    if carnivore.check_if_kills(prey):
-                        carnivore.gaining_weight(prey.weight)
-                        carnivore.evaluate_fitness()
-                        self.remove_animal(prey)
-                        #self.num_animals -= 1
-                        #self.num_animals_per_species['Herbivore'] -= 1
-                        self.update_num_animals()
+            carnivore.feeding(self, self.pop['Herbivore'])
 
     def place_animals(self, pop_list):
         for individual_dict in pop_list:

@@ -72,9 +72,12 @@ class Animal:
         self.age += 1
         self.evaluate_fitness()
 
+
+    """
     def gaining_weight(self, intake_weight):
         self.weight += (self.beta * intake_weight)
         self.evaluate_fitness()
+    """
 
     def weightloss(self):
         self.weight -= (self.eta * self.weight)
@@ -98,6 +101,8 @@ class Animal:
     def move(self, old_cell, new_cell):
         new_cell.pop[type(self)].append(self)
         old_cell.pop[type(self)].remove(self)
+        old_cell.update_animal_num()
+        new_cell.update_animal_num()
 
     def migrate(self, old_cell, map_list):
         if len(map_list) == 0:
@@ -124,6 +129,10 @@ class Animal:
             candidate.propensity = None
         return chosen_cell
 
+    def remove(self, cell):
+        cell.pop[type(self).__name__].remove(self)
+        cell.update_num_animals()
+
 
 class Herbivore(Animal):
     param_dict = {'w_birth': 8.0,
@@ -146,21 +155,18 @@ class Herbivore(Animal):
     def __init__(self, attribute_dict=None):
         super().__init__(attribute_dict)
 
-    def weightgain_and_fodder_left(self, available_fodder):
+    #def weightgain_and_fodder_left(self, available_fodder):
+    def feeding(self, cell):
+        if cell.f >= self.F:
+            # fodder_eaten = self.F
+            cell.f = cell.f - self.F
+            self.weight += (self.beta * self.F)
+            self.evaluate_fitness()
 
-        if available_fodder >= self.F:
-            fodder_eaten = self.F
-            remaining_fodder = available_fodder - self.F
-
-        if available_fodder < self.F:
-            fodder_eaten = available_fodder
-            remaining_fodder = 0
-
-        if fodder_eaten > 0:
-            self.gaining_weight(fodder_eaten)
-
-        return remaining_fodder
-
+        if cell.f < self.F:
+            cell.f = 0
+            self.weight += (self.beta * cell.f)
+            self.evaluate_fitness()
 
 class Carnivore(Animal):
     param_dict = {'w_birth': 6.0,
@@ -195,3 +201,14 @@ class Carnivore(Animal):
                 return False
         else:
             return False
+
+    def feeding(self, cell, herbivores):
+        eaten = 0
+        copy = herbivores
+        for prey in copy:
+            if eaten < self.F:
+                if self.check_if_kills(prey):
+                    self.gaining_weight(prey.weight)
+                    self.evaluate_fitness()
+                    prey.remove(cell)
+                    self.update_num_animals()
