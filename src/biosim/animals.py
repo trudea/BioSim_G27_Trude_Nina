@@ -131,13 +131,12 @@ class Animal:
 
     def remove(self, cell):
         cell.pop[type(self).__name__].remove(self)
-        cell.update_num_animals()
 
     def fertile(self, n):
         probability = self.lambdah * self.phi * (n-1)
         if probability > 1:
             probability = 1
-        if random.random <= probability:
+        if random.random() <= probability:
             return True
 
 
@@ -165,7 +164,6 @@ class Herbivore(Animal):
 
     def feeding(self, cell):
         if cell.f >= self.F:
-            # fodder_eaten = self.F
             cell.f = cell.f - self.F
             self.weight += (self.beta * self.F)
             self.evaluate_fitness()
@@ -215,7 +213,7 @@ class Carnivore(Animal):
         for prey in copy:
             if eaten < self.F:
                 if self.check_if_kills(prey):
-                    self.gaining_weight(prey.weight)
+                    self.weight += prey.weight
                     self.evaluate_fitness()
                     prey.remove(cell)
-                    self.update_num_animals()
+                    # self.update_num_animals()
