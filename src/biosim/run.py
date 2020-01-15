@@ -35,15 +35,12 @@ class Run:
         self.island = Island(map_input)
         self.island.place_animals(animal_input)
 
-    def do_collectively(self, myfunc):
-        for cell in self.island.map.values():
-            for animal in cell.pop:
-                myfunc(animal, cell)
 
     def one_cycle(self):
-        self.island.replenish_all()
+        #self.island.replenish_all()
+        self.island.all_cells('replenish')
         self.island.feeding()
-        self.island.collective_procreation()
+        self.island.all_cells('procreation')
         self.island.migration()
         self.island.aging()
         self.island.weightloss()

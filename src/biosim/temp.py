@@ -9,6 +9,7 @@ from src.biosim.island import Island
 #from src.biosim.landscapes import *
 import src.biosim.animals as animals
 
-ordbok = {'banan' : 1, 'eple': 2}
-for i in ordbok:
-    print(i)
+s = Savannah()
+s.f = 0.3
+getattr(s, 'replenish')()
+print(s.f)

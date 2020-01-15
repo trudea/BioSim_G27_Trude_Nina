@@ -100,7 +100,7 @@ class Animal:
         else:
             return False
 
-    def check_if_moves(self):
+    def movable(self):
         probability = self.mu * self.phi
         if random.random() <= probability:
             return True

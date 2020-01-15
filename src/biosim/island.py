@@ -58,19 +58,16 @@ class Island:
         # del self.species_to_class['Animal']
 
     def all_cells(self, myfunc):
-        for row in self.map:
-            for cell in row:
-                cell.myfunc()
+        for cell in self.map.values():
+            getattr(cell, myfunc)()
 
-    def replenish_all(self):
-        for cell in self.map:
-            self.map[cell].replenish()
 
     def all_animals(self, myfunc):
-        for row in self.island.map:
-            for cell in row:
-                for animal in cell.pop:
-                    myfunc(animal)
+        for cell in self.map.values():
+            for species in cell.pop:
+                for animal in cell.pop[species]:
+                    getattr(animal, myfunc)()
+
 
     def place_animals(self, input_list):
         # ani_dict = {'Herbivore': Herbivore, 'Carnivore': Carnivore}
@@ -87,17 +84,13 @@ class Island:
 
     def remove_animal(self, cell, animal):
         cell.pop[type(animal).__name__].remove(animal)
-    """
-    def move_animal(self, old_cell, new_cell, animal):
-        new_cell.pop.append(animal)
-        old_cell.pop.remove(animal)  # use filtering?
-    """
+   
     def migration(self): # husk filtering
         for pos in self.map:
             for species in self.map[pos].pop:
                 copy = self.map[pos].pop[species]
                 for animal in copy:
-                    if animal.check_if_moves:  # endre navn slik at animal.moves?
+                    if animal.movable():  # endre navn slik at animal.moves?
                         new_cell = self.choose_new_pos(pos, animal)
                         new_cell.pop[type(animal).__name__].append(animal)
                         self.map[pos].pop[type(animal).__name__].remove(animal)
@@ -150,12 +143,13 @@ class Island:
                                 self.num_animals -= 1
                                 self.num_animals_per_species['Herbivore'] -= 1
 
+    """
     def collective_procreation(self):
         # bør flyttes til celle?
         # species_dict = [Herbivore, Carnivore]
         for cell in self.map.values():
             cell.procreation()
-
+    """
 
     def aging(self):
         for cell in self.map.values():
