@@ -6,8 +6,10 @@ from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
 from src.biosim.animals import Herbivore, Carnivore
 from src.biosim.island import Island
 
-a = 'b = 1 + 2'
-exec(a)
-print(b)
-island = Island()
-print(island.map_dict[(1,1)])
+#from src.biosim.landscapes import *
+import src.biosim.animals as animals
+
+s = Savannah()
+s.f = 0.3
+getattr(s, 'replenish')()
+print(s.f)
