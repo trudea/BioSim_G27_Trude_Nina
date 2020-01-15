@@ -38,7 +38,6 @@ class LandscapeCell:
             total += len(self.pop[species])
         return total
 
-
     def get_rel_abundance(self, animal):
         if type(animal) == Herbivore:
             fodder = self.f
@@ -98,9 +97,6 @@ class LandscapeCell:
                     animal.remove(self)
                     # self.num_animals -= 1
                     # self.num_animals_per_species[type(animal).__name__] -= 1
-
-    def remove_animal(self, animal):
-        self.pop[type(animal).__name__].remove(animal)
 
     def migration(self, map_list):
         for species in self.pop:
