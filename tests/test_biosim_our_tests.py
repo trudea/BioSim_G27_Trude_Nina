@@ -12,11 +12,55 @@ import random
 # fiks fixtures for lettere koding
 
 
-@pytest.fixture()
+@pytest.fixture
 def input_list():
-    return [{'loc': (2, 2), 'pop': [{'species': 'Herbivore',
-                                    'age': 10,
-                                     'weight': 12.6}]}]
+    return [
+        {'loc': (3, 4),
+         'pop': [
+         {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
+         {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
+         {'species': 'Carnivore', 'age': 14, 'weight': 10.3},
+         {'species': 'Carnivore', 'age': 5, 'weight': 10.1}]},
+        {'loc': (4, 4),
+         'pop': [
+          {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
+          {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
+          {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]},
+        {'loc': (2, 2),
+         'pop': [{'species': 'Herbivore', 'age': 10, 'weight': 12.6}]}]
+
+
+@pytest.fixture
+def example_herbivore():
+    default_params = ani.Herbivore.param_dict.copy()
+    yield ani.Herbivore()
+    ani.Herbivore.param_dict = default_params
+
+
+@pytest.fixture
+def example_carnivore():
+    default_params = ani.Carnivore.param_dict.copy()
+    yield ani.Carnivore()
+    ani.Herbivore.param_dict = default_params
+
+
+@pytest.fixture
+def example_savannah():
+    default_params = land.Savannah.param_dict.copy()
+    yield land.Savannah()
+    land.Savannah.param_dict = default_params
+
+
+@pytest.fixture
+def example_jungle():
+    default_params = land.Jungle.param_dict.copy()
+    yield land.Jungle()
+    land.Jungle.param_dict = default_params
+
+
+@pytest.fixture
+def example_map():
+    return 'OOOOO\nOJJJO\nOOOOO'
 
 
 class TestIsland:
@@ -29,22 +73,20 @@ class TestIsland:
         i = isl.Island()
         assert isinstance(i, isl.Island)
 
-    def test_constructor_input(self):
+    def test_constructor_input(self, example_map):
         """
         A test to check if an instance of island class is created
         with input
         """
-        map = 'OOOOO\nOJJJO\nOOOOO'
-        i = isl.Island(map)
+        i = isl.Island(example_map)
         assert isinstance(i, isl.Island)
 
-    def test_map_coordinate_instance(self):
+    def test_map_coordinate_instance(self, example_map):
         """
         A test to check if an instance of Island given initial coordinates
         return the true biome-letter.
         """
-        map = 'OOOOO\nOJJJO\nOOOOO'
-        island = isl.Island(map)
+        island = isl.Island(example_map)
         assert type(island.map[0, 0]).__name__ == 'Ocean'
 
     def test_map_ocean(self):
@@ -72,12 +114,11 @@ class TestLandscapes:
             and savannah.param_dict['f_max'] is not 300
         land.Savannah.param_dict = original_dict
 
-    def test_jungle_instance(self):
+    def test_jungle_instance(self, example_jungle):
         """
         Checks if an instance of jungle is created by providing a jungle tile
         """
-        jungle = land.Jungle()
-        assert isinstance(jungle, land.Jungle)
+        assert isinstance(example_jungle, land.Jungle)
 
     def test_desert_instance(self):
         """
@@ -101,97 +142,91 @@ class TestLandscapes:
         mountain = land.Mountain()
         assert isinstance(mountain, land.Mountain)
 
-    def test_fodder_savannah(self):
+    def test_fodder_savannah(self, example_savannah):
         """
         A test that tests if an instance of the Savannah class, given a
         value under f_max replenishes itself (increases the f value)
         """
-        s = land.Savannah()
-        s.f = 200.0
-        s.replenish()
-        assert s.f > 200.0
+        example_savannah.f = 200.0
+        example_savannah.replenish()
+        assert example_savannah.f > 200.0
 
-    def test_fodder_jungle(self):
+    def test_fodder_jungle(self, example_jungle):
         """
         A test that checks if an instance of Jungle class, given a value
         under f_max replenishes itself to the given parameter
         f_max given to that instance of jungle.
         """
-        jungle = land.Jungle()
-        jungle.f = 500
-        jungle.replenish()
-        assert jungle.f == jungle.param_dict['f_max']
+        example_jungle.f = 500
+        example_jungle.replenish()
+        assert example_jungle.f == example_jungle.param_dict['f_max']
+
+    def test_num_specimen(self, input_list):
+        isl.Island().place_animals(input_list)
+        assert isl.Island().map[2, 2].num_specimen("Herbivore") == 1
+
+    def test_relative_abundance(self, input_list, example_carnivore):
+        isl.Island().place_animals(input_list)
+        assert isl.Island().map[3, 4].get_rel_abundance("Carnivore") == 20.8 \
+            / (3 * example_carnivore.F)
 
 
 class TestAnimal:
 
-    def test_herbivore(self):
+    def test_herbivore(self, example_herbivore):
         """
         Checks if instance of herbivore can be created and is instance of
         the animal class
         """
-        herbivore = ani.Herbivore(None)
-        assert isinstance(herbivore, ani.Animal)
+        assert isinstance(example_herbivore, ani.Animal)
 
-    def test_carnivore(self):
+    def test_carnivore(self, example_carnivore):
         """
         Checks if instance of carnivore can be created and is instance
         of the animal class
         """
-        carnivore = ani.Carnivore(None)
-        assert isinstance(carnivore, ani.Animal)
+        assert isinstance(example_carnivore, ani.Animal)
 
-    def test_aging(self):
+    def test_aging(self, example_herbivore):
         """
         Checks if age of a given instance increases by call of instance.aging
         """
-        herbivore = ani.Herbivore(None)
-        age = herbivore.age
-        herbivore.aging()
-        assert herbivore.age > age
+        old_age = example_herbivore.age
+        example_herbivore.aging()
+        assert example_herbivore.age > old_age
 
-    def test_weightloss(self):
+    def test_weightloss(self, example_herbivore):
         """
         Checks if weight of an instance decreases by call of
         instance.weightloss()
         """
-        herbivore = ani.Herbivore(None)
-        weight = herbivore.weight
-        herbivore.losing_weight()
-        assert herbivore.weight < weight
+        old_weight = example_herbivore.weight
+        example_herbivore.losing_weight()
+        assert example_herbivore.weight < old_weight
 
-    def test_herbivore_feeding(self):
+    def test_herbivore_feeding(self, example_herbivore):
         """
         Checks if weight of an instance increases by call of
         instance.feeding(F)
         given initial parameter value F specific for that instance.
         """
-        herbivore = ani.Herbivore(None)
-        previous_weight = herbivore.weight
-        feed = herbivore.param_dict['F']
-        herbivore.gaining_weight(feed)
-        assert previous_weight < herbivore.weight
+        previous_weight = example_herbivore.weight
+        feed = example_herbivore.param_dict['F']
+        example_herbivore.gaining_weight(feed)
+        assert previous_weight < example_herbivore.weight
 
-    def test_get_position(self):
-        connie = ani.Carnivore()
-        cell = isl.Island().map[4, 3]
-        cell.pop.append(connie)
-        assert connie in cell.pop
+    def test_get_position(self, example_carnivore):
+        cell = land.Savannah()
+        cell.pop.add(example_carnivore)
+        assert example_carnivore in cell.pop
 
-    def test_place_animal(self):
-        input = [{'loc': (4, 4), 'pop': [
-            {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
-            {'species': 'Herbivore', 'age': 9, 'weight': 10.3}]}]
-
+    def test_place_animal(self, input_list):
         i = isl.Island()
-        i.place_animals(input)
+        i.place_animals(input_list)
         herbivore_list = i.map[4, 4]
         assert len(herbivore_list.pop) == 2
 
-    def test_tot_w_herbivores(self):
-        input_list =[{'loc': (4, 3), 'pop': [{'species': 'Herbivore',
-                                              'age': 10,
-                                             'weight': 12.6}]}]
+    def test_tot_w_herbivores(self, input_list):
         i = isl.Island()
         i.place_animals(input_list)
         c = i.map[4, 3]
@@ -239,8 +274,8 @@ class TestAnimal:
         cell.pop.append(herbivore)
         assert herbivore.check_if_dying() is True
 
-    def test_little_fodder(self):
-        herbivore = ani.Herbivore()
+    def test_little_fodder(self, example_herbivore):
+        herbivore = example_herbivore
         herbivore_weight_if_not_limited = (herbivore.weight + herbivore.beta *
                                            herbivore.F)
         savannah = land.Savannah()
@@ -248,17 +283,15 @@ class TestAnimal:
         herbivore.weightgain_and_fodder_left(savannah.f)
         assert herbivore.weight < herbivore_weight_if_not_limited
 
-    def test_check_procreation(self):
+    def test_check_procreation(self, example_carnivore):
         random.seed(999)
-        carnivore = ani.Carnivore()
-        carnivore.weight = 30
-        assert carnivore.check_if_procreates(90) is True
+        example_carnivore.weight = 30
+        assert example_carnivore.check_if_procreates(90) is True
 
-    def test_parameter_change(self):
-        conn = ani.Carnivore()
-        old_parameter = ani.Carnivore.param_dict["w_birth"]
-        conn.param_dict["w_birth"] = 10
-        assert ani.Carnivore.param_dict["w_birth"] > old_parameter
+    def test_parameter_change(self, example_carnivore):
+        old_parameter = example_carnivore.param_dict["w_birth"]
+        example_carnivore.param_dict["w_birth"] = 10
+        assert example_carnivore.param_dict["w_birth"] is not old_parameter
 
     def test_value_error_raised_placement_mountain_ocean(self):
         cell_mountain = land.Mountain()
@@ -268,9 +301,22 @@ class TestAnimal:
                 cell_ocean.pop.append(ani.Herbivore)
 
     def test_kill_order_fitness(self):
-
-        pass
+        cell = land.Jungle()
+        herb, herman = ani.Herbivore(), ani.Herbivore()
+        herb.phi, herman.phi = 0.4, 0.3
+        killer, killer.phi = ani.Carnivore(), 1.0
+        cell.pop.add(herb, herman, killer)
+        isl.Island().feeding()
+        assert cell.pop == 2
 
 
 class TestRun:
-    pass
+    def test_do_collectively(self):
+        pass
+
+    def test_one_cycle(self):
+        pass
+
+    def test_run(self):
+        run.Run(5)
+        assert run.run.years_run == 5
