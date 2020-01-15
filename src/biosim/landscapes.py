@@ -12,23 +12,19 @@ from .animals import Herbivore, Carnivore
 class LandscapeCell:
     def __init__(self):
         self.f = 0
-        self.num_animals = 0
+        # self.num_animals = 0
         self.species_to_class = dict(inspect.getmembers(animals, inspect.isclass))
         del self.species_to_class['Animal']
         self.pop = {'Herbivore': [], 'Carnivore': []}
         self.tot_w_herbivores = \
             sum([herbivore.weight for herbivore in self.pop['Herbivore']])
-        #self.num_animals = 0
-        self.num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
+        # self.num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
         self.rel_abundance = None
         self.propensity = None
         self.likelihood = None
 
-
     def num_specimen(self, species):
         return len(self.pop[species])
-
-
 
     def num_animals_per_species(self):
         num_dict = {}
@@ -66,7 +62,7 @@ class LandscapeCell:
 
     def feeding(self):
         for species in self.pop:
-            species = sorted(self.pop[species], key=lambda x: getattr(x, 'phi'))
+            self.pop[species] = sorted(self.pop[species], key=lambda x: getattr(x, 'phi'))
         for herbivore in self.pop['Herbivore']:
             herbivore.feeding(self)
         for carnivore in self.pop['Carnivore']:
@@ -84,36 +80,27 @@ class LandscapeCell:
     def procreation(self):
         N_dict = {Herbivore: self.num_specimen('Herbivore'),
                   Carnivore: self.num_specimen('Carnivore')}
-        newborns = 0
         for species in self.pop.keys():
             copy = self.pop[species]
             for animal in copy:
                 n = N_dict[type(animal)]
                 if n >= 2:
-                    print(type(animal))
                     if animal.fertile(n):
                         newborn = type(animal)()
                         if newborn.weight < animal.weight:
-                            self.pop.append(newborn)
+                            self.pop[species].append(newborn)
                             animal.weight -= animal.zeta * newborn.weight
-                            #self.num_animals += 1
-                            #self.num_animals_per_species[type(animal)] += 1
-        # self.update_num_animals()
-
-
 
     def dying(self):
         for species in self.pop:
             for animal in self.pop[species]:
                 if animal.dies():
-                    self.remove_animal(animal)
-                    self.num_animals -= 1
-                    self.num_animals_per_species[type(animal).__name__] -= 1
-        self.update_num_animals()
+                    animal.remove(self)
+                    # self.num_animals -= 1
+                    # self.num_animals_per_species[type(animal).__name__] -= 1
 
     def remove_animal(self, animal):
         self.pop[type(animal).__name__].remove(animal)
-        self.update_num_animals()
 
     def migration(self, map_list):
         for species in self.pop:

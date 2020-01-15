@@ -60,20 +60,17 @@ class Island:
     def all_cells(self, myfunc):
         for cell in self.map.values():
             getattr(cell, myfunc)()
-        self.update_num_animals()
 
     def all_animals(self, myfunc):
         for cell in self.map.values():
             for species in cell.pop:
                 for animal in cell.pop[species]:
                     getattr(animal, myfunc)()
-        self.update_num_animals()
 
     def place_animals(self, input_list):
         for placement_dict in input_list:
             pos = placement_dict['loc'] # bør flytte resten til celle?
             self.map[pos].place_animals(placement_dict['pop'])
-        # self.update_num_animals()
 
     def migration(self): # husk filtering
         for cell in self.map.keys():
@@ -92,7 +89,9 @@ class Island:
         self.num_animals = 0
         self.num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
         for cell in self.map.values(): # bør kunne flyttes inn
-            self.num_animals += cell.num_animals
+            self.num_animals += cell.num_animals()
             for species in self.num_animals_per_species:
-                self.num_animals_per_species[species] += cell.num_animals_per_species[species]
+                # print(self.num_animals_per_species[species])
+                # print(cell.num_animals_per_species()[species])
+                self.num_animals_per_species[species] += cell.num_animals_per_species()[species]
 
