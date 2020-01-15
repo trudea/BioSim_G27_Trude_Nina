@@ -13,18 +13,17 @@ class LandscapeCell:
     def __init__(self):
         self.f = 0
         self.num_animals = 0
-        self.species_to_class = dict(
-            inspect.getmembers(animals, inspect.isclass))
+        self.species_to_class = dict(inspect.getmembers(animals, inspect.isclass))
         del self.species_to_class['Animal']
         self.pop = {'Herbivore': [], 'Carnivore': []}
         self.tot_w_herbivores = \
-            sum([animal.weight for animal in self.pop if type(animal)
-                 == Herbivore])
+            sum([herbivore.weight for herbivore in self.pop['Herbivore']])
         self.num_animals = 0
         self.num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
         self.rel_abundance = None
         self.propensity = None
         self.likelihood = None
+
 
     def num_specimen(self, species):
         n = 0
@@ -32,6 +31,13 @@ class LandscapeCell:
             if type(animal) == species:
                 n += 1
         return n
+
+    def update_num_animals(self):
+        for species in self.pop:
+            for animal in self.pop[species]:
+                self.num_animals_per_species[type(animal).__name__] += 1
+                self.num_animals += 1
+
 
     def get_rel_abundance(self, animal):
         if type(animal) == Herbivore:
@@ -51,14 +57,27 @@ class LandscapeCell:
         else:
             self.propensity = exp(animal.lambdah * self.rel_abundance)
 
-    def update_num_animals(self):
-        for species in self.pop:
-            for animal in self.pop[species]:
-                self.num_animals_per_species[type(animal).__name__] += 1
-                self.num_animals += 1
-
     def replenish(self):
         pass
+
+    def feeding(self):
+        for species in self.pop:
+            species = sorted(self.pop[species],
+                             key=lambda x: getattr(x, 'phi'))
+        for herbivore in self.pop['Herbivore']:
+            self.f = herbivore.weightgain_and_fodder_left(self.f)
+        for carnivore in self.pop['Carnivore']:
+            eaten = 0
+            copy = self.pop['Herbivore']
+            for prey in copy:  # use filtering
+                if eaten < carnivore.F:
+                    if carnivore.check_if_kills(prey):
+                        carnivore.gaining_weight(prey.weight)
+                        carnivore.evaluate_fitness()
+                        self.remove_animal(prey)
+                        #self.num_animals -= 1
+                        #self.num_animals_per_species['Herbivore'] -= 1
+                        self.update_num_animals()
 
     def place_animals(self, pop_list):
         for individual_dict in pop_list:
@@ -66,8 +85,11 @@ class LandscapeCell:
                 self.pop[individual_dict['species']] = []
             new_animal = eval(individual_dict['species'])(individual_dict)
             self.pop[individual_dict['species']].append(new_animal)
+            # self.num_animals += 1
+            # self.num_animals_per_species[type(new_animal).__name__] += 1
             if individual_dict['species'] == 'Herbivore':
                 self.tot_w_herbivores += new_animal.weight
+            self.update_num_animals() # kanskje mer effektivt å endre variablen
 
     def procreation(self):
         N_dict = {Herbivore: self.num_specimen(Herbivore),
@@ -83,8 +105,10 @@ class LandscapeCell:
                         if newborn.weight < animal.weight:
                             self.pop.append(newborn)
                             animal.weight -= animal.zeta * newborn.weight
-                            newborns += 1
-            return newborns
+                            #self.num_animals += 1
+                            #self.num_animals_per_species[type(animal)] += 1
+        self.update_num_animals()
+
 
 
     def dying(self):
@@ -94,16 +118,14 @@ class LandscapeCell:
                     self.remove_animal(animal)
                     self.num_animals -= 1
                     self.num_animals_per_species[type(animal).__name__] -= 1
+        self.update_num_animals()
 
     def remove_animal(self, animal):
         self.pop[type(animal).__name__].remove(animal)
+        self.update_num_animals()
 
-"""
-    def weightloss(self):
-        for species in self.pop:
-            for animal in self.pop[species]:
-                animal.losing_weight()
-"""
+
+
 class Savannah(LandscapeCell):
     param_dict = {'f_max': 300.0, 'alpha': 0.3}
 

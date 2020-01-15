@@ -87,18 +87,6 @@ class Animal:
         else:
             return False
 
-    def procreates(self, n):
-        if self.age == 0:
-            return False
-        if self.weight < self.zeta * (self.w_birth + self.sigma_birth):
-            return False
-        probability = self.gamma * self.phi * (n - 1)
-        if probability > 1:
-            probability = 1
-        if random.random() <= probability:
-            return True
-        else:
-            return False
 
     def movable(self):
         probability = self.mu * self.phi
@@ -106,6 +94,34 @@ class Animal:
             return True
         else:
             return False
+
+    def move(self, old_cell, new_cell):
+        new_cell.pop[type(self)].append(self)
+        old_cell.pop[type(self)].remove(self)
+
+    def migrate(self, old_cell, map_list):
+        if len(map_list) == 0:
+            pass
+        elif len(map_list) == 1:
+            self.move(old_cell, map_list[0])
+        else:
+            new_cell = self.choose_new_cell(map_list)
+
+    def choose_new_cell(self, map_list):
+        for cell in map_list:
+            cell.get_rel_abundance(self)
+            cell.get_propensity(self)
+        total_propensity = sum([cell.propensity for cell in map_list])
+        for cell in map_list:
+            cell.likelihood = cell.propensity / total_propensity
+        choices = np.random.choice(map_list, 1000, p=[cell.likelihood for cell
+                                                      in map_list])
+        # bør bruke random.random() og intervaller likevel
+        chosen_cell = np.random.choice(choices)
+        for candidate in map_list:
+            candidate.rel_abundance = None
+            candidate.propensity = None
+        return chosen_cell
 
 
 class Herbivore(Animal):

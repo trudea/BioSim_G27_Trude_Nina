@@ -36,16 +36,17 @@ class Run:
         self.island.place_animals(animal_input)
 
 
+
     def one_cycle(self):
         self.island.all_cells('replenish')
-        self.island.feeding()
+        self.island.all_cells('feeding')
         self.island.all_cells('procreation')
         self.island.migration()
         self.island.all_animals('aging')
         self.island.all_animals('weightloss')
         self.island.all_cells('dying')
-        self.island.update_num_animals()
-        # kan flyttes inn i dying hvis ikke myfunc
+        # self.island.update_num_animals()
+        print('Total population: ', self.island.num_animals)
         self.num_animals_results.append(self.island.num_animals)
         self.per_species_results.append(self.island.num_animals_per_species)
 
@@ -53,6 +54,7 @@ class Run:
         years = 0
         while(years < self.desired_years):
             self.one_cycle()
+            #print(run.num_animals_results)
             years += 1
 
 
@@ -67,4 +69,3 @@ if __name__ == "__main__":
     # run = Run(10, animals, map)
     run = Run()
     run.run()
-    print(run.num_animals_results)

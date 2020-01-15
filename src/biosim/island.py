@@ -60,22 +60,64 @@ class Island:
     def all_cells(self, myfunc):
         for cell in self.map.values():
             getattr(cell, myfunc)()
+        self.update_num_animals()
 
     def all_animals(self, myfunc):
         for cell in self.map.values():
             for species in cell.pop:
                 for animal in cell.pop[species]:
                     getattr(animal, myfunc)()
+        self.update_num_animals()
+
 
 
     def place_animals(self, input_list):
         for placement_dict in input_list:
             pos = placement_dict['loc'] # bør flytte resten til celle?
             self.map[pos].place_animals(placement_dict['pop'])
+        self.update_num_animals()
+
+
+# ENDRINGER
 
 
     def migration(self): # husk filtering
-        for pos in self.map:
+        for cell in self.map:
+            print(self.map((0,0)))
+            print(self.map(cell))
+            if type(self.map(cell)) != Ocean and type(self.map(cell)) != Mountain:
+                y, x = cell
+                print((y, x))
+                print('hi')
+                adjecent_pos = [(y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)] # må ta høyde for edges
+                map_list = [self.map[element] for element in adjecent_pos]
+                for element in map_list:
+                    if type(element) == Ocean or type(element) == Mountain:
+                        map_list.remove(element)
+                """
+                if len(map_list) == 0:
+                    return False # eller egen pos
+                elif len(map_list) == 1:
+                    return map_list[0] #
+                """
+                for species in cell.pop:
+                    for animal in cell.pop[species]:
+                        animal.migrate(cell, map_list)
+
+
+
+
+                for cell in map_list:
+                    cell.get_rel_abundance(animal)
+                    cell.get_propensity(animal)
+                total_propensity = sum([cell.propensity for cell in map_list])
+                for cell in map_list:
+                    cell.likelihood = cell.propensity / total_propensity
+
+
+
+
+    """
             for species in self.map[pos].pop:
                 copy = self.map[pos].pop[species]
                 for animal in copy:
@@ -83,7 +125,11 @@ class Island:
                         new_cell = self.choose_new_pos(pos, animal)
                         new_cell.pop[type(animal).__name__].append(animal)
                         self.map[pos].pop[type(animal).__name__].remove(animal)
+                        new_cell.update_num_animals()
+                        self.map[pos].update_num_animals()
+    """
 
+    """
     def choose_new_pos(self, position, animal):
         y, x = position
         list = [(y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)]
@@ -102,32 +148,13 @@ class Island:
             candidate.rel_abundance = None
             candidate.propensity = None
         return chosen_cell
-
+    """
 
     def update_num_animals(self):
         self.num_animals = 0
         self.num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
         for cell in self.map.values(): # bør kunne flyttes inn
-            cell.update_num_animals()
             self.num_animals += cell.num_animals
             for species in self.num_animals_per_species:
-                self.num_animals_per_species[species] +=\
-                    cell.num_animals_per_species[species]
+                self.num_animals_per_species[species] += cell.num_animals_per_species[species]
 
-    def feeding(self):
-        for cell in self.map.values():
-            for species in cell.pop:
-                species = sorted(cell.pop[species], key=lambda x: getattr(x, 'phi'))
-            for herbivore in cell.pop['Herbivore']:
-                    cell.f = herbivore.weightgain_and_fodder_left(cell.f)
-            for carnivore in cell.pop['Carnivore']:
-                    eaten = 0
-                    copy = cell.pop['Herbivore']
-                    for prey in copy:  # use filtering
-                        if eaten < carnivore.F:
-                            if carnivore.check_if_kills(prey):
-                                carnivore.gaining_weight(prey.weight)
-                                carnivore.evaluate_fitness()
-                                cell.remove_animal(prey)
-                                self.num_animals -= 1
-                                self.num_animals_per_species['Herbivore'] -= 1
