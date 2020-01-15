@@ -16,12 +16,6 @@ class LandscapeCell:
         self.species_to_class = dict(
             inspect.getmembers(animals, inspect.isclass))
         del self.species_to_class['Animal']
-        self.pop = {}
-        """
-        for species in self.species_to_class.keys():
-            print(species)
-            self.pop = {species: []}
-        """
         self.pop = {'Herbivore': [], 'Carnivore': []}
         self.tot_w_herbivores = \
             sum([animal.weight for animal in self.pop if type(animal)
@@ -66,14 +60,14 @@ class LandscapeCell:
     def replenish(self):
         pass
 
-    def migration(self):
-        moving = []
-        for animal in self.pop:
-            if animal.check_if_moves:
-                new_cell = self.choose_new_cell(animal)
-                moving.append({'loc': new_cell, 'pop': \
-                    [{'species': type(animal).__name__,
-                      'weight': animal.weight, 'age': animal.age}]})
+    def place_animals(self, pop_list):
+        for individual_dict in pop_list:
+            if individual_dict['species'] not in self.pop:
+                self.pop[individual_dict['species']] = []
+            new_animal = eval(individual_dict['species'])(individual_dict)
+            self.pop[individual_dict['species']].append(new_animal)
+            if individual_dict['species'] == 'Herbivore':
+                self.tot_w_herbivores += new_animal.weight
 
     def procreation(self):
         N_dict = {Herbivore: self.num_specimen(Herbivore),
@@ -82,7 +76,6 @@ class LandscapeCell:
         for species in self.pop.keys():
             copy = self.pop[species]
             for animal in copy:
-                # print(type(animal))
                 n = N_dict[type(animal)]
                 if n >= 2:
                     if animal.check_if_procreates(n):
@@ -94,14 +87,6 @@ class LandscapeCell:
             return newborns
 
 
-
-
-
-
-
-    def remove_animal(self, animal):
-        self.pop[type(animal).__name__].remove(animal)
-
     def dying(self):
         for species in self.pop:
             for animal in self.pop[species]:
@@ -109,6 +94,9 @@ class LandscapeCell:
                     self.remove_animal(animal)
                     self.num_animals -= 1
                     self.num_animals_per_species[type(animal).__name__] -= 1
+
+    def remove_animal(self, animal):
+        self.pop[type(animal).__name__].remove(animal)
 
 """
     def weightloss(self):

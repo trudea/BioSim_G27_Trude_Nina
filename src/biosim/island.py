@@ -70,14 +70,8 @@ class Island:
 
     def place_animals(self, input_list):
         for placement_dict in input_list:
-            pos = placement_dict['loc']
-            for individual_dict in placement_dict['pop']:
-                if individual_dict['species'] not in self.map[pos].pop:
-                    self.map[pos].pop[individual_dict['species']] = []
-                new_animal = eval(individual_dict['species'])(individual_dict)
-                self.map[pos].pop[individual_dict['species']].append(new_animal)
-                if individual_dict['species'] == 'Herbivore':
-                    self.map[pos].tot_w_herbivores += new_animal.weight
+            pos = placement_dict['loc'] # bør flytte resten til celle?
+            self.map[pos].place_animals(placement_dict['pop'])
 
 
     def migration(self): # husk filtering
@@ -85,7 +79,7 @@ class Island:
             for species in self.map[pos].pop:
                 copy = self.map[pos].pop[species]
                 for animal in copy:
-                    if animal.movable():  # endre navn slik at animal.moves?
+                    if animal.movable():
                         new_cell = self.choose_new_pos(pos, animal)
                         new_cell.pop[type(animal).__name__].append(animal)
                         self.map[pos].pop[type(animal).__name__].remove(animal)
@@ -113,7 +107,7 @@ class Island:
     def update_num_animals(self):
         self.num_animals = 0
         self.num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
-        for cell in self.map.values():
+        for cell in self.map.values(): # bør kunne flyttes inn
             cell.update_num_animals()
             self.num_animals += cell.num_animals
             for species in self.num_animals_per_species:
@@ -134,29 +128,6 @@ class Island:
                             if carnivore.check_if_kills(prey):
                                 carnivore.gaining_weight(prey.weight)
                                 carnivore.evaluate_fitness()
-                                self.remove_animal(cell, prey)
+                                cell.remove_animal(prey)
                                 self.num_animals -= 1
                                 self.num_animals_per_species['Herbivore'] -= 1
-
-    """
-    def collective_procreation(self):
-        # bør flyttes til celle?
-        # species_dict = [Herbivore, Carnivore]
-        for cell in self.map.values():
-            cell.procreation()
-    """
-
-"""
-    def aging(self):
-        for cell in self.map.values():
-            for species in cell.pop:
-                for animal in cell.pop[species]:
-                    animal.age += 1
-"""
-"""
-    def weightloss(self):
-        for cell in self.map.values():
-            for species in cell.pop:
-                for animal in cell.pop[species]:
-                    animal.losing_weight()
-"""
