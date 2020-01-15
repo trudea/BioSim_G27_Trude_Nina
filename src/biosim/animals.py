@@ -85,7 +85,7 @@ class Animal:
 
     def dies(self):
         probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
-        if self.phi == 0 or round(random.random(), 3) <= probability:
+        if self.phi == 0 or random.random() <= probability:
             return True
         else:
             return False
@@ -133,6 +133,14 @@ class Animal:
         cell.pop[type(self).__name__].remove(self)
         cell.update_num_animals()
 
+    def fertile(self, n):
+        probability = self.lambdah * self.phi * (n-1)
+        if probability > 1:
+            probability = 1
+        if random.random <= probability:
+            return True
+
+
 
 class Herbivore(Animal):
     param_dict = {'w_birth': 8.0,
@@ -155,7 +163,6 @@ class Herbivore(Animal):
     def __init__(self, attribute_dict=None):
         super().__init__(attribute_dict)
 
-    #def weightgain_and_fodder_left(self, available_fodder):
     def feeding(self, cell):
         if cell.f >= self.F:
             # fodder_eaten = self.F

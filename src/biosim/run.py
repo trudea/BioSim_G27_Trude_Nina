@@ -50,7 +50,6 @@ class Run:
 
     def run(self):
         years = 0
-        print(run.num_animals_results)
         while(years < self.desired_years):
             self.one_cycle()
             print(run.num_animals_results)

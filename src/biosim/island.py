@@ -73,7 +73,7 @@ class Island:
         for placement_dict in input_list:
             pos = placement_dict['loc'] # bør flytte resten til celle?
             self.map[pos].place_animals(placement_dict['pop'])
-        self.update_num_animals()
+        # self.update_num_animals()
 
     def migration(self): # husk filtering
         for cell in self.map.keys():
