@@ -6,27 +6,25 @@
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
+import inspect
 import numpy as np
 from .landscapes import Savannah, Jungle, Ocean, Mountain, Desert
 from .animals import Herbivore, Carnivore
+import src.biosim.animals as animals
+
 
 
 class Island:
     # ta høyde for store og små bokstaver
     land_dict = {'S': Savannah, 'J': Jungle,
                  'O': Ocean, 'M': Mountain, 'D': Desert}
-    ani_dict = {}
 
     def str_to_dict(self, txt):
         # burde ha check_edges som en egen funksjon?
         txt = txt.split('\n')
         if txt[-1] == '\n':
             txt = txt.pop()
-        # print(type(txt))
-        # print(txt[-1])
         edges = txt[0] + txt[-1]
-        #print((edges))
-        #edges.append(txt[])
         for letter in txt[0]:
             if letter != 'O':
                 raise ValueError
@@ -56,6 +54,8 @@ class Island:
         if txt is None:
             txt = open('rossum.txt').read()  # med \n som siste argument
         self.map = self.str_to_dict(txt)
+        #self.species_to_class = dict(inspect.getmembers(animals, inspect.isclass))
+        # del self.species_to_class['Animal']
 
     def all_cells(self, myfunc):
         for row in self.map:
@@ -73,36 +73,34 @@ class Island:
                     myfunc(animal)
 
     def place_animals(self, input_list):
-        ani_dict = {'Herbivore': Herbivore, 'Carnivore': Carnivore}
+        # ani_dict = {'Herbivore': Herbivore, 'Carnivore': Carnivore}
 
         for placement_dict in input_list:
             pos = placement_dict['loc']
-            for individual in placement_dict['pop']:
-                if individual['species'] not in self.map[pos].pop:
-                    self.map[pos].pop[individual['species']] = []
-                    x = individual['species']
-                    y = exec(x)(individual)
-                    print(animalclass)
-                    new_animal = animalclass(individual)
-                # new_animal = ani_dict[individual['species']](individual) # bruke exec?
-                self.map[pos].pop[individual['species']].append(new_animal)
-                self.map[pos].tot_w_herbivores += new_animal.weight
+            for individual_dict in placement_dict['pop']:
+                if individual_dict['species'] not in self.map[pos].pop:
+                    self.map[pos].pop[individual_dict['species']] = []
+                new_animal = eval(individual_dict['species'])(individual_dict)
+                self.map[pos].pop[individual_dict['species']].append(new_animal)
+                if individual_dict['species'] == 'Herbivore':
+                    self.map[pos].tot_w_herbivores += new_animal.weight
 
     def remove_animal(self, cell, animal):
-        cell.pop.remove(animal)
+        cell.pop[type(animal).__name__].remove(animal)
     """
     def move_animal(self, old_cell, new_cell, animal):
         new_cell.pop.append(animal)
         old_cell.pop.remove(animal)  # use filtering?
     """
-    def migration(self):
-        copy = self.map
-        for pos in copy:
-            for animal in copy[pos].pop:
-                if animal.check_if_moves:  # endre navn slik at animal.moves?
-                    new_cell = self.choose_new_pos(pos, animal)
-                    new_cell.pop.append(animal)
-                    self.map[pos].pop.remove(animal)
+    def migration(self): # husk filtering
+        for pos in self.map:
+            for species in self.map[pos].pop:
+                copy = self.map[pos].pop[species]
+                for animal in copy:
+                    if animal.check_if_moves:  # endre navn slik at animal.moves?
+                        new_cell = self.choose_new_pos(pos, animal)
+                        new_cell.pop[type(animal).__name__].append(animal)
+                        self.map[pos].pop[type(animal).__name__].remove(animal)
 
     def choose_new_pos(self, position, animal):
         y, x = position
@@ -136,28 +134,21 @@ class Island:
 
     def feeding(self):
         for cell in self.map.values():
-            cell.pop = sorted(cell.pop, key=lambda x: getattr(x, 'phi'))
-            for animal in cell.pop:
-                if type(animal) == Herbivore:
-                    cell.f = \
-                        animal.weightgain_and_fodder_left(cell.f)
-
-            for animal in cell.pop:
-                if type(animal) == Carnivore:
+            for species in cell.pop:
+                species = sorted(cell.pop[species], key=lambda x: getattr(x, 'phi'))
+            for herbivore in cell.pop['Herbivore']:
+                    cell.f = herbivore.weightgain_and_fodder_left(cell.f)
+            for carnivore in cell.pop['Carnivore']:
                     eaten = 0
-                    copy = cell.pop
-                    for other_animal in copy:  # use filtering
-                        if eaten < animal.F and type(
-                                other_animal) == Herbivore:
-                            if animal.check_if_kills(other_animal):
-                                animal.gaining_weight(
-                                    other_animal.weight)
-                                animal.evaluate_fitness()
-                                self.remove_animal(cell,
-                                                   other_animal)
+                    copy = cell.pop['Herbivore']
+                    for prey in copy:  # use filtering
+                        if eaten < carnivore.F:
+                            if carnivore.check_if_kills(prey):
+                                carnivore.gaining_weight(prey.weight)
+                                carnivore.evaluate_fitness()
+                                self.remove_animal(cell, prey)
                                 self.num_animals -= 1
-                                self.num_animals_per_species[type(
-                                    other_animal)] -= 1
+                                self.num_animals_per_species['Herbivore'] -= 1
 
     def collective_procreation(self):
         # bør flyttes til celle?
@@ -168,18 +159,21 @@ class Island:
 
     def aging(self):
         for cell in self.map.values():
-            for animal in cell.pop:
-                animal.age += 1
+            for species in cell.pop:
+                for animal in cell.pop[species]:
+                    animal.age += 1
 
     def weightloss(self):
         for cell in self.map.values():
-            for animal in cell.pop:
-                animal.losing_weight()
+            for species in cell.pop:
+                for animal in cell.pop[species]:
+                    animal.losing_weight()
 
     def dying(self):
         for cell in self.map.values():
-            for animal in cell.pop:
-                if animal.check_if_dying():
-                    self.remove_animal(cell, animal)
-                    self.num_animals -= 1
-                    self.num_animals_per_species[str(type(animal))] -= 1
+            for species in cell.pop:
+                for animal in cell.pop[species]:
+                    if animal.check_if_dying():
+                        self.remove_animal(cell, animal)
+                        self.num_animals -= 1
+                        self.num_animals_per_species[type(animal).__name__] -= 1

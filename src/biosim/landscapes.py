@@ -3,7 +3,9 @@
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
+import inspect
 from math import exp
+import src.biosim.animals as animals
 from .animals import Herbivore, Carnivore
 
 
@@ -11,7 +13,16 @@ class LandscapeCell:
     def __init__(self):
         self.f = 0
         self.num_animals = 0
+        self.species_to_class = dict(
+            inspect.getmembers(animals, inspect.isclass))
+        del self.species_to_class['Animal']
         self.pop = {}
+        """
+        for species in self.species_to_class.keys():
+            print(species)
+            self.pop = {species: []}
+        """
+        self.pop = {'Herbivore': [], 'Carnivore': []}
         self.tot_w_herbivores = \
             sum([animal.weight for animal in self.pop if type(animal)
                  == Herbivore])
@@ -26,7 +37,6 @@ class LandscapeCell:
         for animal in self.pop:
             if type(animal) == species:
                 n += 1
-        # print(n)
         return n
 
     def get_rel_abundance(self, animal):
@@ -48,9 +58,10 @@ class LandscapeCell:
             self.propensity = exp(animal.lambdah * self.rel_abundance)
 
     def update_num_animals(self):
-        for animal in self.pop:
-            self.num_animals_per_species[type(animal).__name__] += 1
-            self.num_animals += 1
+        for species in self.pop:
+            for animal in self.pop[species]:
+                self.num_animals_per_species[type(animal).__name__] += 1
+                self.num_animals += 1
 
     def replenish(self):
         pass
@@ -68,17 +79,19 @@ class LandscapeCell:
         N_dict = {Herbivore: self.num_specimen(Herbivore),
                   Carnivore: self.num_specimen(Carnivore)}
         newborns = 0
-        copy = self.pop
-        for animal in copy:
-            n = N_dict[type(animal)]
-            if n >= 2:
-                if animal.check_if_procreates(n):
-                    newborn = type(animal)()
-                    if newborn.weight < animal.weight:
-                        self.pop.append(newborn)
-                        animal.weight -= animal.zeta * newborn.weight
-                        newborns += 1
-        return newborns
+        for species in self.pop.keys():
+            copy = self.pop[species]
+            for animal in copy:
+                # print(type(animal))
+                n = N_dict[type(animal)]
+                if n >= 2:
+                    if animal.check_if_procreates(n):
+                        newborn = type(animal)()
+                        if newborn.weight < animal.weight:
+                            self.pop.append(newborn)
+                            animal.weight -= animal.zeta * newborn.weight
+                            newborns += 1
+            return newborns
 
 
 class Savannah(LandscapeCell):

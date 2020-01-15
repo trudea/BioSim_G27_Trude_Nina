@@ -91,8 +91,6 @@ class Animal:
         if self.age == 0:
             return False
         if self.weight < self.zeta * (self.w_birth + self.sigma_birth):
-            # print('oi')
-
             return False
         probability = self.gamma * self.phi * (n - 1)
         if probability > 1:
