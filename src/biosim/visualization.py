@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 
 """
+Features:
+biomass, gjennomsnittsalder for hver art, gjennomsnittlig dødsalder,
+vekstrate per år (antall døde - antall fødte)
+antall døde per år
+antall fødte hvert år
+
 """
 
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
@@ -8,9 +14,9 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 
 from biosim.island import Island
+from biosim.run import Run
 
 import matplotlib.pyplot as plt
-
 
 
 run = Run()
@@ -24,7 +30,7 @@ print(run.per_species_results)
 run = Run(50)
 run.run()
 print(run.num_animals_results)
-print(run.per_species_results)
+
 x = run.per_species_results
 herbivores = []
 carnivores = []
