@@ -61,7 +61,6 @@ class Island:
         for cell in self.map.values():
             getattr(cell, myfunc)()
 
-
     def all_animals(self, myfunc):
         for cell in self.map.values():
             for species in cell.pop:
@@ -70,8 +69,6 @@ class Island:
 
 
     def place_animals(self, input_list):
-        # ani_dict = {'Herbivore': Herbivore, 'Carnivore': Carnivore}
-
         for placement_dict in input_list:
             pos = placement_dict['loc']
             for individual_dict in placement_dict['pop']:
@@ -82,9 +79,7 @@ class Island:
                 if individual_dict['species'] == 'Herbivore':
                     self.map[pos].tot_w_herbivores += new_animal.weight
 
-    def remove_animal(self, cell, animal):
-        cell.pop[type(animal).__name__].remove(animal)
-   
+
     def migration(self): # husk filtering
         for pos in self.map:
             for species in self.map[pos].pop:
@@ -114,10 +109,10 @@ class Island:
             candidate.propensity = None
         return chosen_cell
 
+
     def update_num_animals(self):
         self.num_animals = 0
         self.num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
-
         for cell in self.map.values():
             cell.update_num_animals()
             self.num_animals += cell.num_animals
@@ -151,23 +146,17 @@ class Island:
             cell.procreation()
     """
 
+"""
     def aging(self):
         for cell in self.map.values():
             for species in cell.pop:
                 for animal in cell.pop[species]:
                     animal.age += 1
-
+"""
+"""
     def weightloss(self):
         for cell in self.map.values():
             for species in cell.pop:
                 for animal in cell.pop[species]:
                     animal.losing_weight()
-
-    def dying(self):
-        for cell in self.map.values():
-            for species in cell.pop:
-                for animal in cell.pop[species]:
-                    if animal.check_if_dying():
-                        self.remove_animal(cell, animal)
-                        self.num_animals -= 1
-                        self.num_animals_per_species[type(animal).__name__] -= 1
+"""

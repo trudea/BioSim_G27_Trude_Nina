@@ -94,6 +94,28 @@ class LandscapeCell:
             return newborns
 
 
+
+
+
+
+
+    def remove_animal(self, animal):
+        self.pop[type(animal).__name__].remove(animal)
+
+    def dying(self):
+        for species in self.pop:
+            for animal in self.pop[species]:
+                if animal.dies():
+                    self.remove_animal(animal)
+                    self.num_animals -= 1
+                    self.num_animals_per_species[type(animal).__name__] -= 1
+
+"""
+    def weightloss(self):
+        for species in self.pop:
+            for animal in self.pop[species]:
+                animal.losing_weight()
+"""
 class Savannah(LandscapeCell):
     param_dict = {'f_max': 300.0, 'alpha': 0.3}
 

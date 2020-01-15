@@ -37,14 +37,13 @@ class Run:
 
 
     def one_cycle(self):
-        #self.island.replenish_all()
         self.island.all_cells('replenish')
         self.island.feeding()
         self.island.all_cells('procreation')
         self.island.migration()
-        self.island.aging()
-        self.island.weightloss()
-        self.island.dying()
+        self.island.all_animals('aging')
+        self.island.all_animals('weightloss')
+        self.island.all_cells('dying')
         self.island.update_num_animals()
         # kan flyttes inn i dying hvis ikke myfunc
         self.num_animals_results.append(self.island.num_animals)

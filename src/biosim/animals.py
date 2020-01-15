@@ -76,18 +76,18 @@ class Animal:
         self.weight += (self.beta * intake_weight)
         self.evaluate_fitness()
 
-    def losing_weight(self):
+    def weightloss(self):
         self.weight -= (self.eta * self.weight)
         self.evaluate_fitness()
 
-    def check_if_dying(self):
+    def dies(self):
         probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
         if self.phi == 0 or round(random.random(), 3) <= probability:
             return True
         else:
             return False
 
-    def check_if_procreates(self, n):
+    def procreates(self, n):
         if self.age == 0:
             return False
         if self.weight < self.zeta * (self.w_birth + self.sigma_birth):
