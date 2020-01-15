@@ -124,7 +124,10 @@ class LandscapeCell:
         self.pop[type(animal).__name__].remove(animal)
         self.update_num_animals()
 
-
+    def migration(self, map_list):
+        for species in self.pop:
+            for animal in self.pop[species]:
+                animal.migrate(self, map_list)
 
 class Savannah(LandscapeCell):
     param_dict = {'f_max': 300.0, 'alpha': 0.3}

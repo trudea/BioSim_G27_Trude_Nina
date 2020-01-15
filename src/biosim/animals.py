@@ -106,6 +106,7 @@ class Animal:
             self.move(old_cell, map_list[0])
         else:
             new_cell = self.choose_new_cell(map_list)
+            self.move(old_cell, new_cell)
 
     def choose_new_cell(self, map_list):
         for cell in map_list:

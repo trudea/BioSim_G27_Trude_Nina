@@ -82,27 +82,20 @@ class Island:
 
 
     def migration(self): # husk filtering
-        for cell in self.map:
-            print(self.map((0,0)))
-            print(self.map(cell))
-            if type(self.map(cell)) != Ocean and type(self.map(cell)) != Mountain:
+        for cell in self.map.keys():
+            # print(cell)
+            # print(self.map(cell))
+            if type(self.map[cell]) != Ocean or type(self.map[cell]) != Mountain:
+                pass
+            else:
                 y, x = cell
-                print((y, x))
-                print('hi')
                 adjecent_pos = [(y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)] # må ta høyde for edges
                 map_list = [self.map[element] for element in adjecent_pos]
                 for element in map_list:
                     if type(element) == Ocean or type(element) == Mountain:
                         map_list.remove(element)
-                """
-                if len(map_list) == 0:
-                    return False # eller egen pos
-                elif len(map_list) == 1:
-                    return map_list[0] #
-                """
-                for species in cell.pop:
-                    for animal in cell.pop[species]:
-                        animal.migrate(cell, map_list)
+                cell.migration(map_list)
+
 
 
 
