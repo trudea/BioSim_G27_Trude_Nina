@@ -22,9 +22,9 @@ class Island:
         txt = txt.split('\n')
         if txt[-1] == '\n':
             txt = txt.pop()
-        self.check_letters(txt)
+        #self.check_letters(txt)
         self.check_edges(txt)
-        self.check_letters(txt)
+        #self.check_letters(txt)
         valid = ['O', 'S', 'J', 'D', 'M']
         for row in txt:
             for letter in row:
@@ -41,6 +41,7 @@ class Island:
             y += 1
         return dict
 
+    """
     def check_letters(self, txt):
         valid = ['O', 'S', 'J', 'D', 'M']
         length_line = []
@@ -51,8 +52,10 @@ class Island:
                     raise ValueError
                 if [length for length in length_line] != len(line):
                     raise ValueError
+    """
 
     def check_edges(self, txt):
+        """
         left_column = [line[0] for line in txt]
         right_column = [line[-1] for line in txt]
         to_check = [txt[0], txt[-1], left_column, right_column]
@@ -60,6 +63,8 @@ class Island:
             for element in list:
                 if element != 'O':
                     raise ValueError
+        """
+        pass
 
     def __init__(self, txt=None):
         self.num_animals = 0
@@ -85,11 +90,11 @@ class Island:
             self.map[pos].place_animals(placement_dict['pop'])
 
     def migration(self): # husk filtering
-        for cell in self.map.keys():
-            if type(self.map[cell]) != Ocean or type(self.map[cell]) != Mountain:
+        for pos, cell in self.map.items():
+            if type(cell) == Ocean or type(cell) == Mountain:
                 pass
             else:
-                y, x = cell
+                y, x = pos
                 adjecent_pos = [(y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)] # må ta høyde for edges
                 map_list = [self.map[element] for element in adjecent_pos]
                 for element in map_list:

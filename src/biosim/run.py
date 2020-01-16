@@ -64,27 +64,35 @@ class Run:
 
     def run(self):
         self.years = 0
-        self.desired_years = 50
+        self.desired_years = 75
         run.island.update_num_animals()
         while(self.years < self.desired_years):
-            # print(run.island.num_animals_per_species)
+            print(run.island.num_animals_per_species)
             self.one_cycle()
             """
             c, n = run.island.update_change()
             print('C: ', c, 'N: ', n)
-            self.years += 1
             """
+            self.years += 1
+
 
 
 if __name__ == "__main__":
-    map = 'OOO\n{}JO\nOOO'
+    map = 'OOOOO\nOJJJO\nOJJJO\nOJJJO\nOJJJO\nOOOO'
     animals = [{'loc': (1, 1), 'pop': [
         {'species': 'Herbivore', 'age': 10, 'weight': 40.5},
         {'species': 'Herbivore', 'age': 9, 'weight': 38.3},
         {'species': 'Herbivore', 'age': 14, 'weight': 50.3},
-        {'species': 'Herbivore', 'age': 5, 'weight': 36.1}]}]
+        {'species': 'Herbivore', 'age': 5, 'weight': 36.1}]},
+               {'loc': (2, 2), 'pop': [
+                   {'species': 'Herbivore', 'age': 10, 'weight': 40.5},
+                   {'species': 'Herbivore', 'age': 9, 'weight': 38.3},
+                   {'species': 'Herbivore', 'age': 14, 'weight': 50.3},
+                   {'species': 'Herbivore', 'age': 5, 'weight': 36.1}]}
 
-    Run("OOO\nORO\nOOO")
+               ]
+
+
 
 
     """
@@ -98,7 +106,7 @@ if __name__ == "__main__":
         run.island.map[(2, 3)].pop['Herbivore'].append(Herbivore())
         run.island.map[(1, 2)].pop['Herbivore'].append(Herbivore())
         """
-
+    run = Run(animals)
     run.run()
     # print(run.island.num_animals_per_species)
 

@@ -100,8 +100,8 @@ class Animal:
             return False
 
     def move(self, old_cell, new_cell):
-        new_cell.pop[type(self)].append(self)
-        old_cell.pop[type(self)].remove(self)
+        new_cell.pop[type(self).__name__].append(self)
+        old_cell.pop[type(self).__name__].remove(self)
 
     def migrate(self, old_cell, map_list):
         if len(map_list) == 0:
