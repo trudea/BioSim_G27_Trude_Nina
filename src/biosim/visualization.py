@@ -20,10 +20,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 
+carnivore_list = [{'loc': (1, 1), 'pop': [
+        {'species': 'Carnivore', 'age': 10, 'weight': 40.5},
+        {'species': 'Carnivore', 'age': 9, 'weight': 38.3},
+        {'species': 'Carnivore', 'age': 14, 'weight': 50.3},
+        {'species': 'Carnivore', 'age': 5, 'weight': 36.1}]},
+               {'loc': (2, 2), 'pop': [
+                   {'species': 'Herbivore', 'age': 10, 'weight': 40.5},
+                   {'species': 'Herbivore', 'age': 9, 'weight': 38.3},
+                   {'species': 'Herbivore', 'age': 14, 'weight': 50.3},
+                   {'species': 'Herbivore', 'age': 5, 'weight': 36.1}]}
 
-simulation = r.Run()
-counter = 100
+               ]
 
+counter = 0
+"""
 while counter > 0:
     simulation.one_cycle()
     species = simulation.per_species_results
@@ -35,6 +46,8 @@ while counter > 0:
 
     for s in species:
         carnivores.append(s["Carnivore"])
+    if counter == 100:
+        simulation.island.place_animals(carnivore_list)
 
     plt.plot([x for x in range(len(simulation.per_species_results))],
              [carnivores[i] for i in
@@ -44,17 +57,45 @@ while counter > 0:
     plt.plot([x for x in range(len(simulation.per_species_results))],
              [herbivores[i] for i in range(len(
                  herbivores))], 'g-', label="Herbivores")
+    plt.xlabel("Years")
+    plt.ylabel("Population")
+    plt.title("Biosimulator")
+    plt.legend()
     plt.pause(0.1)
+    plt.show()
     counter -= 1
+"""
+herbivores = []
+carnivores = []
+simulation = r.Run()
+while counter < 500:
+    simulation.one_cycle()
+    if counter == 50:
+        simulation.island.place_animals(carnivore_list)
+    counter += 1
 
+    species = simulation.per_species_results
+for i in species:
+    herbivores.append(i["Herbivore"])
+
+for s in species:
+    carnivores.append(s["Carnivore"])
+
+plt.plot([x for x in range(len(simulation.per_species_results))],
+        [carnivores[i] for i in
+        range(len(simulation.num_animals_results))],
+         'r-', label="Carnivores")
+
+plt.plot([x for x in range(len(simulation.per_species_results))],
+        [herbivores[i] for i in range(len(
+        herbivores))], 'g-', label="Herbivores")
 plt.xlabel("Years")
 plt.ylabel("Population")
 plt.title("Biosimulator")
 plt.legend()
+plt.pause(0.1)
 plt.show()
 
-print(simulation.num_animals_results)
-print(simulation.per_species_results)
 
 """
 kart = """
