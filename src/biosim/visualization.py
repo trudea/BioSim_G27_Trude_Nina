@@ -8,6 +8,7 @@ antall døde per år
 antall fødte hvert år
 
 """
+from biosim.animals import Carnivore, Herbivore
 
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
@@ -17,44 +18,12 @@ from biosim.island import Island
 import biosim.run as r
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 
 
-def replot(n_steps):
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    ax.set_xlim(0, n_steps)
-    ax.set_ylim(0, 1)
-
-    data = []
-    for _ in range(n_steps):
-        data.append(np.random.random())
-        ax.plot(data, 'b-')
-        plt.pause(1e-6)
-
-
-def update(n_steps):
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    ax.set_xlim(0, n_steps)
-    ax.set_ylim(0, 1)
-
-    line = ax.plot(np.arange(n_steps),
-                   np.full(n_steps, np.nan), 'b-')[0]
-
-    for n in range(n_steps):
-        ydata = line.get_ydata()
-        ydata[n] = np.random.random()
-        line.set_ydata(ydata)
-        plt.pause(1e-6)
-
-
-if __name__ == "__main__":
-    replot(1000)
-    plt.show()
-
-"""
 simulation = r.Run()
 counter = 100
+
 while counter > 0:
     simulation.one_cycle()
     species = simulation.per_species_results
@@ -75,19 +44,19 @@ while counter > 0:
     plt.plot([x for x in range(len(simulation.per_species_results))],
              [herbivores[i] for i in range(len(
                  herbivores))], 'g-', label="Herbivores")
-
-    plt.xlabel("Years")
-    plt.ylabel("Population")
-    plt.title("Biosimulator")
-    plt.legend()
-    plt.pause(1e-6)
-    plt.show()
+    plt.pause(0.1)
     counter -= 1
+
+plt.xlabel("Years")
+plt.ylabel("Population")
+plt.title("Biosimulator")
+plt.legend()
+plt.show()
 
 print(simulation.num_animals_results)
 print(simulation.per_species_results)
 
-
+"""
 kart = """
 
 """

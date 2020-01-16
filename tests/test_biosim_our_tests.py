@@ -110,7 +110,8 @@ class TestIsland:
         return the true biome-letter.
         """
         island = isl.Island(example_map)
-        assert type(island.map[0, 0]).__name__ == 'Ocean'
+        coordinate = island.map[(1,0)]
+        assert type(coordinate).__name__ is 'Ocean'
 
     def test_map_ocean(self):
         """
@@ -192,11 +193,12 @@ class TestLandscapes:
 
     def test_num_specimen(self, input_list):
         isl.Island().place_animals(input_list)
-        assert isl.Island().map[2, 2].num_specimen("Herbivore") == 1
+        assert isl.Island().map[(2, 2)].num_specimen("Herbivore") == 1
 
     def test_relative_abundance(self, input_list, example_carnivore):
         isl.Island().place_animals(input_list)
-        assert isl.Island().map[3, 4].get_rel_abundance(example_carnivore)
+        assert isl.Island().map[(3, 4)].get_rel_abundance(example_carnivore) \
+               == 22.8
 
 
 class TestAnimal:
@@ -254,32 +256,30 @@ class TestAnimal:
         c = i.map[3, 4]
         assert c.tot_w_herbivores == 22.8
 
-    def test_move_check(self):
+    def test_move_check(self, example_herbivore):
         """
         A test that ensures that the boolean check_if_animal_moves behaves
         accordingly
         """
         random.seed(1)
-        herb = ani.Herbivore()
-        herb.phi = 0  # asserts probability of moving is 0
-        assert ani.Animal.check_if_moves(herb) is False
+        example_herbivore.phi = 1  # asserts probability of moving is high
+        assert example_herbivore.movable()
 
-    def test_migration(self):
-        herb, herb.phi = ani.Herbivore(), 1
-        cell1, cell2 = land.Savannah(), land.Jungle()
-        cell1.pop.append(herb)
-        isl.Island().migration()
-        assert len(cell1.pop) == 0 \
-            and len(cell2.pop) == 1
+    def test_migration(self, example_carnivore):
+        cell1, cell2 = land.Savannah(), land.Savannah()
+        cell1.pop["Carnivore"].append(example_carnivore)
+        example_carnivore.move(cell1, cell2)
+        assert len(cell2.pop["Carnivore"]) == 1
 
     def test_eat_in_order_fitness(self):
         herbert, halvor = ani.Herbivore(), ani.Herbivore()
         herbert.phi, halvor.phi, herbert.weight, halvor.weight\
             = 0.5, 0.7, 10, 10
         cell = isl.Island().map[3, 2]
-        cell.pop.append(herbert), cell.pop.append(halvor)
+        cell.pop['Herbivore'].append(herbert), cell.pop['Herbivore'].append(
+            halvor)
         cell.f = (herbert.param_dict["F"] - 1)
-        isl.Island.feeding(isl.Island())
+        cell.feeding()
         assert herbert.weight > halvor.weight
 
     def test_check_kills(self):
@@ -302,7 +302,7 @@ class TestAnimal:
                                            herbivore.F)
         savannah = land.Savannah()
         savannah.f = random.randint(0, (herbivore.F - 1))
-        herbivore.weightgain_and_fodder_left(savannah.f)
+        savannah.feeding()
         assert herbivore.weight < herbivore_weight_if_not_limited
 
     def test_check_procreation(self, example_carnivore):
