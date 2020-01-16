@@ -26,13 +26,23 @@ class Run:
                           {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
                           {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
                           {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
+    herbivore_input = [{'loc': (3, 4), 'pop': [
+        {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
+        {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
+        {'species': 'Herbivore', 'age': 14, 'weight': 10.3},
+        {'species': 'Herbivore', 'age': 5, 'weight': 10.1}]},
+                     {'loc': (4, 4),
+                      'pop': [
+                          {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
+                          {'species': 'Herbivore', 'age': 3, 'weight': 7.3},
+                          {'species': 'Herbivore', 'age': 5, 'weight': 8.1}]}]
 
     def __init__(self, desired_years=10, animal_input=None, map_input=None):
         self.desired_years = desired_years
         self.num_animals_results = []
         self.per_species_results = []
         if animal_input is None:
-            animal_input = self.default_input
+            animal_input = self.herbivore_input
         self.island = Island(map_input)
         self.island.place_animals(animal_input)
 
@@ -53,41 +63,42 @@ class Run:
 
     def run(self):
         self.years = 0
+        self.desired_years = 50
         run.island.update_num_animals()
         while(self.years < self.desired_years):
-            print(run.island.num_animals_per_species)
-
-            for cell in run.island.map.values():
-                for carnivore in cell.pop['Carnivore']:
-                    carnivore.phi = 1
+            # print(run.island.num_animals_per_species)
             self.one_cycle()
+            c, n = run.island.update_change()
+            print('C: ', c, 'N: ', n)
             self.years += 1
 
 
 if __name__ == "__main__":
-    map = 'OOOOO\nOSSSO\nOSSSO\nOSSSO\nOOOOO'
-    animals = [{'loc': (2, 2), 'pop': [
+    map = 'OOO\nOJO\nOOO'
+    animals = [{'loc': (1, 1), 'pop': [
         {'species': 'Herbivore', 'age': 10, 'weight': 40.5},
         {'species': 'Herbivore', 'age': 9, 'weight': 38.3},
         {'species': 'Herbivore', 'age': 14, 'weight': 50.3},
         {'species': 'Herbivore', 'age': 5, 'weight': 36.1}]}]
 
-    run = Run()
 
+    run = Run(50, animals, map)
+    """
     for i in range(100):
-        y = int(random.random()*10)
-        x = int(random.random()*10)
-        run.island.map[(y, x)].pop['Carnivore'].append(Carnivore())
-        run.island.map[(y, x)].pop['Herbivore'].append(Herbivore())
-
-
-
-    # run = Run(10, animals, map)
+        # y = int(random.random()*10)
+        # x = int(random.random()*10)
+        # run.island.map[(y, x)].pop['Carnivore'].append(Carnivore())
+        run.island.map[(1, 1)].pop['Herbivore'].append(Herbivore())
+        run.island.map[(2, 2)].pop['Herbivore'].append(Herbivore())
+        run.island.map[(3, 3)].pop['Herbivore'].append(Herbivore())
+        run.island.map[(2, 3)].pop['Herbivore'].append(Herbivore())
+        run.island.map[(1, 2)].pop['Herbivore'].append(Herbivore())
+        """
 
     run.run()
-    for cell in run.island.map.values():
-        for animal in cell.pop['Herbivore']:
-            #print(animal.weight)
-            pass
+    # print(run.island.num_animals_per_species)
+
+
+
 
 

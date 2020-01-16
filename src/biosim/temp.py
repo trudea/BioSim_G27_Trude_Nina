@@ -11,16 +11,13 @@ import src.biosim.animals as animals
 
 carl = Carnivore()
 herman = Herbivore()
-map = 'OOOOOOO\nOSSSSSO\nOSSSSSO\nOSSSSSO\nOSSSSSO\nOSSSSSO\nOOOOOOO'
+map = 'OOO\nJJO\nOOO'
+# map = 'OOOOOOO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOOOOOOO'
 simple_island = Island(map)
-for cell in simple_island.map.values():
-    for species in cell.pop:
-        cell.pop[species].append(eval(species)())
-        cell.pop[species].append(eval(species)())
-        cell.pop[species].append(eval(species)())
-        cell.pop[species].append(eval(species)())
-        cell.pop[species].append(eval(species)())
-print()
-
+herman = Herbivore()
+cell = simple_island.map[3,3]
+for i in range(20):
+    cell.pop['Herbivore'].append(Herbivore)
+cell.procreation()
 
 

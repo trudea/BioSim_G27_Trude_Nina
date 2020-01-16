@@ -12,16 +12,16 @@ from .animals import Herbivore, Carnivore
 class LandscapeCell:
     def __init__(self):
         self.f = 0
-        # self.num_animals = 0
         self.species_to_class = dict(inspect.getmembers(animals, inspect.isclass))
         del self.species_to_class['Animal']
         self.pop = {'Herbivore': [], 'Carnivore': []}
         self.tot_w_herbivores = \
             sum([herbivore.weight for herbivore in self.pop['Herbivore']])
-        # self.num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
         self.rel_abundance = None
         self.propensity = None
         self.likelihood = None
+        self.corpses = 0
+        self.newborns = 0
 
     def num_specimen(self, species):
         return len(self.pop[species])
@@ -77,26 +77,34 @@ class LandscapeCell:
                 self.tot_w_herbivores += new_animal.weight
 
     def procreation(self):
-        N_dict = {Herbivore: self.num_specimen('Herbivore'),
-                  Carnivore: self.num_specimen('Carnivore')}
+        m = 0
         for species in self.pop.keys():
             copy = self.pop[species]
             for animal in copy:
-                n = N_dict[type(animal)]
+                n = self.num_specimen(species)
                 if n >= 2:
                     if animal.fertile(n):
                         newborn = type(animal)()
                         if newborn.weight < animal.weight:
+                            self.newborns += 1
                             self.pop[species].append(newborn)
                             animal.weight -= animal.zeta * newborn.weight
+        # print(m)
 
     def dying(self):
+        for species in self.pop:
+            self.pop[species] = [a for a in self.pop[species] if not a.dies()]
+        self.corpses += 1
+        """
         for species in self.pop:
             copy = self.pop[species]
             for animal in copy:
                 if animal.dies():
+                    a = len(self.pop[species])
                     animal.remove(self)
-
+                    if a == len(self.pop[species]):
+                        print('hi')
+        """
 
 
     def migration(self, map_list):
