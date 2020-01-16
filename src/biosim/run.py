@@ -46,6 +46,7 @@ class Run:
             ini_pop = self.herbivore_input
         self.island = Island(island_map)
         self.island.place_animals(ini_pop)
+        self.years = 0
 
     def one_cycle(self):
         self.island.all_cells('replenish')
@@ -58,16 +59,14 @@ class Run:
         self.island.update_num_animals()
         self.num_animals_results.append(self.island.num_animals)
         self.per_species_results.append(self.island.num_animals_per_species)
+        self.years += 1
 
     def run(self):
-        self.years = 0
-        self.desired_years = 100
+        # self.desired_years = 100
         while(self.years < self.desired_years):
-            print(run.island.num_animals_per_species)
+            # print(run.island.num_animals_per_species)
             self.one_cycle()
-            self.years += 1
             print(self.years)
-
 
 
 if __name__ == "__main__":

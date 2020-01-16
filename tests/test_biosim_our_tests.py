@@ -254,7 +254,7 @@ class TestAnimal:
         assert len(cell2.pop["Carnivore"]) == 1
 
     def test_eat_in_order_fitness(self, example_savannah):
-        herbert, herman = ani.Herbivore, ani.Herbivore
+        herbert, herman = ani.Herbivore(), ani.Herbivore()
         herbert.weight, herbert.phi, herman.weight, herman.phi = 10, 10, 1, 0.5
         example_savannah.f = (herbert.param_dict['F'] - 1)
         example_savannah.pop['Herbivore'].append(herbert)
@@ -263,8 +263,10 @@ class TestAnimal:
         assert herbert.weight > herman.weight
 
     def test_check_kills(self, example_herbivore, example_carnivore):
-        random.seed(1)
+        random.seed(999)
         example_herbivore.phi = 0.1
+        example_carnivore.param_dict["DeltaPhiMax"] = 1
+        # asserts that the probability of killing is high
         example_carnivore.phi = 1
         assert example_carnivore.check_if_kills(example_herbivore)
 
@@ -298,8 +300,8 @@ class TestAnimal:
         cell_mountain = land.Mountain()
         cell_ocean = land.Ocean()
         with pytest.raises(ValueError):
-            cell_mountain.pop.append(ani.Herbivore) and \
-                cell_ocean.pop.append(ani.Herbivore)
+            cell_mountain.pop['Herbivore'].append(ani.Herbivore) and \
+                cell_ocean.pop['Herbivore'].append(ani.Herbivore)
 
     def test_kill_order_fitness(self):
         cell = land.Jungle()
@@ -316,8 +318,11 @@ class TestRun:
         pass
 
     def test_one_cycle(self):
-        pass
+        r = run.Run()
+        r.one_cycle()
+        assert r.years == 1
 
     def test_run(self):
-        run.Run(5)
-        assert run.run.years_run == 5
+        t = run.Run()
+        t.run()
+        assert t.years == t.desired_years
