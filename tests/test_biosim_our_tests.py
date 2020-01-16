@@ -253,15 +253,14 @@ class TestAnimal:
         example_carnivore.move(cell1, cell2)
         assert len(cell2.pop["Carnivore"]) == 1
 
-    def test_eat_in_order_fitness(self, input_list):
-        herbert, halvor = ani.Herbivore(), ani.Herbivore()
-        herbert.phi, halvor.phi, herbert.weight, halvor.weight\
-            = 0.5, 0.7, 10, 10
-        cell = land.Jungle
-        cell.place_animals(input_list)
-        cell.f = (herbert.param_dict["F"] - 1)
-        cell.feeding()
-        assert herbert.weight > halvor.weight
+    def test_eat_in_order_fitness(self, example_savannah):
+        herbert, herman = ani.Herbivore, ani.Herbivore
+        herbert.weight, herbert.phi, herman.weight, herman.phi = 10, 10, 1, 0.5
+        example_savannah.f = (herbert.param_dict['F'] - 1)
+        example_savannah.pop['Herbivore'].append(herbert)
+        example_savannah.pop['Herbivore'].append(herman)
+        example_savannah.feeding()
+        assert herbert.weight > herman.weight
 
     def test_check_kills(self, example_herbivore, example_carnivore):
         random.seed(1)
