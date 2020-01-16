@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 
 """
+Features:
+biomass, gjennomsnittsalder for hver art, gjennomsnittlig dødsalder,
+vekstrate per år (antall døde - antall fødte)
+antall døde per år
+antall fødte hvert år
+
 """
 
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
@@ -8,52 +14,82 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 
 from biosim.island import Island
-
+import biosim.run as r
 import matplotlib.pyplot as plt
+import numpy as np
 
 
+def replot(n_steps):
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.set_xlim(0, n_steps)
+    ax.set_ylim(0, 1)
 
-run = Run()
-run.run()
-print(run.island.num_animals)
-# print(run.island.num_animals_per_species['Herbivore'])
-# print(run.island.num_animals_per_species['Carnivore'])
-print(run.num_animals_results)
-print(run.per_species_results)
+    data = []
+    for _ in range(n_steps):
+        data.append(np.random.random())
+        ax.plot(data, 'b-')
+        plt.pause(1e-6)
 
-run = Run(50)
-run.run()
-print(run.num_animals_results)
-print(run.per_species_results)
-x = run.per_species_results
-herbivores = []
-carnivores = []
 
-for i in x:
-    herbivores.append(i["Herbivore"])
+def update(n_steps):
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.set_xlim(0, n_steps)
+    ax.set_ylim(0, 1)
 
-for s in x:
-    carnivores.append(s["Carnivore"])
+    line = ax.plot(np.arange(n_steps),
+                   np.full(n_steps, np.nan), 'b-')[0]
 
-plt.plot([x for x in range(len(run.per_species_results))],
-         [carnivores[i] for i in range(len(run.num_animals_results))],
-         'r-', label="Carnivores")
+    for n in range(n_steps):
+        ydata = line.get_ydata()
+        ydata[n] = np.random.random()
+        line.set_ydata(ydata)
+        plt.pause(1e-6)
 
-plt.plot([x for x in range(len(run.per_species_results))],
-         [herbivores[i] for i in range(len(
-             herbivores))], 'g-', label="Herbivores")
 
-plt.xlabel("Years")
-plt.ylabel("Population")
-plt.title("Biosimulator")
-plt.legend()
-plt.show()
+if __name__ == "__main__":
+    replot(1000)
+    plt.show()
 
-kart = """OOOOO
-OMJSO
-ODDJO
-OOOOO
 """
+simulation = r.Run()
+counter = 100
+while counter > 0:
+    simulation.one_cycle()
+    species = simulation.per_species_results
+    herbivores = []
+    carnivores = []
+
+    for i in species:
+        herbivores.append(i["Herbivore"])
+
+    for s in species:
+        carnivores.append(s["Carnivore"])
+
+    plt.plot([x for x in range(len(simulation.per_species_results))],
+             [carnivores[i] for i in
+              range(len(simulation.num_animals_results))],
+             'r-', label="Carnivores")
+
+    plt.plot([x for x in range(len(simulation.per_species_results))],
+             [herbivores[i] for i in range(len(
+                 herbivores))], 'g-', label="Herbivores")
+
+    plt.xlabel("Years")
+    plt.ylabel("Population")
+    plt.title("Biosimulator")
+    plt.legend()
+    plt.pause(1e-6)
+    plt.show()
+    counter -= 1
+
+print(simulation.num_animals_results)
+print(simulation.per_species_results)
+
+
+kart = """
+
 """
 #                   R    G    B
 rgb_value = {'O': (0.0, 0.0, 1.0),  # blue
