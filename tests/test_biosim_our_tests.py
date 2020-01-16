@@ -274,6 +274,12 @@ class TestAnimal:
         example_herbivore.phi = 0
         assert example_herbivore.dies()
 
+    def test_animal_dead_is_removed(self, example_herbivore, example_savannah):
+        example_savannah.pop['Herbivore'].append(example_herbivore)
+        example_herbivore.phi = 0
+        example_savannah.dying()
+        assert example_herbivore not in example_savannah.pop['Herbivore']
+
     def test_little_fodder(self, example_herbivore):
         herbivore = example_herbivore
         herbivore_weight_if_not_limited = (herbivore.weight + herbivore.beta *
@@ -288,8 +294,15 @@ class TestAnimal:
         example_carnivore.weight = 45
         assert example_carnivore.fertile(90)
 
-    def test_new_individual(self, example_herbivore):
-        pass
+    def test_new_individual(self, example_herbivore, example_savannah):
+        random.seed(999)
+        example_herbivore.weight = 45
+        for i in range(5):
+            example_savannah.pop['Herbivore'].append(example_herbivore)
+        old_pop = len(example_savannah.pop['Herbivore'])
+        example_savannah.procreation()
+        new_pop = len(example_savannah.pop['Herbivore'])
+        assert new_pop > old_pop
 
     def test_parameter_change(self, example_carnivore):
         old_parameter = example_carnivore.param_dict["w_birth"]
