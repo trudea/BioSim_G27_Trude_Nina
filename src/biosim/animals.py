@@ -134,8 +134,8 @@ class Animal:
     def fertile(self, n):
         probability = self.lambdah * self.phi * (n-1)
         if probability > 1:
-            probability = 1
-        if random.random() <= probability:
+            return True
+        elif random.random() <= probability:
             return True
         else:
             return False
@@ -201,6 +201,7 @@ class Carnivore(Animal):
         elif 0 < self.phi - herbivore.phi < 1:
             probability = (self.phi - herbivore.phi) / self.DeltaPhiMax
             if random.random() <= probability:
+
                 return True
             else:
                 return False
@@ -208,10 +209,14 @@ class Carnivore(Animal):
     def feeding(self, cell, herbivores):
         eaten = 0
         copy = herbivores
+        dead = []
         for prey in copy:
             if eaten < self.F:
                 if self.check_if_kills(prey):
-                    self.weight += prey.weight
+                    self.weight += self.beta * prey.weight
                     self.evaluate_fitness()
-                    prey.remove(cell)
+                    dead.append(prey)
+        copy = dead
+        for victim in copy:
+            victim.remove(cell)
 

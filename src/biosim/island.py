@@ -22,11 +22,10 @@ class Island:
         txt = txt.split('\n')
         if txt[-1] == '\n':
             txt = txt.pop()
-        edges = txt[0] + txt[-1]
+        self.check_edges(txt)
         for letter in txt[0]:
             if letter != 'O':
                 raise ValueError
-
         y = 0
         dict = {}
         for row in txt:
@@ -37,10 +36,10 @@ class Island:
             y += 1
         return dict
 
-    def check_edges(self):
-        left_column = [line[0] for line in self.map]
-        right_column = [line[-1] for line in self.map]
-        to_check = [self.map[0], self.map[-1], left_column, right_column]
+    def check_edges(self, txt):
+        left_column = [line[0] for line in txt]
+        right_column = [line[-1] for line in txt]
+        to_check = [txt[0], txt[-1], left_column, right_column]
         for list in to_check:
             for element in list:
                 if element != 'O':
@@ -52,8 +51,7 @@ class Island:
         if txt is None:
             txt = open('rossum.txt').read()  # med \n som siste argument
         self.map = self.str_to_dict(txt)
-        #self.species_to_class = dict(inspect.getmembers(animals, inspect.isclass))
-        # del self.species_to_class['Animal']
+
 
     def all_cells(self, myfunc):
         for cell in self.map.values():
@@ -91,3 +89,11 @@ class Island:
             for species in self.num_animals_per_species:
                 self.num_animals_per_species[species] += cell.num_animals_per_species()[species]
 
+
+    def update_change(self):
+        corpses = 0
+        newborns = 0
+        for cell in self.map.values():
+            corpses += cell.corpses
+            newborns += cell.newborns
+        return corpses, newborns
