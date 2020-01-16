@@ -22,12 +22,12 @@ class Island:
         txt = txt.split('\n')
         if txt[-1] == '\n':
             txt = txt.pop()
-        print(txt)
+        self.check_letters(txt)
         self.check_edges(txt)
+        self.check_letters(txt)
         valid = ['O', 'S', 'J', 'D', 'M']
         for row in txt:
             for letter in row:
-                print(letter)
                 if letter not in valid:
                     raise ValueError
 
@@ -40,6 +40,17 @@ class Island:
                 x += 1
             y += 1
         return dict
+
+    def check_letters(self, txt):
+        valid = ['O', 'S', 'J', 'D', 'M']
+        length_line = []
+        for line in txt:
+            length_line.append(len(line))
+            for letter in txt:
+                if letter not in valid:
+                    raise ValueError
+                if [length for length in length_line] != len(line):
+                    raise ValueError
 
     def check_edges(self, txt):
         left_column = [line[0] for line in txt]
