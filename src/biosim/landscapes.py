@@ -77,18 +77,22 @@ class LandscapeCell:
                 self.tot_w_herbivores += new_animal.weight
 
     def procreation(self):
-        m = 0
-        for species in self.pop.keys():
-            copy = self.pop[species]
+        for species, pop_list in self.pop.items():
+            copy = pop_list
             for animal in copy:
                 n = self.num_specimen(species)
                 if n >= 2:
                     if animal.fertile(n):
                         newborn = type(animal)()
-                        if newborn.weight < animal.weight:
-                            self.newborns += 1
+                        # print(animal.weight - animal.zeta * newborn.weight)
+                        if animal.weight >= animal.zeta * (newborn.weight + animal.sigma_birth):
+                            q = len(pop_list)
                             self.pop[species].append(newborn)
+                            if len(pop_list) <= q:
+                                print('Pop list not updated')
                             animal.weight -= animal.zeta * newborn.weight
+                            if animal.weight <0:
+                                print('animal weight too small after birth')
 
     def dying(self):
         for species in self.pop:

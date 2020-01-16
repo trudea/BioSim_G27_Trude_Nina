@@ -163,12 +163,18 @@ class Herbivore(Animal):
 
     def feeding(self, cell):
         if cell.f >= self.F:
-            cell.f = cell.f - self.F
+            cell.f -= self.F
+            m = self.weight
             self.weight += (self.beta * self.F)
+            if m >= self.weight:
+                print('weight not gained')
+            h = self.phi
             self.evaluate_fitness()
+            if self.phi <= h and self.phi < 1:
+                print('fitness not improved')
 
 
-        if cell.f < self.F:
+        elif cell.f < self.F:
             cell.f = 0
             self.weight += (self.beta * cell.f)
             self.evaluate_fitness()

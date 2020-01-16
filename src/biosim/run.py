@@ -54,26 +54,19 @@ class Run:
         self.island.migration()
         self.island.all_animals('aging')
         self.island.all_animals('weightloss')
-
         self.island.all_cells('dying')
-
-
         self.island.update_num_animals()
         self.num_animals_results.append(self.island.num_animals)
         self.per_species_results.append(self.island.num_animals_per_species)
 
     def run(self):
         self.years = 0
-        self.desired_years = 75
-        run.island.update_num_animals()
+        self.desired_years = 100
         while(self.years < self.desired_years):
             print(run.island.num_animals_per_species)
             self.one_cycle()
-            """
-            c, n = run.island.update_change()
-            print('C: ', c, 'N: ', n)
-            """
             self.years += 1
+            print(self.years)
 
 
 
@@ -108,9 +101,13 @@ if __name__ == "__main__":
         """
     run = Run(animals)
     run.run()
-    # print(run.island.num_animals_per_species)
 
+    """
+    for i in range(8):
+        run.island.map[(1,1)].pop['Carnivore'].append(Carnivore())
+        run.island.map[(2,2)].pop['Carnivore'].append(Carnivore())
+        run.island.map[(3,3)].pop['Carnivore'].append(Carnivore())
 
-
-
-
+    run.run()
+    print(run.island.num_animals_per_species)
+    """
