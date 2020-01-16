@@ -11,5 +11,16 @@ import src.biosim.animals as animals
 
 carl = Carnivore()
 herman = Herbivore()
-print(carl.phi, ' ', herman.phi)
-print(carl.check_if_kills(herman))
+map = 'OOOOOOO\nOSSSSSO\nOSSSSSO\nOSSSSSO\nOSSSSSO\nOSSSSSO\nOOOOOOO'
+simple_island = Island(map)
+for cell in simple_island.map.values():
+    for species in cell.pop:
+        cell.pop[species].append(eval(species)())
+        cell.pop[species].append(eval(species)())
+        cell.pop[species].append(eval(species)())
+        cell.pop[species].append(eval(species)())
+        cell.pop[species].append(eval(species)())
+print()
+
+
+

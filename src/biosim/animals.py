@@ -73,12 +73,21 @@ class Animal:
         self.evaluate_fitness()
 
     def weightloss(self):
-        self.weight -= (self.eta * self.weight)
+        if (self.eta * self.weight) <= self.weight:
+            self.weight -= (self.eta * self.weight)
+        elif (self.eta * self.weight) > self.weight:
+            self.weight = 0
         self.evaluate_fitness()
+
+
 
     def dies(self):
         probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
-        if self.phi == 0 or random.random() <= probability:
+        if self.weight <= 0:
+            return True
+        elif self.phi <= 0:
+            return True
+        elif random.random() <= probability:
             return True
         else:
             return False
@@ -158,6 +167,7 @@ class Herbivore(Animal):
             self.weight += (self.beta * self.F)
             self.evaluate_fitness()
 
+
         if cell.f < self.F:
             cell.f = 0
             self.weight += (self.beta * cell.f)
@@ -204,3 +214,4 @@ class Carnivore(Animal):
                     self.weight += prey.weight
                     self.evaluate_fitness()
                     prey.remove(cell)
+
