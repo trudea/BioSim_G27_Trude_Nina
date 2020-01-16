@@ -60,30 +60,7 @@ def example_jungle():
 
 @pytest.fixture
 def example_map():
-    return """
-OOOOOOOOOOOOOOOOOOOOO
-OSSSSSJJJJMMJJJJJJJOO
-OSSSSSJJJJMMJJJJJJJOO
-OSSSSSJJJJMMJJJJJJJOO
-OOSSJJJJJJJMMJJJJJJJO
-OOSSJJJJJJJMMJJJJJJJO
-OOOOOOOSMMMMJJJJJJJJO
-OSSSSSJJJJMMJJJJJJJOO
-OSSSSSSSSSMMJJJJJJOOO
-OSSSSSDDDDDJJJJJJJOOO
-OSSSSSDDDDDJJJJJJJOOO
-OSSSSSDDDDDJJJJJJJOOO
-OSSSSSDDDDDMMJJJJJOOO
-OSSSSSDDDDDJJJJOOOOOO
-OOSSSDDDDDDJJOOOOOOOO
-OOSSSSDDDDDDJJOOOOOOO
-OSSSSSDDDDDJJJJJJJOOO
-OSSSSDDDDDDJJJJOOOOOO
-OOSSSSDDDDDJJJOOOOOOO
-OOOSSSSJJJJJJJOOOOOOO
-OOOSSSSSSOOOOOOOOOOOO
-OOOOOOOOOOOOOOOOOOOOO
-"""
+    return """OOOO\nOJJO\nOOOO"""
 
 
 class TestIsland:
@@ -110,7 +87,7 @@ class TestIsland:
         return the true biome-letter.
         """
         island = isl.Island(example_map)
-        coordinate = island.map[(1,0)]
+        coordinate = island.map[(1, 0)]
         assert type(coordinate).__name__ is 'Ocean'
 
     def test_map_ocean(self):
@@ -122,6 +99,10 @@ class TestIsland:
             isl.Island('SSS\nOOO') and \
                 isl.Island('OOO\nOSS') and \
                 isl.Island('OOO\nOSO\nOSO')
+
+    def test_invalid_landscape(self):
+        with pytest.raises(ValueError):
+            isl.Island("OOO\nORO\nOOO")
 
 
 class TestLandscapes:
