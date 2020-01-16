@@ -37,14 +37,15 @@ class Run:
                           {'species': 'Herbivore', 'age': 3, 'weight': 7.3},
                           {'species': 'Herbivore', 'age': 5, 'weight': 8.1}]}]
 
-    def __init__(self, desired_years=10, animal_input=None, map_input=None):
-        self.desired_years = desired_years
+    def __init__(self, ini_pop = None, island_map = None, seed = None):
+
+        self.desired_years = 10
         self.num_animals_results = []
         self.per_species_results = []
-        if animal_input is None:
-            animal_input = self.herbivore_input
-        self.island = Island(map_input)
-        self.island.place_animals(animal_input)
+        if ini_pop is None:
+            ini_pop = self.herbivore_input
+        self.island = Island(island_map)
+        self.island.place_animals(ini_pop)
 
     def one_cycle(self):
         self.island.all_cells('replenish')
@@ -68,21 +69,24 @@ class Run:
         while(self.years < self.desired_years):
             # print(run.island.num_animals_per_species)
             self.one_cycle()
+            """
             c, n = run.island.update_change()
             print('C: ', c, 'N: ', n)
             self.years += 1
+            """
 
 
 if __name__ == "__main__":
-    map = 'OOO\nOJO\nOOO'
+    map = 'OOO\n{}JO\nOOO'
     animals = [{'loc': (1, 1), 'pop': [
         {'species': 'Herbivore', 'age': 10, 'weight': 40.5},
         {'species': 'Herbivore', 'age': 9, 'weight': 38.3},
         {'species': 'Herbivore', 'age': 14, 'weight': 50.3},
         {'species': 'Herbivore', 'age': 5, 'weight': 36.1}]}]
 
+    Run("OOO\nORO\nOOO")
 
-    run = Run(50, animals, map)
+
     """
     for i in range(100):
         # y = int(random.random()*10)

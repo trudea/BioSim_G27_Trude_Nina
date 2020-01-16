@@ -11,7 +11,7 @@ import src.biosim.animals as animals
 
 carl = Carnivore()
 herman = Herbivore()
-map = 'OOO\nJJO\nOOO'
+map = "OOO\nORO\nOOO"
 # map = 'OOOOOOO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOOOOOOO'
 simple_island = Island(map)
 herman = Herbivore()
