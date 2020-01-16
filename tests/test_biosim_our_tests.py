@@ -87,7 +87,7 @@ class TestIsland:
         return the true biome-letter.
         """
         island = isl.Island(example_map)
-        coordinate = island.map[(1, 0)]
+        coordinate = island.map[(0, 0)]
         assert type(coordinate).__name__ is 'Ocean'
 
     def test_map_ocean(self):
