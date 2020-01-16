@@ -21,11 +21,16 @@ for i in range(5):
     cell.pop['Herbivore'].append(Herbivore())
 
 for i in range(50):
-    #cell.procreation()
-    #island.all_cells('dying')
+    island.all_cells('replenish')
+    island.all_cells('feeding')
+    island.all_cells('procreation')
     island.migration()
+    island.all_cells('dying')
     island.update_num_animals()
     print(island.num_animals_per_species)
+
+    #island.update_num_animals()
+
 
 
 

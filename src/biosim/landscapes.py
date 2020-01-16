@@ -92,9 +92,7 @@ class LandscapeCell:
 
     def dying(self):
         for species in self.pop:
-            a = len(self.pop[species])
-            self.pop[species] = [a for a in self.pop[species] if not a.dies()]
-
+            self.pop[species] = [animal for animal in self.pop[species] if not animal.dies()]
 
     def migration(self, map_list):
         for species in self.pop:
