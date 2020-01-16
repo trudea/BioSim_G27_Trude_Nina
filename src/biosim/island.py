@@ -22,10 +22,15 @@ class Island:
         txt = txt.split('\n')
         if txt[-1] == '\n':
             txt = txt.pop()
+        print(txt)
         self.check_edges(txt)
-        for letter in txt[0]:
-            if letter != 'O':
-                raise ValueError
+        valid = ['O', 'S', 'J', 'D', 'M']
+        for row in txt:
+            for letter in row:
+                print(letter)
+                if letter not in valid:
+                    raise ValueError
+
         y = 0
         dict = {}
         for row in txt:
