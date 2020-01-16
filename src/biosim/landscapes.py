@@ -45,7 +45,7 @@ class LandscapeCell:
         if type(animal) == Carnivore:
             fodder = self.tot_w_herbivores
 
-        n = (self.pop[type(animal).__name__])
+        n = self.num_specimen(type(animal).__name__)
         self.rel_abundance = fodder / ((n + 1) * animal.F)
 
     def get_propensity(self, animal):
@@ -89,22 +89,11 @@ class LandscapeCell:
                             self.newborns += 1
                             self.pop[species].append(newborn)
                             animal.weight -= animal.zeta * newborn.weight
-        # print(m)
 
     def dying(self):
         for species in self.pop:
+            a = len(self.pop[species])
             self.pop[species] = [a for a in self.pop[species] if not a.dies()]
-        self.corpses += 1
-        """
-        for species in self.pop:
-            copy = self.pop[species]
-            for animal in copy:
-                if animal.dies():
-                    a = len(self.pop[species])
-                    animal.remove(self)
-                    if a == len(self.pop[species]):
-                        print('hi')
-        """
 
 
     def migration(self, map_list):
