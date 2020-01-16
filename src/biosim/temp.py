@@ -9,7 +9,7 @@ from src.biosim.island import Island
 #from src.biosim.landscapes import *
 import src.biosim.animals as animals
 
-s = Savannah()
-s.f = 0.3
-getattr(s, 'replenish')()
-print(s.f)
+carl = Carnivore()
+herman = Herbivore()
+print(carl.phi, ' ', herman.phi)
+print(carl.check_if_kills(herman))

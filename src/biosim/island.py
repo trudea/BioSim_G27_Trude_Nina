@@ -12,8 +12,6 @@ from .landscapes import Savannah, Jungle, Ocean, Mountain, Desert
 from .animals import Herbivore, Carnivore
 import src.biosim.animals as animals
 
-
-
 class Island:
     # ta høyde for store og små bokstaver
     land_dict = {'S': Savannah, 'J': Jungle,
@@ -91,7 +89,5 @@ class Island:
         for cell in self.map.values(): # bør kunne flyttes inn
             self.num_animals += cell.num_animals()
             for species in self.num_animals_per_species:
-                # print(self.num_animals_per_species[species])
-                # print(cell.num_animals_per_species()[species])
                 self.num_animals_per_species[species] += cell.num_animals_per_species()[species]
 

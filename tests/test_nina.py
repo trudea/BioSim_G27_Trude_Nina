@@ -1,9 +1,9 @@
 import pytest
 
 import src.biosim.run as bs
-import biosim.island as isl
-import biosim.animals as ani
-import biosim.landscapes as land
+import src.biosim.island as isl
+import src.biosim.animals as ani
+import src.biosim.landscapes as land
 
 class TestIsland:
     rossum_string = 'OOOOOOOOOOOOOOOOOOOOO\nOSSSSSJJJJMMJJJJJJJOO\nOSSSSSJJJJMMJJJJJJJOO\nOSSSSSJJJJMMJJJJJJJOO\nOOSSJJJJJJJMMJJJJJJJO\nOOSSJJJJJJJMMJJJJJJJO\nOOOOOOOSMMMMJJJJJJJJO\nOSSSSSJJJJMMJJJJJJJOO\nOSSSSSSSSSMMJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSSDDDDDMMJJJJJOOO\nOSSSSSDDDDDJJJJOOOOOO\nOOSSSDDDDDDJJOOOOOOOO\nOOSSSSDDDDDDJJOOOOOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSDDDDDDJJJJOOOOOO\nOOSSSSDDDDDJJJOOOOOOO\nOOOSSSSJJJJJJJOOOOOOO\nOOOSSSSSSOOOOOOOOOOOO\nOOOOOOOOOOOOOOOOOOOOO'
@@ -37,3 +37,12 @@ class TestIsland:
             isl.Island('OO\nOSJ\nOOO')
         with pytest.raises(ValueError):
             isl.Island('OO\nOSO\nJOO')
+
+def test_carnivore_feeding():
+    h = Herbivore()
+    h.age = 50
+    h.weight = 2
+    h.phi = 0.02
+    c = Carnivore()
+    c.phi = 1
+

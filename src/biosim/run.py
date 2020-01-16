@@ -27,7 +27,6 @@ class Run:
 
     def __init__(self, desired_years=10, animal_input=None, map_input=None):
         self.desired_years = desired_years
-        self.years_run = 0
         self.num_animals_results = []
         self.per_species_results = []
         if animal_input is None:
@@ -46,18 +45,17 @@ class Run:
         self.island.update_num_animals()
         self.num_animals_results.append(self.island.num_animals)
         self.per_species_results.append(self.island.num_animals_per_species)
-        print('Total: ', run.island.num_animals)
-        print(run.island.num_animals_per_species)
 
     def run(self):
-        years = 0
+        self.years = 0
         run.island.update_num_animals()
-        print('Total: ', run.island.num_animals)
-        print(run.island.num_animals_per_species)
-        while(years < self.desired_years):
+        while(self.years < self.desired_years):
+            for cell in run.island.map.values():
+                for carnivore in cell.pop['Carnivore']:
+                    carnivore.phi = 1
             self.one_cycle()
-            # print(run.num_animals_results)
-            years += 1
+            self.years += 1
+
 
 if __name__ == "__main__":
     map = 'OOOOO\nOSSSO\nOSSSO\nOSSSO\nOOOOO'
@@ -70,3 +68,6 @@ if __name__ == "__main__":
     # run = Run(10, animals, map)
     run = Run()
     run.run()
+    for i in run.per_species_results:
+        print(i)
+

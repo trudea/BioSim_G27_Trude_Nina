@@ -72,13 +72,6 @@ class Animal:
         self.age += 1
         self.evaluate_fitness()
 
-
-    """
-    def gaining_weight(self, intake_weight):
-        self.weight += (self.beta * intake_weight)
-        self.evaluate_fitness()
-    """
-
     def weightloss(self):
         self.weight -= (self.eta * self.weight)
         self.evaluate_fitness()
@@ -90,7 +83,6 @@ class Animal:
         else:
             return False
 
-
     def movable(self):
         probability = self.mu * self.phi
         if random.random() <= probability:
@@ -101,8 +93,6 @@ class Animal:
     def move(self, old_cell, new_cell):
         new_cell.pop[type(self)].append(self)
         old_cell.pop[type(self)].remove(self)
-        old_cell.update_animal_num()
-        new_cell.update_animal_num()
 
     def migrate(self, old_cell, map_list):
         if len(map_list) == 0:
@@ -138,8 +128,8 @@ class Animal:
             probability = 1
         if random.random() <= probability:
             return True
-
-
+        else:
+            return False
 
 class Herbivore(Animal):
     param_dict = {'w_birth': 8.0,
@@ -200,12 +190,10 @@ class Carnivore(Animal):
             return False
         elif 0 < self.phi - herbivore.phi < 1:
             probability = (self.phi - herbivore.phi) / self.DeltaPhiMax
-            if round(random.random(), 7) <= probability:
+            if random.random() <= probability:
                 return True
             else:
                 return False
-        else:
-            return False
 
     def feeding(self, cell, herbivores):
         eaten = 0
@@ -216,4 +204,3 @@ class Carnivore(Animal):
                     self.weight += prey.weight
                     self.evaluate_fitness()
                     prey.remove(cell)
-                    # self.update_num_animals()
