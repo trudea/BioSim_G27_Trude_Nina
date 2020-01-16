@@ -92,16 +92,19 @@ class LandscapeCell:
 
     def dying(self):
         for species in self.pop:
-            for animal in self.pop[species]:
+            copy = self.pop[species]
+            for animal in copy:
                 if animal.dies():
                     animal.remove(self)
-                    # self.num_animals -= 1
-                    # self.num_animals_per_species[type(animal).__name__] -= 1
+
+
 
     def migration(self, map_list):
         for species in self.pop:
             for animal in self.pop[species]:
                 animal.migrate(self, map_list)
+
+
 
 class Savannah(LandscapeCell):
     param_dict = {'f_max': 300.0, 'alpha': 0.3}
@@ -116,6 +119,8 @@ class Savannah(LandscapeCell):
 
     def replenish(self):
         self.f = self.alpha * (self.f_max - self.f) + self.f
+
+
 
 
 class Jungle(LandscapeCell):

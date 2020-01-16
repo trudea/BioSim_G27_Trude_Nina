@@ -9,6 +9,8 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 #  from src.biosim.island import Island
 from src.biosim.island import Island
+import random
+from src.biosim.animals import Carnivore, Herbivore
 
 #import matplotlib.pyplot as plt
 
@@ -41,7 +43,10 @@ class Run:
         self.island.migration()
         self.island.all_animals('aging')
         self.island.all_animals('weightloss')
+
         self.island.all_cells('dying')
+
+
         self.island.update_num_animals()
         self.num_animals_results.append(self.island.num_animals)
         self.per_species_results.append(self.island.num_animals_per_species)
@@ -50,6 +55,8 @@ class Run:
         self.years = 0
         run.island.update_num_animals()
         while(self.years < self.desired_years):
+            print(run.island.num_animals_per_species)
+
             for cell in run.island.map.values():
                 for carnivore in cell.pop['Carnivore']:
                     carnivore.phi = 1
@@ -65,9 +72,22 @@ if __name__ == "__main__":
         {'species': 'Herbivore', 'age': 14, 'weight': 50.3},
         {'species': 'Herbivore', 'age': 5, 'weight': 36.1}]}]
 
-    # run = Run(10, animals, map)
     run = Run()
+
+    for i in range(100):
+        y = int(random.random()*10)
+        x = int(random.random()*10)
+        run.island.map[(y, x)].pop['Carnivore'].append(Carnivore())
+        run.island.map[(y, x)].pop['Herbivore'].append(Herbivore())
+
+
+
+    # run = Run(10, animals, map)
+
     run.run()
-    for i in run.per_species_results:
-        print(i)
+    for cell in run.island.map.values():
+        for animal in cell.pop['Herbivore']:
+            #print(animal.weight)
+            pass
+
 

@@ -6,6 +6,7 @@
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
+import random
 
 class BioSim:
     def __init__(
