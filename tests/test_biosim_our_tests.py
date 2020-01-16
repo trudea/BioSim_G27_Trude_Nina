@@ -60,7 +60,30 @@ def example_jungle():
 
 @pytest.fixture
 def example_map():
-    return 'OOOOO\nOJJJO\nOOOOO'
+    return """
+OOOOOOOOOOOOOOOOOOOOO
+OSSSSSJJJJMMJJJJJJJOO
+OSSSSSJJJJMMJJJJJJJOO
+OSSSSSJJJJMMJJJJJJJOO
+OOSSJJJJJJJMMJJJJJJJO
+OOSSJJJJJJJMMJJJJJJJO
+OOOOOOOSMMMMJJJJJJJJO
+OSSSSSJJJJMMJJJJJJJOO
+OSSSSSSSSSMMJJJJJJOOO
+OSSSSSDDDDDJJJJJJJOOO
+OSSSSSDDDDDJJJJJJJOOO
+OSSSSSDDDDDJJJJJJJOOO
+OSSSSSDDDDDMMJJJJJOOO
+OSSSSSDDDDDJJJJOOOOOO
+OOSSSDDDDDDJJOOOOOOOO
+OOSSSSDDDDDDJJOOOOOOO
+OSSSSSDDDDDJJJJJJJOOO
+OSSSSDDDDDDJJJJOOOOOO
+OOSSSSDDDDDJJJOOOOOOO
+OOOSSSSJJJJJJJOOOOOOO
+OOOSSSSSSOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOOOO
+"""
 
 
 class TestIsland:
@@ -161,14 +184,19 @@ class TestLandscapes:
         example_jungle.replenish()
         assert example_jungle.f == example_jungle.param_dict['f_max']
 
+    def test_num_animals_per_species(self, input_list, example_map):
+        island = isl.Island(example_map)
+        island.place_animals(input_list)
+        island.update_num_animals()
+        assert island.num_animals_per_species['Herbivore'] == 4
+
     def test_num_specimen(self, input_list):
         isl.Island().place_animals(input_list)
         assert isl.Island().map[2, 2].num_specimen("Herbivore") == 1
 
     def test_relative_abundance(self, input_list, example_carnivore):
         isl.Island().place_animals(input_list)
-        assert isl.Island().map[3, 4].get_rel_abundance("Carnivore") == 20.8 \
-            / (3 * example_carnivore.F)
+        assert isl.Island().map[3, 4].get_rel_abundance(example_carnivore)
 
 
 class TestAnimal:
@@ -201,24 +229,18 @@ class TestAnimal:
         instance.weightloss()
         """
         old_weight = example_herbivore.weight
-        example_herbivore.losing_weight()
+        example_herbivore.weightloss()
         assert example_herbivore.weight < old_weight
 
-    def test_herbivore_feeding(self, example_herbivore):
+    def test_herbivore_feeding(self, example_herbivore, example_savannah):
         """
         Checks if weight of an instance increases by call of
         instance.feeding(F)
         given initial parameter value F specific for that instance.
         """
         previous_weight = example_herbivore.weight
-        feed = example_herbivore.param_dict['F']
-        example_herbivore.gaining_weight(feed)
+        example_herbivore.feeding(example_savannah)
         assert previous_weight < example_herbivore.weight
-
-    def test_get_position(self, example_carnivore):
-        cell = land.Savannah()
-        cell.pop.add(example_carnivore)
-        assert example_carnivore in cell.pop
 
     def test_place_animal(self, input_list):
         i = isl.Island()
@@ -229,8 +251,8 @@ class TestAnimal:
     def test_tot_w_herbivores(self, input_list):
         i = isl.Island()
         i.place_animals(input_list)
-        c = i.map[4, 3]
-        assert c.tot_w_herbivores == 12.6
+        c = i.map[3, 4]
+        assert c.tot_w_herbivores == 22.8
 
     def test_move_check(self):
         """
