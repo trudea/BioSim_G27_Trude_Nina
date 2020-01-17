@@ -39,8 +39,8 @@ class TestIsland:
 
 def test_carnivore_kills(mocker):
     mocker.patch('random.random', return_value=0.1)
-    c = ani.Carnivore({'phi = 0.9', })
-    h = ani.Herbivore()
+    c = ani.Carnivore({'phi': 0.9})
+    h = ani.Herbivore({'phi': 0.2})
 
     assert c.check_if_kills(h)
 

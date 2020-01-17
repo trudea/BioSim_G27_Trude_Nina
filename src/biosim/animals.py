@@ -210,7 +210,7 @@ class Carnivore(Animal):
         super().__init__(attribute_dict)
 
     def check_if_kills(self, herbivore):
-        if self.phi < herbivore.phi:
+        if self.phi <= herbivore.phi:
             return False
         elif 0 < self.phi - herbivore.phi < 1:
             probability = (self.phi - herbivore.phi) / self.DeltaPhiMax
