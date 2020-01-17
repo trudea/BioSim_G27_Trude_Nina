@@ -37,12 +37,27 @@ class TestIsland:
         with pytest.raises(ValueError):
             isl.Island('OO\nOSO\nJOO')
 
-def test_carnivore_kills(mocker):
-    mocker.patch('random.random', return_value=0.1)
-    c = ani.Carnivore({'phi': 0.9})
+def test_kill_check(mocker):
+    mocker.patch('random.random', return_value=0.001)
     h = ani.Herbivore({'phi': 0.2})
+    c1 = ani.Carnivore({'phi': 0.9})
+    c2 = ani.Carnivore({'phi': 0.2})
+    c3 = ani.Carnivore({'phi': 0.1})
+    assert c1.check_if_kills(h)
+    assert not c2.check_if_kills(h)
+    assert not c3.check_if_kills(h)
 
-    assert c.check_if_kills(h)
+def test_carnivore_feeding(mocker):
+    cell = land.Savannah()
+    mocker.patch('random.random', return_value=0.001) # lavere enn sanns?
+    cell.pop['Herbivore'] = [ani.Herbivore({'phi': 0.1}), ani.Herbivore({'phi': 0.5}), ani.Herbivore({'phi': 0.9})]
+    c1 = ani.Carnivore({'phi: ', 0.01})
+    c1.feed
+    c2 = ani.Carnivore({'phi': 0.5})
+    c2.feeding(cell, cell.pop['Herbivore'])
+    assert len(cell.pop['Herbivore']) == 0
+
+
 
 
 

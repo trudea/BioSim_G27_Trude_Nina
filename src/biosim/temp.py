@@ -22,6 +22,8 @@ for h in simple_herb_list:
     simple_herbs.append(h)
 simple_herb_pop = [{'loc': (1,1), 'pop' : simple_herbs}]
 
-carl = Carnivore({'phi' : 1.0})
-print(carl.phi)
-herman = Herbivore()
+mocker.patch('random.random', return_value=0.001)
+herbivores = [ani.Herbivore({'phi': 0.1}), ani.Herbivore({'phi': 0.5}),
+              ani.Herbivore({'phi': 0.9})]
+c = Carnivore({'phi': 0.5})
+c.feeding()

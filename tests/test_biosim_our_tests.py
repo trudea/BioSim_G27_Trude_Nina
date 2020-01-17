@@ -339,3 +339,13 @@ class TestRun:
         t = run.Run()
         t.run()
         assert t.years == t.desired_years
+
+def test_kill_check(mocker):
+    mocker.patch('random.random', return_value=0.001)
+    h = ani.Herbivore({'phi': 0.2})
+    c1 = ani.Carnivore({'phi': 0.9})
+    c2 = ani.Carnivore({'phi': 0.2})
+    c3 = ani.Carnivore({'phi': 0.1})
+    assert c1.check_if_kills(h)
+    assert not c2.check_if_kills(h)
+    assert not c3.check_if_kills(h)

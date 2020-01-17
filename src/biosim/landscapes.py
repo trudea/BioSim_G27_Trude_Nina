@@ -66,7 +66,7 @@ class LandscapeCell:
         for herbivore in self.pop['Herbivore']:
             herbivore.feeding(self)
         for carnivore in self.pop['Carnivore']:
-            carnivore.feeding(self, self.pop['Herbivore'])
+            carnivore.feeding(self)
 
     def place_animals(self, pop_list):
         for individual_dict in pop_list:
