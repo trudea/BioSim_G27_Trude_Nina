@@ -38,11 +38,14 @@ class TestIsland:
         with pytest.raises(ValueError):
             isl.Island('OO\nOSO\nJOO')
 
-def test_carnivore_feeding():
-    h = Herbivore()
-    h.age = 50
-    h.weight = 2
-    h.phi = 0.02
-    c = Carnivore()
-    c.phi = 1
+def test_carnivore_kills():
+    c = ani.Carnivore()
+    c.phi = 0.9
+    c.weight = 30.0
+    h = ani.Herbivore()
+    h.phi = 0.05
+    c.weight = 20
+    assert c.check_if_kills(h)
+
+
 

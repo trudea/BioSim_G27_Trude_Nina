@@ -42,10 +42,11 @@ class LandscapeCell:
         if type(animal) == Herbivore:
             fodder = self.f
 
-        if type(animal) == Carnivore:
+        elif type(animal) == Carnivore:
             fodder = self.tot_w_herbivores
 
         n = self.num_specimen(type(animal).__name__)
+        #print(fodder / ((n + 1) * animal.F))
         self.rel_abundance = fodder / ((n + 1) * animal.F)
 
     def get_propensity(self, animal):
@@ -84,7 +85,6 @@ class LandscapeCell:
                 if n >= 2:
                     if animal.fertile(n):
                         newborn = type(animal)()
-                        # print(animal.weight - animal.zeta * newborn.weight)
                         if animal.weight >= animal.zeta * (newborn.weight + animal.sigma_birth):
                             q = len(pop_list)
                             self.pop[species].append(newborn)

@@ -50,7 +50,14 @@ class Run:
     def one_cycle(self):
         self.island.all_cells('replenish')
         self.island.all_cells('feeding')
+        carnilist = list_carnivores()
+        carniw = [carni.weight for carni in carnilist]
         self.island.all_cells('procreation')
+        carnilist = list_carnivores()
+        weights = [carni.weight for carni in carnilist]
+        for i in range(len(weights)):
+            #print(weights[i] - carniw[i])
+            pass
         self.island.migration()
         self.island.all_animals('aging')
         self.island.all_animals('weightloss')
@@ -61,12 +68,12 @@ class Run:
 
     def run(self):
         self.years = 0
-        self.desired_years = 100
+        self.desired_years = 50
         while(self.years < self.desired_years):
             print(run.island.num_animals_per_species)
             self.one_cycle()
             self.years += 1
-            print(self.years)
+            # print(self.years)
 
 
 
@@ -88,26 +95,69 @@ if __name__ == "__main__":
 
 
 
-    """
+
+
+
+    map = 'OOOOOOO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOOOOOOO'
+
+    # island = Island()
+    run = Run()
+
+    cell = run.island.map[(1, 1)]
+    for i in range(5):
+        cell.pop['Herbivore'].append(Herbivore())
+        cell.pop['Herbivore'].append(Herbivore())
+        cell.pop['Herbivore'].append(Herbivore())
+    cell = run.island.map[(2, 2)]
+    for i in range(5):
+        cell.pop['Herbivore'].append(Herbivore())
+        cell.pop['Herbivore'].append(Herbivore())
+        cell.pop['Herbivore'].append(Herbivore())
+    cell = run.island.map[(1, 2)]
+    for i in range(5):
+        cell.pop['Herbivore'].append(Herbivore())
+        cell.pop['Herbivore'].append(Herbivore())
+        cell.pop['Herbivore'].append(Herbivore())
+    cell = run.island.map[(2, 1)]
+    for i in range(5):
+        cell.pop['Herbivore'].append(Herbivore())
+        cell.pop['Herbivore'].append(Herbivore())
+        cell.pop['Herbivore'].append(Herbivore())
+
+
+    def list_herbivores():
+        all_herbivores = []
+        for cell in run.island.map.values():
+            if len(cell.pop['Herbivore']) > 0:
+                for element in cell.pop['Herbivore']:
+                    all_herbivores.append(element)
+        return all_herbivores
+
+
+    def list_carnivores():
+        all_carnivores = []
+        for cell in run.island.map.values():
+            if len(cell.pop['Carnivore']) > 0:
+                for element in cell.pop['Carnivore']:
+                    all_carnivores.append(element)
+        return all_carnivores
+
+    run.run()
+
     for i in range(100):
-        # y = int(random.random()*10)
-        # x = int(random.random()*10)
-        # run.island.map[(y, x)].pop['Carnivore'].append(Carnivore())
-        run.island.map[(1, 1)].pop['Herbivore'].append(Herbivore())
-        run.island.map[(2, 2)].pop['Herbivore'].append(Herbivore())
-        run.island.map[(3, 3)].pop['Herbivore'].append(Herbivore())
-        run.island.map[(2, 3)].pop['Herbivore'].append(Herbivore())
-        run.island.map[(1, 2)].pop['Herbivore'].append(Herbivore())
-        """
-    run = Run(animals)
-    run.run()
-
-    """
-    for i in range(8):
-        run.island.map[(1,1)].pop['Carnivore'].append(Carnivore())
-        run.island.map[(2,2)].pop['Carnivore'].append(Carnivore())
-        run.island.map[(3,3)].pop['Carnivore'].append(Carnivore())
+        run.island.map[(1, 1)].pop['Carnivore'].append(Carnivore())
+        run.island.map[(2, 2)].pop['Carnivore'].append(Carnivore())
+        run.island.map[(3, 3)].pop['Carnivore'].append(Carnivore())
+        run.island.map[(1, 1)].pop['Carnivore'].append(Carnivore())
+        run.island.map[(2, 2)].pop['Carnivore'].append(Carnivore())
+        run.island.map[(3, 3)].pop['Carnivore'].append(Carnivore())
+        run.island.map[(1, 1)].pop['Carnivore'].append(Carnivore())
+        run.island.map[(2, 2)].pop['Carnivore'].append(Carnivore())
+        run.island.map[(3, 3)].pop['Carnivore'].append(Carnivore())
+        run.island.map[(1, 1)].pop['Carnivore'].append(Carnivore())
+        run.island.map[(2, 2)].pop['Carnivore'].append(Carnivore())
+        run.island.map[(3, 3)].pop['Carnivore'].append(Carnivore())
+    run.island.update_num_animals()
+    # print(run.island.num_animals_per_species)
 
     run.run()
-    print(run.island.num_animals_per_species)
-    """

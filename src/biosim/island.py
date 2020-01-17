@@ -19,6 +19,7 @@ class Island:
 
     def str_to_dict(self, txt):
         # burde ha check_edges som en egen funksjon?
+        # print(txt)
         txt = txt.split('\n')
         if txt[-1] == '\n':
             txt = txt.pop()
@@ -41,7 +42,7 @@ class Island:
             y += 1
         return dict
 
-    """
+
     def check_letters(self, txt):
         valid = ['O', 'S', 'J', 'D', 'M']
         length_line = []
@@ -52,10 +53,10 @@ class Island:
                     raise ValueError
                 if [length for length in length_line] != len(line):
                     raise ValueError
-    """
+
 
     def check_edges(self, txt):
-        """
+
         left_column = [line[0] for line in txt]
         right_column = [line[-1] for line in txt]
         to_check = [txt[0], txt[-1], left_column, right_column]
@@ -63,8 +64,8 @@ class Island:
             for element in list:
                 if element != 'O':
                     raise ValueError
-        """
-        pass
+
+
 
     def __init__(self, txt=None):
         self.num_animals = 0
