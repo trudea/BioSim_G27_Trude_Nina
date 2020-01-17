@@ -82,7 +82,7 @@ class Animal:
 
 
     def dies(self):
-        probability = round(self.param_dict['omega'] * (1 - self.phi), 3)
+        probability = self.param_dict['omega'] * (1 - self.phi)
         if self.weight <= 0:
             return True
         elif self.phi <= 0:
@@ -133,8 +133,8 @@ class Animal:
 
     def fertile(self, n):
         probability = self.lambdah * self.phi * (n-1)
-        if probability > 1:
-            return True
+        if probability > 1.0:
+            probability = 1.0
         elif random.random() <= probability:
             return True
         else:
@@ -162,16 +162,20 @@ class Herbivore(Animal):
         super().__init__(attribute_dict)
 
     def feeding(self, cell):
+        self.evaluate_fitness()
+        h = self.phi
         if cell.f >= self.F:
             cell.f -= self.F
             m = self.weight
             self.weight += (self.beta * self.F)
             if m >= self.weight:
                 print('weight not gained')
-            h = self.phi
             self.evaluate_fitness()
+            """
             if self.phi <= h and self.phi < 1:
+                print(h, ' ', self.phi)
                 print('fitness not improved')
+            """
 
 
         elif cell.f < self.F:
@@ -207,22 +211,27 @@ class Carnivore(Animal):
         elif 0 < self.phi - herbivore.phi < 1:
             probability = (self.phi - herbivore.phi) / self.DeltaPhiMax
             if random.random() <= probability:
-
                 return True
             else:
                 return False
 
     def feeding(self, cell, herbivores):
         eaten = 0
-        copy = herbivores
         dead = []
-        for prey in copy:
+        for prey in herbivores:
             if eaten < self.F:
                 if self.check_if_kills(prey):
+                    x = self.weight
                     self.weight += self.beta * prey.weight
+                    if self.weight <= x:
+                        print('Carni weight not gained')
+                    c = self.phi
                     self.evaluate_fitness()
+                    if self.phi <= c and self.phi < 0.98:
+                        # print(c, ' ', self.phi)
+                        # print('Fitness not updated')
+                        pass
                     dead.append(prey)
-        copy = dead
-        for victim in copy:
-            victim.remove(cell)
+        cell.pop['Herbivore'] = [herbivore for herbivore in cell.pop['Herbivore'] if herbivore not in dead]
+
 

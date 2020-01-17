@@ -8,73 +8,20 @@ from src.biosim.island import Island
 
 #from src.biosim.landscapes import *
 import src.biosim.animals as animals
+import src.biosim.island as island
+from src.biosim.run import Run
 
-import random
+simple_map = 'OOOO\nOJJO\nOOOO'
+simple_herbs = []
+simple_herb_list = [Herbivore() for i in range(50)]
+for h in simple_herb_list:
+    simple_herb = {}
+    simple_herb['species'] = 'Herbivore'
+    simple_herb['age'] = h.age
+    simple_herb['weight'] = h.weight
+    simple_herbs.append(h)
+print(len(simple_herbs))
+simple_herb_pop = [{'loc': (1,1), 'pop' : simple_herbs}]
 
-map = 'OOOOOOO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOOOOOOO'
-random.seed(33)
-island = Island(map)
-cell = island.map[(1,1)]
-for i in range(5):
-    cell.pop['Herbivore'].append(Herbivore())
-    cell.pop['Herbivore'].append(Herbivore())
-    cell.pop['Herbivore'].append(Herbivore())
-cell = island.map[(2,2)]
-for i in range(5):
-    cell.pop['Herbivore'].append(Herbivore())
-    cell.pop['Herbivore'].append(Herbivore())
-    cell.pop['Herbivore'].append(Herbivore())
-cell = island.map[(1,2)]
-for i in range(5):
-    cell.pop['Herbivore'].append(Herbivore())
-    cell.pop['Herbivore'].append(Herbivore())
-    cell.pop['Herbivore'].append(Herbivore())
-cell = island.map[(2,1)]
-for i in range(5):
-    cell.pop['Herbivore'].append(Herbivore())
-    cell.pop['Herbivore'].append(Herbivore())
-    cell.pop['Herbivore'].append(Herbivore())
-
-def list_herbivores():
-    all_herbivores = []
-    for cell in island.map.values():
-        if len(cell.pop['Herbivore']) > 0:
-            for element in cell.pop['Herbivore']:
-                all_herbivores.append(element)
-    return all_herbivores
-
-island.update_num_animals()
-#print(island.num_animals_per_species)
-for i in range(2):
-    island.all_cells('replenish')
-    for i in [type(cell) == Jungle for cell in island.map.values()]:
-        if cell.f != 800.0:
-            print('Not replenished')
-    copy = list_herbivores()
-    island.all_cells('feeding')
-    for cell in [cell for cell in island.map.values() if type(cell) == Jungle]:
-        # print(cell.f)
-        if cell.f == 800.0 and len(cell.pop['Herbivore']) > 0:
-            print('Not consumed')
-    all_herbivores = list_herbivores()
-    weights = [herbivore.weight for herbivore in all_herbivores]
-    for i in range(len(copy)):
-        # print(weights[i] - copy[i].weight)
-        pass
-    all_herbivores = list_herbivores()
-    print(len(all_herbivores))
-    island.all_cells('procreation')
-    all_herbivores = list_herbivores()
-    print(len(all_herbivores))
-    # island.migration()
-    # island.all_cells('dying')
-    island.update_num_animals()
-    # print(island.num_animals_per_species)
-
-    #island.update_num_animals()
-    pass
-
-
-
-
-
+run = Run()
+run = Run(simple_herb_pop, simple_map)
