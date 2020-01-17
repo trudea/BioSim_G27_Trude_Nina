@@ -87,7 +87,7 @@ class TestIsland:
         return the true biome-letter.
         """
         island = isl.Island(example_map)
-        coordinate = island.map[(1, 0)]
+        coordinate = island.map[(0, 0)]
         assert type(coordinate).__name__ is 'Ocean'
 
     def test_map_ocean(self):
@@ -167,19 +167,20 @@ class TestLandscapes:
         assert example_jungle.f == example_jungle.param_dict['f_max']
 
     def test_num_animals_per_species(self, input_list, example_map):
-        island = isl.Island(example_map)
+        island = isl.Island()
         island.place_animals(input_list)
-        island.update_num_animals()
         assert island.num_animals_per_species['Herbivore'] == 4
 
     def test_num_specimen(self, input_list):
         isl.Island().place_animals(input_list)
+        isl.Island().update_num_animals()
         assert isl.Island().map[(2, 2)].num_specimen("Herbivore") == 1
 
     def test_relative_abundance(self, input_list, example_carnivore):
         isl.Island().place_animals(input_list)
+        isl.Island().update_num_animals()
         assert isl.Island().map[(3, 4)].get_rel_abundance(example_carnivore) \
-               == 22.8
+        == 22.8
 
 
 class TestAnimal:
@@ -252,30 +253,32 @@ class TestAnimal:
         example_carnivore.move(cell1, cell2)
         assert len(cell2.pop["Carnivore"]) == 1
 
-    def test_eat_in_order_fitness(self):
-        herbert, halvor = ani.Herbivore(), ani.Herbivore()
-        herbert.phi, halvor.phi, herbert.weight, halvor.weight\
-            = 0.5, 0.7, 10, 10
-        cell = isl.Island().map[3, 2]
-        cell.pop['Herbivore'].append(herbert), cell.pop['Herbivore'].append(
-            halvor)
-        cell.f = (herbert.param_dict["F"] - 1)
-        cell.feeding()
-        assert herbert.weight > halvor.weight
+    def test_eat_in_order_fitness(self, example_savannah):
+        herbert, herman = ani.Herbivore(), ani.Herbivore()
+        herbert.weight, herbert.phi, herman.weight, herman.phi = 10, 10, 1, 0.5
+        example_savannah.f = (herbert.param_dict['F'] - 1)
+        example_savannah.pop['Herbivore'].append(herbert)
+        example_savannah.pop['Herbivore'].append(herman)
+        example_savannah.feeding()
+        assert herbert.weight > herman.weight
 
-    def test_check_kills(self):
+    def test_check_kills(self, example_herbivore, example_carnivore):
         random.seed(999)
-        carnie = ani.Carnivore()
-        herbie = ani.Herbivore
-        carnie.phi, herbie.phi = 1, 1
-        assert carnie.check_if_kills(herbie) is False
+        example_herbivore.phi = 0.1
+        example_carnivore.param_dict["DeltaPhiMax"] = 1
+        # asserts that the probability of killing is high
+        example_carnivore.phi = 1
+        assert example_carnivore.check_if_kills(example_herbivore)
 
-    def test_animal_dead(self):
-        herbivore = ani.Herbivore()
-        herbivore.phi = 0
-        cell = isl.Island().map[1, 1]
-        cell.pop.append(herbivore)
-        assert herbivore.check_if_dying() is True
+    def test_animal_dead(self, example_herbivore):
+        example_herbivore.phi = 0
+        assert example_herbivore.dies()
+
+    def test_animal_dead_is_removed(self, example_herbivore, example_savannah):
+        example_savannah.pop['Herbivore'].append(example_herbivore)
+        example_herbivore.phi = 0
+        example_savannah.dying()
+        assert example_herbivore not in example_savannah.pop['Herbivore']
 
     def test_little_fodder(self, example_herbivore):
         herbivore = example_herbivore
@@ -288,8 +291,18 @@ class TestAnimal:
 
     def test_check_procreation(self, example_carnivore):
         random.seed(999)
-        example_carnivore.weight = 30
-        assert example_carnivore.check_if_procreates(90) is True
+        example_carnivore.weight = 45
+        assert example_carnivore.fertile(90)
+
+    def test_new_individual(self, example_herbivore, example_savannah):
+        random.seed(999)
+        example_herbivore.weight = 45
+        for i in range(5):
+            example_savannah.pop['Herbivore'].append(example_herbivore)
+        old_pop = len(example_savannah.pop['Herbivore'])
+        example_savannah.procreation()
+        new_pop = len(example_savannah.pop['Herbivore'])
+        assert new_pop > old_pop
 
     def test_parameter_change(self, example_carnivore):
         old_parameter = example_carnivore.param_dict["w_birth"]
@@ -300,8 +313,8 @@ class TestAnimal:
         cell_mountain = land.Mountain()
         cell_ocean = land.Ocean()
         with pytest.raises(ValueError):
-            cell_mountain.pop.append(ani.Herbivore) and \
-                cell_ocean.pop.append(ani.Herbivore)
+            cell_mountain.pop['Herbivore'].append(ani.Herbivore) and \
+                cell_ocean.pop['Herbivore'].append(ani.Herbivore)
 
     def test_kill_order_fitness(self):
         cell = land.Jungle()
@@ -318,8 +331,11 @@ class TestRun:
         pass
 
     def test_one_cycle(self):
-        pass
+        r = run.Run()
+        r.one_cycle()
+        assert r.years == 1
 
     def test_run(self):
-        run.Run(5)
-        assert run.run.years_run == 5
+        t = run.Run()
+        t.run()
+        assert t.years == t.desired_years
