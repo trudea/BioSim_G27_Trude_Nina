@@ -51,14 +51,7 @@ class Run:
     def one_cycle(self):
         self.island.all_cells('replenish')
         self.island.all_cells('feeding')
-        carnilist = list_carnivores()
-        carniw = [carni.weight for carni in carnilist]
         self.island.all_cells('procreation')
-        carnilist = list_carnivores()
-        weights = [carni.weight for carni in carnilist]
-        for i in range(len(weights)):
-            #print(weights[i] - carniw[i])
-            pass
         self.island.migration()
         self.island.all_animals('aging')
         self.island.all_animals('weightloss')
@@ -72,7 +65,7 @@ class Run:
         self.years = 0
         self.desired_years = 50
         while(self.years < self.desired_years):
-            # print(run.island.num_animals_per_species)
+            print(run.island.num_animals_per_species)
             self.one_cycle()
             self.years += 1
             # print(self.years)
