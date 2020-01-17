@@ -5,6 +5,7 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 import inspect
 from math import exp
+import src.biosim.animals as animals
 from .animals import Herbivore, Carnivore
 
 

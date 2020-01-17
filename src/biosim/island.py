@@ -113,10 +113,3 @@ class Island:
                 self.num_animals_per_species[species] +=\
                     cell.num_animals_per_species()[species]
 
-    def update_change(self):
-        corpses = 0
-        newborns = 0
-        for cell in self.map.values():
-            corpses += cell.corpses
-            newborns += cell.newborns
-        return corpses, newborns

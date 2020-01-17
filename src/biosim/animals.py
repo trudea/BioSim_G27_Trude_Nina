@@ -175,11 +175,7 @@ class Herbivore(Animal):
             if m >= self.weight:
                 print('weight not gained')
             self.evaluate_fitness()
-            """
-            if self.phi <= h and self.phi < 1:
-                print(h, ' ', self.phi)
-                print('fitness not improved')
-            """
+
 
 
         elif cell.f < self.F:
@@ -211,11 +207,9 @@ class Carnivore(Animal):
 
     def check_if_kills(self, herbivore):
         if self.phi <= herbivore.phi:
-            print('hi')
             return False
         elif 0 < self.phi - herbivore.phi < 1.0:
             probability = (self.phi - herbivore.phi) / self.DeltaPhiMax
-            print(probability)
             if random.random() <= probability:
                 return True
             else:
