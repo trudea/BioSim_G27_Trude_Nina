@@ -35,12 +35,15 @@ class Animal:
             self.parameters_set = True
         self.age = None
         self.weight = None
+        self.phi = None
 
         if attribute_dict is not None:
             if 'weight' in attribute_dict:
                 self.weight = attribute_dict['weight']
             if 'age' in attribute_dict:
                 self.age = attribute_dict['age']
+            if 'phi' in attribute_dict:
+                self.phi = attribute_dict['phi']
 
         if self.age is None:
             self.age = 0
@@ -50,7 +53,8 @@ class Animal:
                 np.random.normal(self.param_dict['w_birth'],
                                  self.param_dict['sigma_birth'], 1000)
             self.weight = np.random.choice(statistic_population)
-        self.evaluate_fitness()
+        if self.phi is None:
+            self.evaluate_fitness()
 
     """
         if not self.parameters_set:

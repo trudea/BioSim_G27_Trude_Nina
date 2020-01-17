@@ -20,8 +20,8 @@ for h in simple_herb_list:
     simple_herb['age'] = h.age
     simple_herb['weight'] = h.weight
     simple_herbs.append(h)
-print(len(simple_herbs))
 simple_herb_pop = [{'loc': (1,1), 'pop' : simple_herbs}]
 
-run = Run()
-run = Run(simple_herb_pop, simple_map)
+carl = Carnivore({'phi' : 1.0})
+print(carl.phi)
+herman = Herbivore()

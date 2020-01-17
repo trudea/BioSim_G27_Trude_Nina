@@ -1,5 +1,4 @@
 import pytest
-
 import src.biosim.run as bs
 import src.biosim.island as isl
 import src.biosim.animals as ani
@@ -38,13 +37,11 @@ class TestIsland:
         with pytest.raises(ValueError):
             isl.Island('OO\nOSO\nJOO')
 
-def test_carnivore_kills():
-    c = ani.Carnivore()
-    c.phi = 0.9
-    c.weight = 30.0
+def test_carnivore_kills(mocker):
+    mocker.patch('random.random', return_value=0.1)
+    c = ani.Carnivore({'phi = 0.9', })
     h = ani.Herbivore()
-    h.phi = 0.05
-    c.weight = 20
+
     assert c.check_if_kills(h)
 
 
