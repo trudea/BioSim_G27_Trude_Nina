@@ -3,10 +3,10 @@
 """
 """
 import pandas as pd
-from .island import Island
-from .animals import Animal, Herbivore, Carnivore
-from .run import Run
-from .landscapes import Savannah, Jungle, Mountain, Desert, Ocean
+from src.biosim.island import Island as isl
+from src.biosim.animals import Animal, Herbivore, Carnivore
+from src.biosim.run import Run
+from src.biosim.landscapes import Savannah, Jungle, Mountain, Desert, Ocean
 __author__ = ""
 __email__ = ""
 
@@ -80,7 +80,7 @@ class BioSim:
         Add a population to the island
         :param population: List of dictionaries specifying population
         """
-        self.place_animals(population)
+        self.Island().place_animals(population)
         pass
 
     @property
@@ -110,3 +110,5 @@ class BioSim:
     def make_movie(self):
         """Create MPEG4 movie from visualization images saved."""
         pass
+
+if __name__ == '__main__':

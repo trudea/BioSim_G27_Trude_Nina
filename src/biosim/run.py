@@ -76,13 +76,22 @@ if __name__ == "__main__":
     animals = [{'loc': (1, 1), 'pop': [
         {'species': 'Herbivore', 'age': 10, 'weight': 40.5},
         {'species': 'Herbivore', 'age': 9, 'weight': 38.3},
-        {'species': 'Herbivore', 'age': 14, 'weight': 50.3},
+        {'species': 'Carnivore', 'age': 14, 'weight': 50.3},
         {'species': 'Herbivore', 'age': 5, 'weight': 36.1}]},
                {'loc': (2, 2), 'pop': [
                    {'species': 'Herbivore', 'age': 10, 'weight': 40.5},
                    {'species': 'Herbivore', 'age': 9, 'weight': 38.3},
-                   {'species': 'Herbivore', 'age': 14, 'weight': 50.3},
-                   {'species': 'Herbivore', 'age': 5, 'weight': 36.1}]}
+                   {'species': 'Carnivore', 'age': 14, 'weight': 50.3},
+                   {'species': 'Herbivore', 'age': 5, 'weight': 36.1},
+                   {'species': 'Herbivore', 'age': 10, 'weight': 40.5},
+                   {'species': 'Herbivore', 'age': 9, 'weight': 38.3},
+                   {'species': 'Carnivore', 'age': 14, 'weight': 50.3},
+                   {'species': 'Herbivore', 'age': 5, 'weight': 36.1},
+                   {'species': 'Herbivore', 'age': 10, 'weight': 40.5},
+                   {'species': 'Herbivore', 'age': 9, 'weight': 38.3},
+                   {'species': 'Carnivore', 'age': 14, 'weight': 50.3},
+                   {'species': 'Herbivore', 'age': 5, 'weight': 36.1}
+               ]}
 
                ]
 
