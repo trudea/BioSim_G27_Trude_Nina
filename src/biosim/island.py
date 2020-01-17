@@ -108,8 +108,8 @@ class Island:
         for cell in self.map.values(): # bør kunne flyttes inn
             self.num_animals += cell.num_animals()
             for species in self.num_animals_per_species:
-                self.num_animals_per_species[species] += cell.num_animals_per_species()[species]
-
+                self.num_animals_per_species[species] +=\
+                    cell.num_animals_per_species()[species]
 
     def update_change(self):
         corpses = 0
