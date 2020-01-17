@@ -249,11 +249,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         layout.addWidget(QtWidgets.QTableWidget(2, 2), 0, 2, 0, 1)
         layout.addWidget(QtWidgets.QPushButton("Simulate"), 2, 0)
 
-
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
-
-
 
     def fileQuit(self):
         self.close()
