@@ -211,18 +211,20 @@ class Carnivore(Animal):
 
     def check_if_kills(self, herbivore):
         if self.phi <= herbivore.phi:
+            print('hi')
             return False
-        elif 0 < self.phi - herbivore.phi < 1:
+        elif 0 < self.phi - herbivore.phi < 1.0:
             probability = (self.phi - herbivore.phi) / self.DeltaPhiMax
+            print(probability)
             if random.random() <= probability:
                 return True
             else:
                 return False
 
-    def feeding(self, cell, herbivores):
+    def feeding(self, cell):
         eaten = 0
         dead = []
-        for prey in herbivores:
+        for prey in cell.pop['Herbivore']:
             if eaten < self.F:
                 if self.check_if_kills(prey):
                     x = self.weight
