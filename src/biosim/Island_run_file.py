@@ -6,15 +6,7 @@
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
-
-import random
-from src.biosim.animals import Carnivore, Herbivore
-import matplotlib.pyplot as plt
-import inspect
-import numpy as np
-from .landscapes import Savannah, Jungle, Ocean, Mountain, Desert
-from .animals import Herbivore, Carnivore
-import src.biosim.animals as animals
+from .landscapes import *
 
 
 class Island:
@@ -32,9 +24,9 @@ class Island:
         for line in txt:
             if len(line) != len(txt[0]):
                 raise ValueError
-        #self.check_letters(txt)
+        self.check_letters(txt)
         self.check_edges(txt)
-        #self.check_letters(txt)
+        self.check_letters(txt)
         valid = ['O', 'S', 'J', 'D', 'M']
         for row in txt:
             for letter in row:
@@ -115,6 +107,7 @@ class Island:
                 self.num_animals_per_species[species] +=\
                     cell.num_animals_per_species()[species]
 
+
 class Run:
     default_input = [{'loc': (3, 4), 'pop': [
         {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
@@ -168,7 +161,6 @@ class Run:
             print(run.island.num_animals_per_species)
             self.one_cycle()
             self.years += 1
-
 
 
 if __name__ == "__main__":
