@@ -26,18 +26,8 @@ class AdjacentCell(Cell):
         self.upper_limit = 0
 """
 
-
-class TestMap:
-    def test_line_amount(self):
-        pass
-
-    def test_num_specimen(self):
-        pass
-
-    def test_choose_new_cell(self):
-
-        pass
-
+def test_line_amount():
+    pass
 
 class Testanimal:
     pass
@@ -53,11 +43,6 @@ class TestRun:
     def test_collective_procreation(self):
         pass
 
-    def test_run(self):
-        pass
-
-    def test_one_cycle(self):
-        pass
 
 if __name__ == "__main__":
     cell = isl.Cell(3, 3, 'S')
