@@ -79,7 +79,7 @@ class Run:
 
 
 if __name__ == "__main__":
-    map = 'OOOOO\nOJJJO\nOJJJO\nOJJJO\nOJJJO\nOOOO'
+    # map = 'OOOOO\nOJJJO\nOJJJO\nOJJJO\nOJJJO\nOOOO'
     animals = [{'loc': (1, 1), 'pop': [
         {'species': 'Herbivore', 'age': 10, 'weight': 40.5},
         {'species': 'Herbivore', 'age': 9, 'weight': 38.3},
@@ -99,11 +99,11 @@ if __name__ == "__main__":
 
 
 
-    map = 'OOOOOOO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOOOOOOO'
+    # map = 'OOOOOOO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOJJJJJO\nOOOOOOO'
 
     # island = Island()
     run = Run()
-
+    """
     cell = run.island.map[(1, 1)]
     for i in range(5):
         cell.pop['Herbivore'].append(Herbivore())
@@ -160,5 +160,5 @@ if __name__ == "__main__":
         run.island.map[(3, 3)].pop['Carnivore'].append(Carnivore())
     run.island.update_num_animals()
     # print(run.island.num_animals_per_species)
-
+    """
     run.run()

@@ -49,13 +49,21 @@ def test_kill_check(mocker):
 
 def test_carnivore_feeding(mocker):
     cell = land.Savannah()
-    mocker.patch('random.random', return_value=0.001) # lavere enn sanns?
+    mocker.patch('random.random', return_value=0.9) # lavere enn sanns?
     cell.pop['Herbivore'] = [ani.Herbivore({'phi': 0.1}), ani.Herbivore({'phi': 0.5}), ani.Herbivore({'phi': 0.9})]
     c1 = ani.Carnivore({'phi: ', 0.01})
-    c1.feed
+    former_weight = c1.weight
+    c1.feeding(cell)
+    assert len(cell.pop['Herbivore']) == 3
+    assert c1.weight == former_weight
+    mocker.patch('random.random', return_value=0.001)
     c2 = ani.Carnivore({'phi': 0.5})
-    c2.feeding(cell, cell.pop['Herbivore'])
+    former_weight = c2.weight
+    c2.feeding(cell)
     assert len(cell.pop['Herbivore']) == 0
+    assert c2.weight > former_weight
+
+
 
 
 

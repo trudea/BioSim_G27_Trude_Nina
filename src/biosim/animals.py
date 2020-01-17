@@ -211,6 +211,7 @@ class Carnivore(Animal):
 
     def check_if_kills(self, herbivore):
         if self.phi <= herbivore.phi:
+            print('hi')
             return False
         elif 0 < self.phi - herbivore.phi < 1.0:
             probability = (self.phi - herbivore.phi) / self.DeltaPhiMax
