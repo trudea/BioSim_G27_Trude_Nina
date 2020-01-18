@@ -135,14 +135,14 @@ def plot(years):
     plt.title("Biosimulator")
     plt.legend()
 """
-map = 'OOO \n OJO\n OOO \n OOO'
+
 
 def plotting_simulation(years):
     fig = plt.figure()
     ax = fig.add_subplot(211)
     px = fig.add_subplot(212)
     fig.show()
-    simulation = r.Run(default_input, map)
+    simulation = r.Run(default_input)
 
     x, y = [], []
     y_herb, y_carn = [], []
@@ -167,4 +167,4 @@ def plotting_simulation(years):
 
 
 if __name__ == '__main__':
-    plotting_simulation(100).show()
+    plotting_simulation(10).show()

@@ -8,33 +8,28 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 import inspect
 import numpy as np
-from .landscapes import Savannah, Jungle, Ocean, Mountain, Desert
-from .animals import Herbivore, Carnivore
-import src.biosim.animals as animals
+from biosim.landscapes import Savannah, Jungle, Ocean, Mountain, Desert
+from biosim.animals import Herbivore, Carnivore
+import biosim.animals as animals
+
 
 class Island:
     # ta høyde for store og små bokstaver
     land_dict = {'S': Savannah, 'J': Jungle,
                  'O': Ocean, 'M': Mountain, 'D': Desert}
 
+    def __init__(self, txt=None):
+        self.num_animals = 0
+        self.num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
+        if txt is None:
+            txt = open('rossum.txt').read()  # med \n som siste argument
+        self.map = self.str_to_dict(txt)
+
     def str_to_dict(self, txt):
-        txt = txt.split('\n')
-        print(txt[-1])
+        txt = txt.splitlines()
         if txt[-1] == '\n':
             txt = txt.pop()
-        txt.pop()
-        print(txt[-1]) # midlertidig
-        for line in txt:
-            if len(line) != len(txt[0]):
-                raise ValueError
-        #self.check_letters(txt)
-        self.check_edges(txt)
-        #self.check_letters(txt)
-        valid = ['O', 'S', 'J', 'D', 'M']
-        for row in txt:
-            for letter in row:
-                if letter not in valid:
-                    raise ValueError
+        self.check_all(txt)
 
         y = 0
         dict = {}
@@ -46,35 +41,26 @@ class Island:
             y += 1
         return dict
 
-
-    def check_letters(self, txt):
+    @staticmethod
+    def check_all(txt):
         valid = ['O', 'S', 'J', 'D', 'M']
-        length_line = []
+        right_edge = [line[-1] for line in txt]
+        left_edge = [line[0] for line in txt]
+        edges = [txt[0][:], txt[-1][:], right_edge, left_edge]
+        edges_list = [letter for edge in edges for letter in edge]
+
+        for i in txt:
+            if len(i) != len(txt[0]):
+                raise ValueError('Map lines not same length')
+
+        for letter in edges_list:
+            if letter != 'O':
+                raise ValueError('Map has to be surrounded by ocean')
+
         for line in txt:
-            length_line.append(len(line))
-            for letter in txt:
+            for letter in line:
                 if letter not in valid:
-                    raise ValueError
-                if [length for length in length_line] != len(line):
-                    raise ValueError
-
-
-    def check_edges(self, txt):
-        left_column = [line[0] for line in txt]
-        right_column = [line[-1] for line in txt]
-        to_check = [txt[0], txt[-1], left_column, right_column]
-        for list in to_check:
-            for element in list:
-                if element != 'O':
-                    raise ValueError
-
-    def __init__(self, txt=None):
-        self.num_animals = 0
-        self.num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
-        if txt is None:
-            txt = open('rossum.txt').read()  # med \n som siste argument
-        self.map = self.str_to_dict(txt)
-
+                    raise ValueError('Invalid landscape type')
 
     def all_cells(self, myfunc):
         for cell in self.map.values():
@@ -113,3 +99,7 @@ class Island:
                 self.num_animals_per_species[species] +=\
                     cell.num_animals_per_species()[species]
 
+
+if __name__ == '__main__':
+    map = 'OOOO\nOJJO\nOOOO'
+    Island(map)
