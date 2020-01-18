@@ -157,11 +157,11 @@ class Savannah(LandscapeCell):
 
     @classmethod
     def set_parameter(cls, new_params):
-        print (cls.class_params)
+        print (cls.params)
         if new_params is not None:
-            cls.class_params.update(new_params)
-        for param in cls.class_params:
-            exec("cls.%s = %s" % (param, cls.class_params[param]))
+            cls.params.update(new_params)
+        for param in cls.params:
+            exec("cls.%s = %s" % (param, cls.params[param]))
         cls.params_set = True
 
     def replenish(self):
