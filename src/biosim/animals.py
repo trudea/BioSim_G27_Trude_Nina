@@ -14,11 +14,8 @@ import random
 class Animal:
 
     def __init__(self, attribute_dict):
-
-
         self.age = None
         self.weight = None
-        # self.phi = None
 
         if attribute_dict is not None:
             if 'weight' in attribute_dict:
@@ -36,23 +33,6 @@ class Animal:
                 np.random.normal(self.params['w_birth'],
                                  self.params['sigma_birth'], 1000)
             self.weight = np.random.choice(statistic_population)
-
-
-    """
-        if not self.parameters_set:
-            self.set_parameters()
-    """
-    """
-
-    @classmethod
-    def set_parameters(cls, params=None):
-        for parameter in cls.param_dict:
-            # self.w_birth = default_param_dict[]
-            setattr(cls, parameter, cls.param_dict[parameter])
-
-        cls.parameters_set = True
-
-    """
 
     @property
     def phi(self):
@@ -130,12 +110,16 @@ class Herbivore(Animal):
     def __init__(self, attribute_dict=None):
         super().__init__(attribute_dict)
         if not self.params_set:
-            for param in self.params:
-                if param == 'lambda':
-                    self.lambdah = self.params['lambda']
-                else:
-                    exec("self.%s = %s" % (param, self.params[param]))
-            self.parameters_set = True
+            self.set_params()
+            self.params_set = True
+
+    @classmethod
+    def set_params(cls, params=None):
+        for param in cls.params:
+            if param == 'lambda':
+                cls.lambdah = cls.params['lambda']
+            else:
+                setattr(cls, param, cls.params[param])
 
 
     def feeding(self, cell):
@@ -145,8 +129,6 @@ class Herbivore(Animal):
             self.weight += (self.beta * self.F)
             if m >= self.weight:
                 print('weight not gained')
-
-
 
         elif cell.f < self.F:
             cell.f = 0
@@ -175,12 +157,18 @@ class Carnivore(Animal):
     def __init__(self, attribute_dict=None):
         super().__init__(attribute_dict)
         if not self.params_set:
-            for param in self.params:
-                if param == 'lambda':
-                    self.lambdah = self.params['lambda']
-                else:
-                    exec("self.%s = %s" % (param, self.params[param]))
-            self.parameters_set = True
+            self.set_params()
+            self.params_set = True
+
+
+    @classmethod
+    def set_params(cls, params=None):
+        for param in cls.params:
+            if param == 'lambda':
+                cls.lambdah = cls.params['lambda']
+            else:
+                setattr(cls, param, cls.params[param])
+
 
     def check_if_kills(self, herbivore):
         if self.phi <= herbivore.phi:

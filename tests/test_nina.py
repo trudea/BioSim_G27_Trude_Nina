@@ -1,8 +1,7 @@
 import pytest
-import src.biosim.run as bs
-import src.biosim.island as isl
 import src.biosim.animals as ani
 import src.biosim.landscapes as land
+import src.biosim.simulation as sim
 
 class TestIsland:
     rossum_string = 'OOOOOOOOOOOOOOOOOOOOO\nOSSSSSJJJJMMJJJJJJJOO\nOSSSSSJJJJMMJJJJJJJOO\nOSSSSSJJJJMMJJJJJJJOO\nOOSSJJJJJJJMMJJJJJJJO\nOOSSJJJJJJJMMJJJJJJJO\nOOOOOOOSMMMMJJJJJJJJO\nOSSSSSJJJJMMJJJJJJJOO\nOSSSSSSSSSMMJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSSDDDDDMMJJJJJOOO\nOSSSSSDDDDDJJJJOOOOOO\nOOSSSDDDDDDJJOOOOOOOO\nOOSSSSDDDDDDJJOOOOOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSDDDDDDJJJJOOOOOO\nOOSSSSDDDDDJJJOOOOOOO\nOOOSSSSJJJJJJJOOOOOOO\nOOOSSSSSSOOOOOOOOOOOO\nOOOOOOOOOOOOOOOOOOOOO'
@@ -93,8 +92,16 @@ def test_feed_carnivore_pop_change(mocker, ex_savannah, ex_herbivores, ex_carniv
     c2.feeding(cell)
     assert len(cell.pop['Herbivore']) == 0
 
-def test_carnivore_fertile(mocker):
-    c1 = ani.Carnivore({'phi: ', 0.01})
+
+
+
+def test_herbivore_weight():
+    sim = BioSim()
+    for cell in sim.map.values():
+        for herbivore in cell.pop['Herbivore']:
+            if herbivore.weight <= 0:
+                assert False
+
 
 
 

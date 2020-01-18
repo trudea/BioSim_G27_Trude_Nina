@@ -14,45 +14,54 @@ from .animals import Herbivore, Carnivore
 
 class LandscapeCell:
     def __init__(self):
+        self.params_set = False
         self.f = 0
         self.species_to_class = dict(inspect.getmembers(animals, inspect.isclass))
         del self.species_to_class['Animal']
         self.pop = {'Herbivore': [], 'Carnivore': []}
-        self.tot_w_herbivores = \
-            sum([herbivore.weight for herbivore in self.pop['Herbivore']])
+        #self.tot_w_herbivores = \
+        #    sum([herbivore.weight for herbivore in self.pop['Herbivore']])
 
     def num_specimen(self, species):
         return len(self.pop[species])
 
-
+    """
     @property
     def num_animals_per_species(self):
         num_dict = {}
         for species in self.pop:
             num_dict[species] = len(self.pop[species])
         return num_dict
+    """
 
+    """
     @property
     def num_animals(self):
         total = 0
         for species in self.pop:
             total += len(self.pop[species])
         return total
+    """
+
+    @property
+    def tot_w_herbivores(self):
+        return sum([herbivore.weight for herbivore in self.pop['Herbivore']])
 
     @property
     def rel_abundance(self):
-        animal = Herbivore()
-        animaltype = type(animal)
+        return self._rel_abundance
+
+    @rel_abundance.setter
+    def rel_abundance(self, animal):
         fodder = 0
-        if animaltype == Herbivore:
+        if type(animal) == Herbivore:
             fodder = self.f
+        elif type(animal) == Carnivore:
 
-        elif animaltype == Carnivore:
             fodder = self.tot_w_herbivores
+        n = self.num_specimen(type(animal).__name__)
 
-        n = self.num_specimen(animaltype.__name__)
-
-        return fodder / ((n + 1) * animal.F)
+        self._rel_abundance = fodder / ((n + 1) * animal.F)
 
 
     @property
@@ -66,7 +75,8 @@ class LandscapeCell:
         elif type(self) == Mountain:
             self._propensity = 0
         else:
-            self._propensity = exp(animal.lambdah * self.rel_abundance)
+            self.rel_abundance = animal
+            self._propensity = exp(animal.lambdah * self._rel_abundance)
 
     @property
     def likelihood(self):
@@ -108,8 +118,6 @@ class LandscapeCell:
                 self.pop[individual_dict['species']] = []
             new_animal = eval(individual_dict['species'])(individual_dict)
             self.pop[individual_dict['species']].append(new_animal)
-            if individual_dict['species'] == 'Herbivore':
-                self.tot_w_herbivores += new_animal.weight
 
     def replenish(self):
         pass
@@ -145,50 +153,45 @@ class LandscapeCell:
 
 class Savannah(LandscapeCell):
     params = {'f_max': 300.0, 'alpha': 0.3}
-    params_set = False
 
-    def __init__(self, param_dict=None):
+    def __init__(self, new_params=None):
         super().__init__()
         if not self.params_set:
-            for param in self.params:
-                exec("self.%s = %s" % (param, self.params[param]))
-            self.f = self.f_max
+            self.set_params()
+            self.params_set = True
+
+        self.f = self.f_max
 
 
     @classmethod
-    def set_parameter(cls, new_params):
-        print (cls.params)
+    def set_params(cls, new_params=None):
         if new_params is not None:
             cls.params.update(new_params)
         for param in cls.params:
-            exec("cls.%s = %s" % (param, cls.params[param]))
+            setattr(cls, param, cls.params[param])
         cls.params_set = True
 
     def replenish(self):
         self.f = self.alpha * (self.f_max - self.f) + self.f
 
 
-
-
 class Jungle(LandscapeCell):
     params = {'f_max': 800.0}
-    params_set = False
 
     def __init__(self, param_dict=None):
         super().__init__()
         if not self.params_set:
-            for param in self.params:
-                exec("self.%s = %s" % (param, self.params[param]))
-            self.f = self.f_max
+            self.set_params()
+            self.params_set = True
 
+        self.f = self.f_max
 
     @classmethod
-    def set_parameter(cls, new_params):
+    def set_params(cls, new_params=None):
         if new_params is not None:
             cls.params.update(new_params)
         for param in cls.params:
-            exec("cls.%s = %s" % (param, cls.params[param]))
-        cls.params_set = True
+            setattr(cls, param, cls.params[param])
 
     def replenish(self):
         self.f = self.f_max
