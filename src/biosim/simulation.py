@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from biosim.island import Island
 
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
@@ -158,7 +157,7 @@ class BioSim:
         self.per_species_results = []
 
         while (self.years < self.num_years):
-            print(self.num_animals_per_species)
+            # print(self.num_animals_per_species)
             self.all_cells('replenish')
             self.all_cells('feeding')
             self.all_cells('procreation')
@@ -170,6 +169,7 @@ class BioSim:
             self.num_animals_results.append(self.num_animals)
             self.per_species_results.append(self.num_animals_per_species)
             self.years += 1
+            print(self.num_animals_per_species)
 
     def add_population(self, population):
         """
@@ -177,14 +177,12 @@ class BioSim:
 
         :param population: List of dictionaries specifying population
         """
-        for individual_dict in population:
-            if individual_dict['species'] not in self.pop:
-                self.pop[individual_dict['species']] = []
-            new_animal = eval(individual_dict['species'])(individual_dict)
-            self.pop[individual_dict['species']].append(new_animal)
-            if individual_dict['species'] == 'Herbivore':
-                self.tot_w_herbivores += new_animal.weight
-        return
+        for loc_dict in population:
+            loc = self.map[loc_dict['loc']]
+            loc.place_animals(loc_dict['pop'])
+
+
+
 
 
     """ property fungerer ved at den gjør metoder om til objekter
@@ -204,19 +202,17 @@ class BioSim:
         num_animals = 0
         num_animals_per_species: {'Herbivore': 0, 'Carnivore': 0}
         for cell in self.map.values():
-            num_animals += len(cell.pop['Herbivore']) + len(cell.pop[Carnivore])
+            num_animals += len(cell.pop['Herbivore']) + len(cell.pop['Carnivore'])
         return num_animals
-
         return self.num_animals
 
     @property
     def num_animals_per_species(self):
         """Number of animals per species in island, as dictionary."""
-
-        num_animals_per_species: {'Herbivore': 0, 'Carnivore': 0}
+        num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
         for cell in self.map.values():
-            for species in self.num_animals_per_species:
-                self.num_animals_per_species[species] += len(cell.pop[species])
+            for species in num_animals_per_species:
+                num_animals_per_species[species] += len(cell.pop[species])
         return num_animals_per_species
         return self.num_animals_per_species
 
@@ -257,7 +253,7 @@ class BioSim:
 
     def place_animals(self, input_list):
         for placement_dict in input_list:
-            pos = placement_dict['loc'] # bør flytte resten til celle?
+            pos = placement_dict['loc']
             self.map[pos].place_animals(placement_dict['pop'])
 
     def migration(self): # husk filtering
@@ -290,4 +286,4 @@ if __name__ == '__main__':
 
     sim = BioSim(default_txt, default_pop, default_seed)
     sim.add_population(default_pop)
-    sim.simulate(1)
+    sim.simulate(25)

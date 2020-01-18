@@ -20,9 +20,6 @@ class LandscapeCell:
         self.rel_abundance = None
         self.propensity = None
         self.likelihood = None
-        self.corpses = 0
-        self.newborns = 0
-
 
     def num_specimen(self, species):
         return len(self.pop[species])
@@ -58,6 +55,17 @@ class LandscapeCell:
             self.propensity = 0
         else:
             self.propensity = exp(animal.lambdah * self.rel_abundance)
+
+    def place_animals(self, pop_list):
+        for individual_dict in pop_list:
+            if individual_dict['species'] not in self.pop:
+                self.pop[individual_dict['species']] = []
+            new_animal = eval(individual_dict['species'])(individual_dict)
+            self.pop[individual_dict['species']].append(new_animal)
+            if individual_dict['species'] == 'Herbivore':
+                self.tot_w_herbivores += new_animal.weight
+        return
+
 
     def replenish(self):
         pass
