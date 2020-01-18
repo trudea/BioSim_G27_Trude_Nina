@@ -115,35 +115,6 @@ class Animal:
         new_cell.pop[type(self).__name__].append(self)
         old_cell.pop[type(self).__name__].remove(self)
 
-    """
-    def migrate(self, old_cell, map_list):
-        if len(map_list) == 0:
-            pass
-        elif len(map_list) == 1:
-            self.move(old_cell, map_list[0])
-        else:
-            new_cell = self.choose_new_cell(map_list)
-            self.move(old_cell, new_cell)
-    """
-
-    """
-    def new_cell(self, map_list):
-        animal
-        total_propensity = sum([cell.propensity(self) for cell in map_list])
-        print(total_propensity)
-        cell.likelihood(total_propensity)
-
-        #for cell in map_list:
-        #    cell.likelihood = cell.propensity / total_propensity
-       
-        choices = np.random.choice(map_list, 1000, p=[cell.likelihood for cell
-                                                      in map_list])
-        chosen_cell = np.random.choice(choices)
-        return chosen_cell
-    """
-
-
-
     def remove(self, cell):
         cell.pop[type(self).__name__].remove(self)
 
@@ -235,7 +206,6 @@ class Carnivore(Animal):
                     if self.weight <= x:
                         print('Carni weight not gained')
                     c = self.phi
-                    self.evaluate_fitness()
                     if self.phi <= c and self.phi < 0.98:
                         # print(c, ' ', self.phi)
                         # print('Fitness not updated')

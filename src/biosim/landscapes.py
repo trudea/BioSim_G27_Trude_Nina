@@ -24,6 +24,7 @@ class LandscapeCell:
     def num_specimen(self, species):
         return len(self.pop[species])
 
+
     @property
     def num_animals_per_species(self):
         num_dict = {}
@@ -31,7 +32,7 @@ class LandscapeCell:
             num_dict[species] = len(self.pop[species])
         return num_dict
 
-    # @property
+    @property
     def num_animals(self):
         total = 0
         for species in self.pop:
@@ -79,7 +80,6 @@ class LandscapeCell:
     def migration(self, map_list):
         for species in self.pop:
             for animal in self.pop[species]:
-                # animal.migrate(self, map_list)
                 if len(map_list) == 0:
                     pass
                 elif len(map_list) == 1:
@@ -100,8 +100,7 @@ class LandscapeCell:
         r = random.random()
         for i in range(len(upper_limits)):
             if r <= upper_limits[i]:
-                chosen_cell = map_list[i]
-        return chosen_cell
+                return map_list[i]
 
     def place_animals(self, pop_list):
         for individual_dict in pop_list:
@@ -111,17 +110,6 @@ class LandscapeCell:
             self.pop[individual_dict['species']].append(new_animal)
             if individual_dict['species'] == 'Herbivore':
                 self.tot_w_herbivores += new_animal.weight
-
-    """
-    def place_animals(self, pop_list):
-        for individual_dict in pop_list:
-            if individual_dict['species'] not in self.pop:
-                self.pop[individual_dict['species']] = []
-            new_animal = eval(individual_dict['species'])(individual_dict)
-            self.pop[individual_dict['species']].append(new_animal)
-            if individual_dict['species'] == 'Herbivore':
-                self.tot_w_herbivores += new_animal.weight
-    """
 
     def replenish(self):
         pass
@@ -156,15 +144,25 @@ class LandscapeCell:
             self.pop[species] = [animal for animal in self.pop[species] if not animal.dies()]
 
 class Savannah(LandscapeCell):
-    param_dict = {'f_max': 300.0, 'alpha': 0.3}
+    params = {'f_max': 300.0, 'alpha': 0.3}
+    params_set = False
 
     def __init__(self, param_dict=None):
         super().__init__()
-        if param_dict is not None:
-            self.param_dict.update(param_dict)
-        for parameter in self.param_dict:
-            exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
-        self.f = self.f_max
+        if self.params_set is False:
+            for param in self.params:
+                exec("self.%s = %s" % (param, self.params[param]))
+            self.f = self.f_max
+
+
+    @classmethod
+    def set_parameter(cls, new_params):
+        print (cls.class_params)
+        if new_params is not None:
+            cls.class_params.update(new_params)
+        for param in cls.class_params:
+            exec("cls.%s = %s" % (param, cls.class_params[param]))
+        cls.params_set = True
 
     def replenish(self):
         self.f = self.alpha * (self.f_max - self.f) + self.f
@@ -173,15 +171,25 @@ class Savannah(LandscapeCell):
 
 
 class Jungle(LandscapeCell):
-    param_dict = {'f_max': 800.0}
+    params = {'f_max': 800.0}
+    params_set = False
 
     def __init__(self, param_dict=None):
         super().__init__()
-        if param_dict is not None:
-            self.param_dict.update(param_dict)
-        for parameter in self.param_dict:
-            exec("self.%s = %s" % (parameter, self.param_dict[parameter]))
-        self.f = self.f_max
+        if self.params_set is False:
+            for param in self.params:
+                exec("self.%s = %s" % (param, self.params[param]))
+            self.f = self.f_max
+
+
+    @classmethod
+    def set_parameter(cls, new_params):
+        if new_params is not None:
+            cls.params.update(new_params)
+        for param in cls.params:
+            exec("cls.%s = %s" % (param, cls.params[param]))
+        cls.params_set = True
+
 
     def replenish(self):
         self.f = self.f_max

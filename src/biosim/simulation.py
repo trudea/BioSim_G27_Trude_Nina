@@ -5,6 +5,8 @@ __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 import inspect
+import textwrap
+import matplotlib.pyplot as plt
 import random
 from src.biosim.animals import Herbivore, Carnivore
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
@@ -134,10 +136,8 @@ class BioSim:
         :param landscape: String, code letter for landscape
         :param params: Dict with valid parameter specification for landscape
         """
-        landscape = landscape.split
-        list_landscape = []
-        for line in landscape:
-            list_landscape.append([line])
+        self.land_dict[landscape].set_parameter(params)
+
 
     def simulate(self, num_years, vis_years=1, img_years=None):
         """
@@ -155,6 +155,7 @@ class BioSim:
 
         self.num_animals_results = []
         self.per_species_results = []
+
 
         while (self.years < self.num_years):
             self.all_cells('replenish')
@@ -180,14 +181,6 @@ class BioSim:
             loc = self.map[loc_dict['loc']]
             loc.place_animals(loc_dict['pop'])
 
-
-
-
-
-    """ property fungerer ved at den gjør metoder om til objekter
-    se https://www.journaldev.com/14893/python-property-decorator for mer
-    basically: en metode num_animals() kan kalles kun ved num_animals
-    """
 
     @property
     def year(self):
@@ -279,7 +272,73 @@ if __name__ == '__main__':
                           {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
                           {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
                           {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
-
+    """
     sim = BioSim(default_txt, default_pop, default_seed)
+    sim.set_animal_parameters(Herbivore)
+    sim.set_animal_parameters(Carnivore)
+    sim.set_landscape_parameters(Savannah)
+    sim.set_animal_parameters(Jungle)
     sim.add_population(default_pop)
     sim.simulate(20)
+    """
+    plt.ion()
+
+    geogr = """\
+               OOOOOOOOOOOOOOOOOOOOO
+               OOOOOOOOSMMMMJJJJJJJO
+               OSSSSSJJJJMMJJJJJJJOO
+               OSSSSSSSSSMMJJJJJJOOO
+               OSSSSSJJJJJJJJJJJJOOO
+               OSSSSSJJJDDJJJSJJJOOO
+               OSSJJJJJDDDJJJSSSSOOO
+               OOSSSSJJJDDJJJSOOOOOO
+               OSSSJJJJJDDJJJJJJJOOO
+               OSSSSJJJJDDJJJJOOOOOO
+               OOSSSSJJJJJJJJOOOOOOO
+               OOOSSSSJJJJJJJOOOOOOO
+               OOOOOOOOOOOOOOOOOOOOO"""
+    geogr = textwrap.dedent(geogr)
+
+    ini_herbs = [
+        {
+            "loc": (10, 10),
+            "pop": [
+                {"species": "Herbivore", "age": 5, "weight": 20}
+                for _ in range(150)
+            ],
+        }
+    ]
+    ini_carns = [
+        {
+            "loc": (10, 10),
+            "pop": [
+                {"species": "Carnivore", "age": 5, "weight": 20}
+                for _ in range(40)
+            ],
+        }
+    ]
+
+    sim = BioSim(island_map=geogr, ini_pop=ini_herbs, seed=123456)
+
+    sim.set_animal_parameters("Herbivore", {"zeta": 3.2, "xi": 1.8})
+    sim.set_animal_parameters(
+        "Carnivore",
+        {
+            "a_half": 70,
+            "phi_age": 0.5,
+            "omega": 0.3,
+            "F": 65,
+            "DeltaPhiMax": 9.0,
+        },
+    )
+
+    sim.set_landscape_parameters("J", {"f_max": 700})
+
+    sim.simulate(num_years=100, vis_years=1, img_years=2000)
+
+    sim.add_population(population=ini_carns)
+    sim.simulate(num_years=100, vis_years=1, img_years=2000)
+
+    plt.savefig("check_sim.pdf")
+
+    input("Press ENTER")
