@@ -1,20 +1,20 @@
-class Country:
-    def __init__(self):
-        self.name = 'Montenegro'
-        self.food = ['eple', 'pære', 'banan']
+import numpy as np
 
-    @property
-    def num_food(self):
-        return self._num_food
-
-    @num_food.getter
-    def num_food(self, x):
-        if x == 1:
-            self._num_food = len(self.food)
-        elif x == 2:
-            self._num_food = 44
+p = np.array([0.25, 0.25, 0.25, 0.25])
+print(p)
+x = np.cumsum(p)
+print(x)
 
 
-d = Country()
-d.num_food() = 5
-print(d.num_food())
+    n = 0
+    while np.random.random() >= P[n]:
+        n += 1
+
+
+
+    num_observed[n] += 1
+
+for n, (e, o) in enumerate(zip(num_expected, num_observed)):
+    print(n, e, o)
+
+"""

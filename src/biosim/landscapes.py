@@ -6,6 +6,8 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 import inspect
 from math import exp
 import numpy as np
+from pytest import approx
+import random
 import src.biosim.animals as animals
 from .animals import Herbivore, Carnivore
 
@@ -92,18 +94,14 @@ class LandscapeCell:
         total_propensity = sum([cell.propensity for cell in map_list])
         for cell in map_list:
             cell.likelihood = total_propensity
-        probs = [cell.likelihood for cell in map_list]
-        if not sum(probs) == 1:
-            print('Probabilities do not add up')
-        choices = np.random.choice(map_list, 1000, p=[cell.likelihood for cell
-                                                      in map_list])
-        # bør bruke random.random() og intervaller likevel
-        chosen_cell = np.random.choice(choices)
+        if not sum([cell.likelihood for cell in map_list]) == approx(1):
+            print('Probabilities do not add up: ', sum([cell.likelihood for cell in map_list]))
+        upper_limits = np.cumsum([cell.likelihood for cell in map_list])
+        r = random.random()
+        for i in range(len(upper_limits)):
+            if r <= upper_limits[i]:
+                chosen_cell = map_list[i]
         return chosen_cell
-
-
-
-
 
     def place_animals(self, pop_list):
         for individual_dict in pop_list:
