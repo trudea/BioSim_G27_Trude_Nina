@@ -130,6 +130,8 @@ class BioSim:
         :param params: Dict with valid parameter specification for species
         """
         self.name = species
+        # self.land_dict[].set_parameter(params)
+
 
     def set_landscape_parameters(self, landscape, params):
         """
@@ -209,15 +211,12 @@ class BioSim:
     @property
     def num_animals_per_species(self):
         """Number of animals per species in island, as dictionary."""
-        return self.num_animals_per_species
-
-    @num_animals_per_species.setter
-    def num_animals_per_species(self, value):
-        num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
+        _num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
         for cell in self.map.values():
-            for species in value:
-                num_animals_per_species[species] += len(cell.pop[species])
-        num_animals_per_species = value
+            for species in cell.pop:
+                _num_animals_per_species[species] += len(
+                    cell.pop[species])
+        return _num_animals_per_species
 
     @property
     def animal_distribution(self):
@@ -299,3 +298,6 @@ if __name__ == '__main__':
     sim.add_population(default_pop)
     sim.simulate(10)
     print(sim.year)
+
+
+
