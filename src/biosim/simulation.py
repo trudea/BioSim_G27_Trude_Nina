@@ -282,4 +282,4 @@ if __name__ == '__main__':
 
     sim = BioSim(default_txt, default_pop, default_seed)
     sim.add_population(default_pop)
-    sim.simulate(25)
+    sim.simulate(1)

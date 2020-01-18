@@ -18,18 +18,18 @@ class LandscapeCell:
         self.pop = {'Herbivore': [], 'Carnivore': []}
         self.tot_w_herbivores = \
             sum([herbivore.weight for herbivore in self.pop['Herbivore']])
-        self.propensity = 0
-        self.likelihood = None
 
     def num_specimen(self, species):
         return len(self.pop[species])
 
+    @property
     def num_animals_per_species(self):
         num_dict = {}
         for species in self.pop:
             num_dict[species] = len(self.pop[species])
         return num_dict
 
+    # @property
     def num_animals(self):
         total = 0
         for species in self.pop:
@@ -51,27 +51,27 @@ class LandscapeCell:
 
         return fodder / ((n + 1) * animal.F)
 
+
     @property
     def propensity(self):
-        return self.propensity
-
+        return self._propensity
 
     @propensity.setter
     def propensity(self, animal):
-        if type(animal) == Herbivore:
-            propensity = 0.3
-        elif type(animal) == Carnivore:
-            propensity = 0.7
-        """
-        # self.animal = animal
         if type(self) == Ocean:
-            self.propensity = 0
+            self._propensity = 0
         elif type(self) == Mountain:
-            self.propensity = 0
+            self._propensity = 0
         else:
-            self.propensity = exp(animal.lambdah * self.rel_abundance)
-        """
+            self._propensity = exp(animal.lambdah * self.rel_abundance)
 
+    @property
+    def likelihood(self):
+        return self._likelihood
+
+    @likelihood.setter
+    def likelihood(self, total):
+        self._likelihood = self._propensity / total
 
 
     def migration(self, map_list):
@@ -87,26 +87,21 @@ class LandscapeCell:
                     animal.move(self, new_cell)
 
     def new_cell(self, animal, map_list):
-        cell = map_list[0]
-        print(cell.propensity(animal))
-        #print(cell.propensity(animal))
-        """
-        total_propensity = sum(
-            [cell.propensity(animal) for cell in map_list])
         for cell in map_list:
-            cell.likelihood = cell.propensity / total_propensity
+            cell.propensity = animal # setter verdi
+        total_propensity = sum([cell.propensity for cell in map_list])
+        for cell in map_list:
+            cell.likelihood = total_propensity
+        probs = [cell.likelihood for cell in map_list]
+        if not sum(probs) == 1:
+            print('Probabilities do not add up')
         choices = np.random.choice(map_list, 1000, p=[cell.likelihood for cell
                                                       in map_list])
         # bør bruke random.random() og intervaller likevel
         chosen_cell = np.random.choice(choices)
         return chosen_cell
-    """
-    """
-    @property
-    def likelihood(self, animal, map_list):
-    likelihood = self.propensity(animal) / sum(
-        [cell.propensity(cell, animal) for cell in map_list])
-    """
+
+
 
 
 
@@ -118,8 +113,17 @@ class LandscapeCell:
             self.pop[individual_dict['species']].append(new_animal)
             if individual_dict['species'] == 'Herbivore':
                 self.tot_w_herbivores += new_animal.weight
-        return
 
+    """
+    def place_animals(self, pop_list):
+        for individual_dict in pop_list:
+            if individual_dict['species'] not in self.pop:
+                self.pop[individual_dict['species']] = []
+            new_animal = eval(individual_dict['species'])(individual_dict)
+            self.pop[individual_dict['species']].append(new_animal)
+            if individual_dict['species'] == 'Herbivore':
+                self.tot_w_herbivores += new_animal.weight
+    """
 
     def replenish(self):
         pass
@@ -131,15 +135,6 @@ class LandscapeCell:
             herbivore.feeding(self)
         for carnivore in self.pop['Carnivore']:
             carnivore.feeding(self)
-
-    def place_animals(self, pop_list):
-        for individual_dict in pop_list:
-            if individual_dict['species'] not in self.pop:
-                self.pop[individual_dict['species']] = []
-            new_animal = eval(individual_dict['species'])(individual_dict)
-            self.pop[individual_dict['species']].append(new_animal)
-            if individual_dict['species'] == 'Herbivore':
-                self.tot_w_herbivores += new_animal.weight
 
     def procreation(self):
         for species, pop_list in self.pop.items():
@@ -161,11 +156,6 @@ class LandscapeCell:
     def dying(self):
         for species in self.pop:
             self.pop[species] = [animal for animal in self.pop[species] if not animal.dies()]
-
-
-
-
-
 
 class Savannah(LandscapeCell):
     param_dict = {'f_max': 300.0, 'alpha': 0.3}

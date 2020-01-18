@@ -55,8 +55,7 @@ class Animal:
                 np.random.normal(self.param_dict['w_birth'],
                                  self.param_dict['sigma_birth'], 1000)
             self.weight = np.random.choice(statistic_population)
-        if self.phi is None:
-            self.evaluate_fitness()
+
 
     """
         if not self.parameters_set:
@@ -128,27 +127,22 @@ class Animal:
     """
 
     """
-    def choose_new_cell(self, map_list):
-        # for cell in map_list:
-            # cell.get_rel_abundance(self)
-            # cell.get_propensity(self)
-        animaltype = type(self)
-        for cell in map_list:
-            print(animaltype)
-            p = cell.propensity(animaltype)
-            print(p)
-        total_propensity = sum([cell.propensity(animaltype) for cell in map_list])
-        for cell in map_list:
-            cell.likelihood = cell.propensity(self) / total_propensity
+    def new_cell(self, map_list):
+        animal
+        total_propensity = sum([cell.propensity(self) for cell in map_list])
+        print(total_propensity)
+        cell.likelihood(total_propensity)
+
+        #for cell in map_list:
+        #    cell.likelihood = cell.propensity / total_propensity
+       
         choices = np.random.choice(map_list, 1000, p=[cell.likelihood for cell
                                                       in map_list])
-        # bør bruke random.random() og intervaller likevel
         chosen_cell = np.random.choice(choices)
-        for candidate in map_list:
-            candidate.rel_abundance = None
-            candidate.propensity = None
         return chosen_cell
-        """
+    """
+
+
 
     def remove(self, cell):
         cell.pop[type(self).__name__].remove(self)
