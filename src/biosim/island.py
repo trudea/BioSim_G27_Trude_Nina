@@ -19,8 +19,7 @@ class Island:
                  'O': Ocean, 'M': Mountain, 'D': Desert}
 
     def str_to_dict(self, txt):
-        txt = txt.split('\n')
-        print(txt[-1])
+        txt = txt.splitlines()
         if txt[-1] == '\n':
             txt = txt.pop()
         print(txt)
@@ -99,4 +98,5 @@ class Island:
 
 if __name__ == '__main__':
     map = 'OOO\nOJO\nOOO'
-    Island(map)
+    s = Island(map)
+    print(s.map)
