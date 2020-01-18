@@ -6,6 +6,7 @@ import src.biosim.island as isl
 import src.biosim.animals as ani
 import src.biosim.landscapes as land
 import src.biosim.run as run
+import src.biosim.simulation as sim
 import pytest
 import random
 
@@ -340,12 +341,18 @@ class TestRun:
         t.run()
         assert t.years == t.desired_years
 
-def test_kill_check(mocker):
-    mocker.patch('random.random', return_value=0.001)
-    h = ani.Herbivore({'phi': 0.2})
-    c1 = ani.Carnivore({'phi': 0.9})
-    c2 = ani.Carnivore({'phi': 0.2})
-    c3 = ani.Carnivore({'phi': 0.1})
-    assert c1.check_if_kills(h)
-    assert not c2.check_if_kills(h)
-    assert not c3.check_if_kills(h)
+    def test_kill_check(mocker):
+        mocker.patch('random.random', return_value=0.001)
+        h = ani.Herbivore({'phi': 0.2})
+        c1 = ani.Carnivore({'phi': 0.9})
+        c2 = ani.Carnivore({'phi': 0.2})
+        c3 = ani.Carnivore({'phi': 0.1})
+        assert c1.check_if_kills(h)
+        assert not c2.check_if_kills(h)
+        assert not c3.check_if_kills(h)
+
+
+class TestSimulation:
+    def test_animal_distribution(self):
+        sim.animal_distribution.get
+        pass
