@@ -18,12 +18,19 @@ class Island:
     land_dict = {'S': Savannah, 'J': Jungle,
                  'O': Ocean, 'M': Mountain, 'D': Desert}
 
+    def __init__(self, txt=None):
+        self.num_animals = 0
+        self.num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
+        if txt is None:
+            txt = open('rossum.txt').read()  # med \n som siste argument
+        self.map = self.str_to_dict(txt)
+
     def str_to_dict(self, txt):
         txt = txt.splitlines()
         if txt[-1] == '\n':
             txt = txt.pop()
-        print(txt)
         self.check_all(txt)
+
         y = 0
         dict = {}
         for row in txt:
@@ -34,16 +41,19 @@ class Island:
             y += 1
         return dict
 
-    def check_all(self, txt):
+    @staticmethod
+    def check_all(txt):
         valid = ['O', 'S', 'J', 'D', 'M']
-        edges = [txt[0][:], txt[-1][:], txt[:][0], txt[:][-1]]
-        edges = ''.join(edges)
+        right_edge = [line[-1] for line in txt]
+        left_edge = [line[0] for line in txt]
+        edges = [txt[0][:], txt[-1][:], right_edge, left_edge]
+        edges_list = [letter for edge in edges for letter in edge]
 
         for i in txt:
             if len(i) != len(txt[0]):
                 raise ValueError('Map lines not same length')
 
-        for letter in edges:
+        for letter in edges_list:
             if letter != 'O':
                 raise ValueError('Map has to be surrounded by ocean')
 
@@ -51,13 +61,6 @@ class Island:
             for letter in line:
                 if letter not in valid:
                     raise ValueError('Invalid landscape type')
-
-    def __init__(self, txt=None):
-        self.num_animals = 0
-        self.num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
-        if txt is None:
-            txt = open('rossum.txt').read()  # med \n som siste argument
-        self.map = self.str_to_dict(txt)
 
     def all_cells(self, myfunc):
         for cell in self.map.values():
@@ -96,7 +99,7 @@ class Island:
                 self.num_animals_per_species[species] +=\
                     cell.num_animals_per_species()[species]
 
+
 if __name__ == '__main__':
-    map = 'OOO\nOJO\nOOO'
-    s = Island(map)
-    print(s.map)
+    map = 'OOOO\nOJJO\nOOOO'
+    Island(map)
