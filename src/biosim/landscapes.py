@@ -149,7 +149,7 @@ class Savannah(LandscapeCell):
 
     def __init__(self, param_dict=None):
         super().__init__()
-        if self.params_set is False:
+        if not self.params_set:
             for param in self.params:
                 exec("self.%s = %s" % (param, self.params[param]))
             self.f = self.f_max
@@ -176,7 +176,7 @@ class Jungle(LandscapeCell):
 
     def __init__(self, param_dict=None):
         super().__init__()
-        if self.params_set is False:
+        if not self.params_set:
             for param in self.params:
                 exec("self.%s = %s" % (param, self.params[param]))
             self.f = self.f_max
@@ -189,7 +189,6 @@ class Jungle(LandscapeCell):
         for param in cls.params:
             exec("cls.%s = %s" % (param, cls.params[param]))
         cls.params_set = True
-
 
     def replenish(self):
         self.f = self.f_max
