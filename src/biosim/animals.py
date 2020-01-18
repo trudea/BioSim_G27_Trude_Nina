@@ -14,6 +14,7 @@ import random
 class Animal:
     parameters_set = False
 
+    """
     def evaluate_fitness(self):
         q_plus = 1.0 / (1 + exp(self.param_dict['phi_age'] *
                                 (self.age - self.param_dict['a_half'])))
@@ -22,6 +23,7 @@ class Animal:
                                  (self.weight - self.param_dict['w_half'])))
 
         self.phi = q_plus * q_minus
+    """
 
     def __init__(self, attribute_dict):
 
@@ -35,7 +37,7 @@ class Animal:
             self.parameters_set = True
         self.age = None
         self.weight = None
-        self.phi = None
+        # self.phi = None
 
         if attribute_dict is not None:
             if 'weight' in attribute_dict:
@@ -72,18 +74,25 @@ class Animal:
 
     """
 
+    @property
+    def phi(self):
+        q_plus = 1.0 / (1 + exp(self.param_dict['phi_age'] *
+                                (self.age - self.param_dict['a_half'])))
+
+        q_minus = 1.0 / (1 + exp(-self.param_dict['phi_weight'] *
+                                 (self.weight - self.param_dict[
+                                     'w_half'])))
+
+        return q_plus * q_minus
+
     def aging(self):
         self.age += 1
-        self.evaluate_fitness()
 
     def weightloss(self):
         if (self.eta * self.weight) <= self.weight:
             self.weight -= (self.eta * self.weight)
         elif (self.eta * self.weight) > self.weight:
             self.weight = 0
-        self.evaluate_fitness()
-
-
 
     def dies(self):
         probability = self.param_dict['omega'] * (1 - self.phi)
@@ -166,15 +175,13 @@ class Herbivore(Animal):
         super().__init__(attribute_dict)
 
     def feeding(self, cell):
-        self.evaluate_fitness()
-        h = self.phi
+        # self.evaluate_fitness()
         if cell.f >= self.F:
             cell.f -= self.F
             m = self.weight
             self.weight += (self.beta * self.F)
             if m >= self.weight:
                 print('weight not gained')
-            self.evaluate_fitness()
 
 
 

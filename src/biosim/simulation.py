@@ -157,7 +157,6 @@ class BioSim:
         self.per_species_results = []
 
         while (self.years < self.num_years):
-            # print(self.num_animals_per_species)
             self.all_cells('replenish')
             self.all_cells('feeding')
             self.all_cells('procreation')
@@ -204,7 +203,6 @@ class BioSim:
         for cell in self.map.values():
             num_animals += len(cell.pop['Herbivore']) + len(cell.pop['Carnivore'])
         return num_animals
-        return self.num_animals
 
     @property
     def num_animals_per_species(self):
@@ -214,7 +212,6 @@ class BioSim:
             for species in num_animals_per_species:
                 num_animals_per_species[species] += len(cell.pop[species])
         return num_animals_per_species
-        return self.num_animals_per_species
 
     @property
     def animal_distribution(self):
