@@ -120,8 +120,7 @@ class BioSim:
             for letter in row:
                 if letter not in self.land_dict:
                     raise ValueError
-    
-    
+
     def set_animal_parameters(self, species, params):
         """
         Set parameters for animal species.

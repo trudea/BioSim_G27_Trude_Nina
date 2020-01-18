@@ -12,29 +12,10 @@ import random
 
 
 class Animal:
-    parameters_set = False
-
-    """
-    def evaluate_fitness(self):
-        q_plus = 1.0 / (1 + exp(self.param_dict['phi_age'] *
-                                (self.age - self.param_dict['a_half'])))
-
-        q_minus = 1.0 / (1 + exp(-self.param_dict['phi_weight'] *
-                                 (self.weight - self.param_dict['w_half'])))
-
-        self.phi = q_plus * q_minus
-    """
 
     def __init__(self, attribute_dict):
 
-        if not self.parameters_set:
-            for parameter in self.param_dict:
-                if parameter == 'lambda':
-                    self.lambdah = self.param_dict['lambda']
-                else:
-                    exec("self.%s = %s" % (parameter,
-                                           self.param_dict[parameter]))
-            self.parameters_set = True
+
         self.age = None
         self.weight = None
         # self.phi = None
@@ -52,8 +33,8 @@ class Animal:
 
         if self.weight is None:
             statistic_population = \
-                np.random.normal(self.param_dict['w_birth'],
-                                 self.param_dict['sigma_birth'], 1000)
+                np.random.normal(self.params['w_birth'],
+                                 self.params['sigma_birth'], 1000)
             self.weight = np.random.choice(statistic_population)
 
 
@@ -75,11 +56,11 @@ class Animal:
 
     @property
     def phi(self):
-        q_plus = 1.0 / (1 + exp(self.param_dict['phi_age'] *
-                                (self.age - self.param_dict['a_half'])))
+        q_plus = 1.0 / (1 + exp(self.params['phi_age'] *
+                                (self.age - self.params['a_half'])))
 
-        q_minus = 1.0 / (1 + exp(-self.param_dict['phi_weight'] *
-                                 (self.weight - self.param_dict[
+        q_minus = 1.0 / (1 + exp(-self.params['phi_weight'] *
+                                 (self.weight - self.params[
                                      'w_half'])))
 
         return q_plus * q_minus
@@ -94,7 +75,7 @@ class Animal:
             self.weight = 0
 
     def dies(self):
-        probability = self.param_dict['omega'] * (1 - self.phi)
+        probability = self.params['omega'] * (1 - self.phi)
         if self.weight <= 0:
             return True
         elif self.phi <= 0:
@@ -128,7 +109,7 @@ class Animal:
             return False
 
 class Herbivore(Animal):
-    param_dict = {'w_birth': 8.0,
+    params = {'w_birth': 8.0,
                   'sigma_birth': 1.5,
                   'beta': 0.9,
                   'eta': 0.05,
@@ -144,9 +125,18 @@ class Herbivore(Animal):
                   'omega': 0.4,
                   'F': 10.0
                   }
+    params_set = False
 
     def __init__(self, attribute_dict=None):
         super().__init__(attribute_dict)
+        if not self.params_set:
+            for param in self.params:
+                if param == 'lambda':
+                    self.lambdah = self.params['lambda']
+                else:
+                    exec("self.%s = %s" % (param, self.params[param]))
+            self.parameters_set = True
+
 
     def feeding(self, cell):
         if cell.f >= self.F:
@@ -163,7 +153,7 @@ class Herbivore(Animal):
             self.weight += (self.beta * cell.f)
 
 class Carnivore(Animal):
-    param_dict = {'w_birth': 6.0,
+    params = {'w_birth': 6.0,
                   'sigma_birth': 1.0,
                   'beta': 0.75,
                   'eta': 0.125,
@@ -180,9 +170,17 @@ class Carnivore(Animal):
                   'F': 50.0,
                   'DeltaPhiMax': 10.0
                   }
+    params_set = False
 
     def __init__(self, attribute_dict=None):
         super().__init__(attribute_dict)
+        if not self.params_set:
+            for param in self.params:
+                if param == 'lambda':
+                    self.lambdah = self.params['lambda']
+                else:
+                    exec("self.%s = %s" % (param, self.params[param]))
+            self.parameters_set = True
 
     def check_if_kills(self, herbivore):
         if self.phi <= herbivore.phi:

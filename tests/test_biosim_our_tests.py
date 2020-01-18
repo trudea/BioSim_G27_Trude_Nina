@@ -2,10 +2,8 @@
 
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
-import src.biosim.island as isl
 import src.biosim.animals as ani
 import src.biosim.landscapes as land
-import src.biosim.run as run
 import src.biosim.simulation as sim
 import pytest
 import random
@@ -47,16 +45,16 @@ def example_carnivore():
 
 @pytest.fixture
 def example_savannah():
-    default_params = land.Savannah.param_dict.copy()
+    params = land.Savannah.param_dict.copy()
     yield land.Savannah()
-    land.Savannah.param_dict = default_params
+    land.Savannah.params = params
 
 
 @pytest.fixture
 def example_jungle():
-    default_params = land.Jungle.param_dict.copy()
+    params = land.Jungle.params.copy()
     yield land.Jungle()
-    land.Jungle.param_dict = default_params
+    land.Jungle.params = params
 
 
 @pytest.fixture
@@ -71,8 +69,8 @@ class TestIsland:
         A test to check if an instance of island class is created
         without input
         """
-        i = isl.Island()
-        assert isinstance(i, isl.Island)
+        s = sim.BioSim(example_map, input_list, 333)
+        assert isinstance(s, sim.BioSim)
 
     def test_constructor_input(self, example_map):
         """
