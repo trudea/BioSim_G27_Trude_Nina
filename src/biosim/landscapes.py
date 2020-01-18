@@ -23,6 +23,7 @@ class LandscapeCell:
         self.corpses = 0
         self.newborns = 0
 
+
     def num_specimen(self, species):
         return len(self.pop[species])
 
@@ -39,6 +40,7 @@ class LandscapeCell:
         return total
 
     def get_rel_abundance(self, animal):
+        fodder = 0
         if type(animal) == Herbivore:
             fodder = self.f
 

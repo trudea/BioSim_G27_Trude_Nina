@@ -5,6 +5,7 @@ import BioSim_G27_Trude_Nina.src.biosim.landscapes as land
 import BioSim_G27_Trude_Nina.src.biosim.run as run
 import pytest
 import random
+import pandas as pd
 
 
 # keyword argument sorted
@@ -27,22 +28,7 @@ class AdjacentCell(Cell):
 """
 
 
-class TestMap:
-    def test_line_amount(self):
-        pass
-
-    def test_num_specimen(self):
-        pass
-
-    def test_choose_new_cell(self):
-
-        pass
-
-
-class Testanimal:
-    pass
-
-
+"""
 class TestRun:
     def test_collective_replenishing(self):
         pass
@@ -52,14 +38,11 @@ class TestRun:
 
     def test_collective_procreation(self):
         pass
+        """
 
-    def test_run(self):
-        pass
-
-    def test_one_cycle(self):
-        pass
 
 if __name__ == "__main__":
+    """
     cell = isl.Cell(3, 3, 'S')
     island = isl.Island()
     carnivore1, carnivore2 = ani.Carnivore(), ani.Carnivore()
@@ -67,3 +50,4 @@ if __name__ == "__main__":
     carnivore2.weight, carnivore2.phi = 15, 1
     cell.pop.append([carnivore1, carnivore2])
     print(cell.pop)
+    """

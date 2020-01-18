@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""
-"""
+from biosim.island import Island
 
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
@@ -10,6 +9,8 @@ import inspect
 import random
 from src.biosim.animals import Herbivore, Carnivore
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
+import pandas as pd
+
 
 class BioSim:
     def __init__(
@@ -85,7 +86,7 @@ class BioSim:
         self.img_base = img_base
         self.fmt = img_fmt
         # lage img_no?
-
+    
     def str_to_dict(self, txt):
         txt = txt.split('\n')
         if not txt[-1].isalpha():
@@ -100,7 +101,7 @@ class BioSim:
                 x += 1
             y += 1
         return dict
-
+    
     def check_txt(self, txt):
         left_column = [line[0] for line in txt]
         right_column = [line[-1] for line in txt]
@@ -116,7 +117,8 @@ class BioSim:
             for letter in row:
                 if letter not in self.land_dict:
                     raise ValueError
-
+    
+    
     def set_animal_parameters(self, species, params):
         """
         Set parameters for animal species.
@@ -164,7 +166,7 @@ class BioSim:
             self.all_animals('aging')
             self.all_animals('weightloss')
             self.all_cells('dying')
-            #self.update_num_animals()
+            # self.update_num_animals()
             self.num_animals_results.append(self.num_animals)
             self.per_species_results.append(self.num_animals_per_species)
             self.years += 1
@@ -175,36 +177,59 @@ class BioSim:
 
         :param population: List of dictionaries specifying population
         """
+        for individual_dict in population:
+            if individual_dict['species'] not in self.pop:
+                self.pop[individual_dict['species']] = []
+            new_animal = eval(individual_dict['species'])(individual_dict)
+            self.pop[individual_dict['species']].append(new_animal)
+            if individual_dict['species'] == 'Herbivore':
+                self.tot_w_herbivores += new_animal.weight
+        return
+
+
+    """ property fungerer ved at den gjør metoder om til objekter
+    se https://www.journaldev.com/14893/python-property-decorator for mer
+    basically: en metode num_animals() kan kalles kun ved num_animals
+    """
 
     @property
     def year(self):
         """Last year simulated."""
+        return self.year
 
     @property
     def num_animals(self):
         """Total number of animals on island."""
-        """
+
         num_animals = 0
         num_animals_per_species: {'Herbivore': 0, 'Carnivore': 0}
         for cell in self.map.values():
             num_animals += len(cell.pop['Herbivore']) + len(cell.pop[Carnivore])
         return num_animals
-        """
+
+        return self.num_animals
 
     @property
     def num_animals_per_species(self):
         """Number of animals per species in island, as dictionary."""
-        """
+
         num_animals_per_species: {'Herbivore': 0, 'Carnivore': 0}
         for cell in self.map.values():
             for species in self.num_animals_per_species:
                 self.num_animals_per_species[species] += len(cell.pop[species])
         return num_animals_per_species
-        """
+        return self.num_animals_per_species
 
     @property
     def animal_distribution(self):
-        """Pandas DataFrame with animal count per species for each cell on island."""
+        """Pandas DataFrame with animal count per species
+         for each cell on island."""
+        print("Creating table")
+        data = {'Population': self.num_animals, 'Herbivores':
+                self.num_animals_per_species['Herbivore'],
+                'Carnivore': self.num_animals_per_species['Carnivore']}
+        return pd.DataFrame(data)
+
 
     def make_movie(self):
         """Create MPEG4 movie from visualization images saved."""
@@ -249,10 +274,6 @@ class BioSim:
                 cell.migration(map_list)
 
 
-
-
-
-
 if __name__ == '__main__':
     default_seed = 33
     default_txt = open('rossum.txt').read()
@@ -268,4 +289,5 @@ if __name__ == '__main__':
                           {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
 
     sim = BioSim(default_txt, default_pop, default_seed)
+    sim.add_population(default_pop)
     sim.simulate(1)
