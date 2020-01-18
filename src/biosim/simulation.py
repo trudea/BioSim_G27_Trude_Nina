@@ -209,21 +209,31 @@ class BioSim:
     @property
     def num_animals_per_species(self):
         """Number of animals per species in island, as dictionary."""
+        return self.num_animals_per_species
+
+    @num_animals_per_species.setter
+    def num_animals_per_species(self, value):
         num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
         for cell in self.map.values():
-            for species in num_animals_per_species:
+            for species in value:
                 num_animals_per_species[species] += len(cell.pop[species])
-        return num_animals_per_species
+        num_animals_per_species = value
 
     @property
     def animal_distribution(self):
         """Pandas DataFrame with animal count per species
          for each cell on island."""
-        print("Creating table")
-        data = {'Population': self.num_animals, 'Herbivores':
-                self.num_animals_per_species['Herbivore'],
-                'Carnivore': self.num_animals_per_species['Carnivore']}
+        print("Getting")
         return pd.DataFrame(data)
+
+    @animal_distribution.setter
+    def animal_distribution(self, num_animals_per_species):
+        data = num_animals_per_species
+        data = {'Population': self.num_animals, 'Herbivores':
+                num_animals_per_species['Herbivore'],
+                'Carnivore': self.num_animals_per_species['Carnivore']}
+
+
 
 
     def make_movie(self):
@@ -285,10 +295,7 @@ if __name__ == '__main__':
                           {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
                           {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
 
-
     sim = BioSim(default_txt, default_pop, default_seed)
     sim.add_population(default_pop)
     sim.simulate(10)
     print(sim.year)
-
-
