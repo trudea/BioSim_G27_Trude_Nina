@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from biosim.island import Island
 
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 import inspect
+import textwrap
+import matplotlib.pyplot as plt
 import random
 from src.biosim.animals import Herbivore, Carnivore
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
@@ -49,7 +50,7 @@ class BioSim:
         """
         self.land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M': Mountain, 'D': Desert}
         self.map = island_map
-        self.years = 0
+        self._year = 0
         self.default_pop = [{'loc': (3, 4), 'pop': [
             {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
             {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
@@ -63,12 +64,14 @@ class BioSim:
                                   'weight': 7.3},
                                  {'species': 'Carnivore', 'age': 5,
                                   'weight': 8.1}]}]
+        """
         if ini_pop is None:
             self.ini_pop = self.default_pop
+        """
 
         self.map = self.str_to_dict(island_map)
 
-        self.place_animals(self.default_pop)
+        #self.place_animals(self.default_pop)
 
         random.seed(seed)
 
@@ -135,10 +138,7 @@ class BioSim:
         :param landscape: String, code letter for landscape
         :param params: Dict with valid parameter specification for landscape
         """
-        landscape = landscape.split
-        list_landscape = []
-        for line in landscape:
-            list_landscape.append([line])
+        self.land_dict[landscape].set_parameter(params)
 
     def simulate(self, num_years, vis_years=1, img_years=None):
         """
@@ -153,23 +153,29 @@ class BioSim:
         self.num_years = num_years
         self.vis_years = vis_years
         self.img_years = img_years
+        self.sim_years = 0
 
         self.num_animals_results = []
         self.per_species_results = []
 
-        while (self.years < self.num_years):
+
+        while (self.sim_years < self.num_years):
+            self.one_year()
+            self.sim_years += 1
             print(self.num_animals_per_species)
-            self.all_cells('replenish')
-            self.all_cells('feeding')
-            self.all_cells('procreation')
-            self.migration()
-            self.all_animals('aging')
-            self.all_animals('weightloss')
-            self.all_cells('dying')
-            # self.update_num_animals()
-            self.num_animals_results.append(self.num_animals)
-            self.per_species_results.append(self.num_animals_per_species)
-            self.years += 1
+
+    def one_year(self):
+        self.all_cells('replenish')
+        self.all_cells('feeding')
+        self.all_cells('procreation')
+        self.migration()
+        self.all_animals('aging')
+        self.all_animals('weightloss')
+        self.all_cells('dying')
+        # self.update_num_animals()
+        self.num_animals_results.append(self.num_animals)
+        self.per_species_results.append(self.num_animals_per_species)
+        self.year = 1
 
     def add_population(self, population):
         """
@@ -177,48 +183,37 @@ class BioSim:
 
         :param population: List of dictionaries specifying population
         """
-        for individual_dict in population:
-            if individual_dict['species'] not in self.pop:
-                self.pop[individual_dict['species']] = []
-            new_animal = eval(individual_dict['species'])(individual_dict)
-            self.pop[individual_dict['species']].append(new_animal)
-            if individual_dict['species'] == 'Herbivore':
-                self.tot_w_herbivores += new_animal.weight
-        return
+        for loc_dict in population:
+            loc = self.map[loc_dict['loc']]
+            loc.place_animals(loc_dict['pop'])
 
-
-    """ property fungerer ved at den gjør metoder om til objekter
-    se https://www.journaldev.com/14893/python-property-decorator for mer
-    basically: en metode num_animals() kan kalles kun ved num_animals
-    """
 
     @property
     def year(self):
         """Last year simulated."""
-        return self.year
+        return self._year
+
+    @year.setter
+    def year(self, n):
+        self._year += n
+
 
     @property
     def num_animals(self):
         """Total number of animals on island."""
-
         num_animals = 0
-        num_animals_per_species: {'Herbivore': 0, 'Carnivore': 0}
         for cell in self.map.values():
-            num_animals += len(cell.pop['Herbivore']) + len(cell.pop[Carnivore])
+            num_animals += len(cell.pop['Herbivore']) + len(cell.pop['Carnivore'])
         return num_animals
-
-        return self.num_animals
 
     @property
     def num_animals_per_species(self):
         """Number of animals per species in island, as dictionary."""
-
-        num_animals_per_species: {'Herbivore': 0, 'Carnivore': 0}
+        num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
         for cell in self.map.values():
-            for species in self.num_animals_per_species:
-                self.num_animals_per_species[species] += len(cell.pop[species])
+            for species in num_animals_per_species:
+                num_animals_per_species[species] += len(cell.pop[species])
         return num_animals_per_species
-        return self.num_animals_per_species
 
     @property
     def animal_distribution(self):
@@ -234,6 +229,7 @@ class BioSim:
     def make_movie(self):
         """Create MPEG4 movie from visualization images saved."""
 
+    """
     default_pop = [{'loc': (3, 4), 'pop': [
         {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
         {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
@@ -244,7 +240,7 @@ class BioSim:
                         {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
                         {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
                         {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
-
+    """
     def all_cells(self, myfunc):
         for cell in self.map.values():
             getattr(cell, myfunc)()
@@ -257,7 +253,7 @@ class BioSim:
 
     def place_animals(self, input_list):
         for placement_dict in input_list:
-            pos = placement_dict['loc'] # bør flytte resten til celle?
+            pos = placement_dict['loc']
             self.map[pos].place_animals(placement_dict['pop'])
 
     def migration(self): # husk filtering
@@ -266,9 +262,10 @@ class BioSim:
                 pass
             else:
                 y, x = pos
-                adjecent_pos = [(y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)] # må ta høyde for edges
+                adjecent_pos = [(y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)]
                 map_list = [self.map[element] for element in adjecent_pos]
-                for element in map_list:
+                copy = map_list
+                for element in copy:
                     if type(element) == Ocean or type(element) == Mountain:
                         map_list.remove(element)
                 cell.migration(map_list)
@@ -288,6 +285,10 @@ if __name__ == '__main__':
                           {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
                           {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
 
+
     sim = BioSim(default_txt, default_pop, default_seed)
     sim.add_population(default_pop)
-    sim.simulate(1)
+    sim.simulate(10)
+    print(sim.year)
+
+

@@ -14,6 +14,7 @@ import random
 class Animal:
     parameters_set = False
 
+    """
     def evaluate_fitness(self):
         q_plus = 1.0 / (1 + exp(self.param_dict['phi_age'] *
                                 (self.age - self.param_dict['a_half'])))
@@ -22,6 +23,7 @@ class Animal:
                                  (self.weight - self.param_dict['w_half'])))
 
         self.phi = q_plus * q_minus
+    """
 
     def __init__(self, attribute_dict):
 
@@ -35,7 +37,7 @@ class Animal:
             self.parameters_set = True
         self.age = None
         self.weight = None
-        self.phi = None
+        # self.phi = None
 
         if attribute_dict is not None:
             if 'weight' in attribute_dict:
@@ -53,8 +55,7 @@ class Animal:
                 np.random.normal(self.param_dict['w_birth'],
                                  self.param_dict['sigma_birth'], 1000)
             self.weight = np.random.choice(statistic_population)
-        if self.phi is None:
-            self.evaluate_fitness()
+
 
     """
         if not self.parameters_set:
@@ -72,18 +73,25 @@ class Animal:
 
     """
 
+    @property
+    def phi(self):
+        q_plus = 1.0 / (1 + exp(self.param_dict['phi_age'] *
+                                (self.age - self.param_dict['a_half'])))
+
+        q_minus = 1.0 / (1 + exp(-self.param_dict['phi_weight'] *
+                                 (self.weight - self.param_dict[
+                                     'w_half'])))
+
+        return q_plus * q_minus
+
     def aging(self):
         self.age += 1
-        self.evaluate_fitness()
 
     def weightloss(self):
         if (self.eta * self.weight) <= self.weight:
             self.weight -= (self.eta * self.weight)
         elif (self.eta * self.weight) > self.weight:
             self.weight = 0
-        self.evaluate_fitness()
-
-
 
     def dies(self):
         probability = self.param_dict['omega'] * (1 - self.phi)
@@ -106,31 +114,6 @@ class Animal:
     def move(self, old_cell, new_cell):
         new_cell.pop[type(self).__name__].append(self)
         old_cell.pop[type(self).__name__].remove(self)
-
-    def migrate(self, old_cell, map_list):
-        if len(map_list) == 0:
-            pass
-        elif len(map_list) == 1:
-            self.move(old_cell, map_list[0])
-        else:
-            new_cell = self.choose_new_cell(map_list)
-            self.move(old_cell, new_cell)
-
-    def choose_new_cell(self, map_list):
-        for cell in map_list:
-            cell.get_rel_abundance(self)
-            cell.get_propensity(self)
-        total_propensity = sum([cell.propensity for cell in map_list])
-        for cell in map_list:
-            cell.likelihood = cell.propensity / total_propensity
-        choices = np.random.choice(map_list, 1000, p=[cell.likelihood for cell
-                                                      in map_list])
-        # bør bruke random.random() og intervaller likevel
-        chosen_cell = np.random.choice(choices)
-        for candidate in map_list:
-            candidate.rel_abundance = None
-            candidate.propensity = None
-        return chosen_cell
 
     def remove(self, cell):
         cell.pop[type(self).__name__].remove(self)
@@ -166,15 +149,12 @@ class Herbivore(Animal):
         super().__init__(attribute_dict)
 
     def feeding(self, cell):
-        self.evaluate_fitness()
-        h = self.phi
         if cell.f >= self.F:
             cell.f -= self.F
             m = self.weight
             self.weight += (self.beta * self.F)
             if m >= self.weight:
                 print('weight not gained')
-            self.evaluate_fitness()
 
 
 
@@ -226,7 +206,6 @@ class Carnivore(Animal):
                     if self.weight <= x:
                         print('Carni weight not gained')
                     c = self.phi
-                    self.evaluate_fitness()
                     if self.phi <= c and self.phi < 0.98:
                         # print(c, ' ', self.phi)
                         # print('Fitness not updated')
