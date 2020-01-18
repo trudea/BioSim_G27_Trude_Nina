@@ -116,6 +116,7 @@ class Animal:
         new_cell.pop[type(self).__name__].append(self)
         old_cell.pop[type(self).__name__].remove(self)
 
+    """
     def migrate(self, old_cell, map_list):
         if len(map_list) == 0:
             pass
@@ -124,14 +125,21 @@ class Animal:
         else:
             new_cell = self.choose_new_cell(map_list)
             self.move(old_cell, new_cell)
+    """
 
+    """
     def choose_new_cell(self, map_list):
+        # for cell in map_list:
+            # cell.get_rel_abundance(self)
+            # cell.get_propensity(self)
+        animaltype = type(self)
         for cell in map_list:
-            cell.get_rel_abundance(self)
-            cell.get_propensity(self)
-        total_propensity = sum([cell.propensity for cell in map_list])
+            print(animaltype)
+            p = cell.propensity(animaltype)
+            print(p)
+        total_propensity = sum([cell.propensity(animaltype) for cell in map_list])
         for cell in map_list:
-            cell.likelihood = cell.propensity / total_propensity
+            cell.likelihood = cell.propensity(self) / total_propensity
         choices = np.random.choice(map_list, 1000, p=[cell.likelihood for cell
                                                       in map_list])
         # bør bruke random.random() og intervaller likevel
@@ -140,6 +148,7 @@ class Animal:
             candidate.rel_abundance = None
             candidate.propensity = None
         return chosen_cell
+        """
 
     def remove(self, cell):
         cell.pop[type(self).__name__].remove(self)
@@ -175,7 +184,6 @@ class Herbivore(Animal):
         super().__init__(attribute_dict)
 
     def feeding(self, cell):
-        # self.evaluate_fitness()
         if cell.f >= self.F:
             cell.f -= self.F
             m = self.weight

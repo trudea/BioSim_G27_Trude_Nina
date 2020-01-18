@@ -197,9 +197,7 @@ class BioSim:
     @property
     def num_animals(self):
         """Total number of animals on island."""
-
         num_animals = 0
-        num_animals_per_species: {'Herbivore': 0, 'Carnivore': 0}
         for cell in self.map.values():
             num_animals += len(cell.pop['Herbivore']) + len(cell.pop['Carnivore'])
         return num_animals
@@ -259,9 +257,10 @@ class BioSim:
                 pass
             else:
                 y, x = pos
-                adjecent_pos = [(y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)] # må ta høyde for edges
+                adjecent_pos = [(y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)]
                 map_list = [self.map[element] for element in adjecent_pos]
-                for element in map_list:
+                copy = map_list
+                for element in copy:
                     if type(element) == Ocean or type(element) == Mountain:
                         map_list.remove(element)
                 cell.migration(map_list)

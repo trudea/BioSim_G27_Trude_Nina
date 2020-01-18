@@ -5,6 +5,7 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 import inspect
 from math import exp
+import numpy as np
 import src.biosim.animals as animals
 from .animals import Herbivore, Carnivore
 
@@ -17,8 +18,7 @@ class LandscapeCell:
         self.pop = {'Herbivore': [], 'Carnivore': []}
         self.tot_w_herbivores = \
             sum([herbivore.weight for herbivore in self.pop['Herbivore']])
-        self.rel_abundance = None
-        self.propensity = None
+        self.propensity = 0
         self.likelihood = None
 
     def num_specimen(self, species):
@@ -36,25 +36,79 @@ class LandscapeCell:
             total += len(self.pop[species])
         return total
 
-    def get_rel_abundance(self, animal):
+    @property
+    def rel_abundance(self):
+        animal = Herbivore()
+        animaltype = type(animal)
         fodder = 0
-        if type(animal) == Herbivore:
+        if animaltype == Herbivore:
             fodder = self.f
 
-        elif type(animal) == Carnivore:
+        elif animaltype == Carnivore:
             fodder = self.tot_w_herbivores
 
-        n = self.num_specimen(type(animal).__name__)
-        #print(fodder / ((n + 1) * animal.F))
-        self.rel_abundance = fodder / ((n + 1) * animal.F)
+        n = self.num_specimen(animaltype.__name__)
 
-    def get_propensity(self, animal):
+        return fodder / ((n + 1) * animal.F)
+
+    @property
+    def propensity(self):
+        return self.propensity
+
+
+    @propensity.setter
+    def propensity(self, animal):
+        if type(animal) == Herbivore:
+            propensity = 0.3
+        elif type(animal) == Carnivore:
+            propensity = 0.7
+        """
+        # self.animal = animal
         if type(self) == Ocean:
             self.propensity = 0
         elif type(self) == Mountain:
             self.propensity = 0
         else:
             self.propensity = exp(animal.lambdah * self.rel_abundance)
+        """
+
+
+
+    def migration(self, map_list):
+        for species in self.pop:
+            for animal in self.pop[species]:
+                # animal.migrate(self, map_list)
+                if len(map_list) == 0:
+                    pass
+                elif len(map_list) == 1:
+                    animal.move(self, map_list[0])
+                else:
+                    new_cell = self.new_cell(animal, map_list)
+                    animal.move(self, new_cell)
+
+    def new_cell(self, animal, map_list):
+        cell = map_list[0]
+        print(cell.propensity(animal))
+        #print(cell.propensity(animal))
+        """
+        total_propensity = sum(
+            [cell.propensity(animal) for cell in map_list])
+        for cell in map_list:
+            cell.likelihood = cell.propensity / total_propensity
+        choices = np.random.choice(map_list, 1000, p=[cell.likelihood for cell
+                                                      in map_list])
+        # bør bruke random.random() og intervaller likevel
+        chosen_cell = np.random.choice(choices)
+        return chosen_cell
+    """
+    """
+    @property
+    def likelihood(self, animal, map_list):
+    likelihood = self.propensity(animal) / sum(
+        [cell.propensity(cell, animal) for cell in map_list])
+    """
+
+
 
     def place_animals(self, pop_list):
         for individual_dict in pop_list:
@@ -108,10 +162,8 @@ class LandscapeCell:
         for species in self.pop:
             self.pop[species] = [animal for animal in self.pop[species] if not animal.dies()]
 
-    def migration(self, map_list):
-        for species in self.pop:
-            for animal in self.pop[species]:
-                animal.migrate(self, map_list)
+
+
 
 
 
