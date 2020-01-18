@@ -161,7 +161,6 @@ class Herbivore(Animal):
         elif cell.f < self.F:
             cell.f = 0
             self.weight += (self.beta * cell.f)
-            self.evaluate_fitness()
 
 class Carnivore(Animal):
     param_dict = {'w_birth': 6.0,
