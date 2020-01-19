@@ -36,12 +36,16 @@ class BioSim:
         :param island_map: Multi-line string specifying island geography
         :param ini_pop: List of dictionaries specifying initial population
         :param seed: Integer used as random number seed
-        :param ymax_animals: Number specifying y-axis limit for graph showing animal numbers
-        :param cmax_animals: Dict specifying color-code limits for animal densities
-        :param img_base: String with beginning of file name for figures, including path
+        :param ymax_animals: Number specifying y-axis limit for graph showing
+        animal numbers
+        :param cmax_animals: Dict specifying color-code limits for animal
+        densities
+        :param img_base: String with beginning of file name for figures,
+        including path
         :param img_fmt: String with file type for figures, e.g. 'png'
 
-        If ymax_animals is None, the y-axis limit should be adjusted automatically.
+        If ymax_animals is None, the y-axis limit should be adjusted
+        automatically.
 
         If cmax_animals is None, sensible, fixed default values should be used.
         cmax_animals is a dict mapping species names to numbers, e.g.,
@@ -55,14 +59,16 @@ class BioSim:
         where img_no are consecutive image numbers starting from 0.
         img_base should contain a path and beginning of a file name.
         """
-        self.land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M': Mountain, 'D': Desert}
+        self.land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M':
+                          Mountain, 'D': Desert}
         self.active = {Savannah: 0, Jungle: 0, Desert: 0}
         self._year = 0
         self.map = self.str_to_dict(island_map)
         for cell in self.map.values():
             if type(cell) in self.active:
                 self.active[type(cell)] += 1
-        self.map_active = {key:value for (key, value) in self.map.items() if type(value) in self.active}
+        self.map_active = {key: value for (key, value) in self.map.items() if
+                           type(value) in self.active}
         self.map = self.map_active
         self.add_population(ini_pop)
 
@@ -91,7 +97,7 @@ class BioSim:
         :return: dict: Dictionary with tuples of y- and x-coordinate as keys,
         and instance of landscape class as values
         """
-
+        print(type(txt))
         txt = txt.split('\n')
         if not txt[-1].isalpha():
             txt.pop()
@@ -153,7 +159,8 @@ class BioSim:
 
         :param num_years: number of years to simulate
         :param vis_years: years between visualization updates
-        :param img_years: years between visualizations saved to files (default: vis_years)
+        :param img_years: years between visualizations saved to files
+        (default: vis_years)
 
         Image files will be numbered consecutively.
         """
@@ -164,7 +171,6 @@ class BioSim:
 
         self.num_animals_results = []
         self.per_species_results = []
-
 
         while (self.sim_years < self.num_years):
             self.one_year()
@@ -197,7 +203,6 @@ class BioSim:
             loc = self.map[loc_dict['loc']]
             loc.place_animals(loc_dict['pop'])
 
-
     @property
     def year(self):
         """Last year simulated."""
@@ -212,7 +217,8 @@ class BioSim:
         """Total number of animals on island."""
         num_animals = 0
         for cell in self.map.values():
-            num_animals += len(cell.pop['Herbivore']) + len(cell.pop['Carnivore'])
+            num_animals += len(cell.pop['Herbivore']) +\
+                           len(cell.pop['Carnivore'])
         return num_animals
 
     @property
@@ -271,7 +277,8 @@ class BioSim:
             else:
                 y, x = pos
                 adjecent_pos = [(y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)]
-                map_list = [self.map[element] for element in adjecent_pos if element in self.map]
+                map_list = [self.map[element] for element in adjecent_pos if
+                            element in self.map]
                 copy = map_list
                 for element in copy:
                     if type(element) == Ocean or type(element) == Mountain:
@@ -317,7 +324,7 @@ if __name__ == '__main__':
     default_txt = open('rossum.txt').read()
     ini_herbs = [
         {
-            "loc": (10, 10),
+            "loc": (1, 1),
             "pop": [
                 {"species": "Herbivore", "age": 5, "weight": 20}
                 for _ in range(150)
@@ -333,6 +340,7 @@ if __name__ == '__main__':
             ],
         }
     ]
+    default_txt = 'OOOOO\nODJSO\nOJSJO\nOOOOO'
 
     sim = BioSim(default_txt, ini_herbs, 123456)
 
@@ -351,7 +359,7 @@ if __name__ == '__main__':
 
     sim.simulate(num_years=50, vis_years=1, img_years=2000)
 
-    sim.add_population(population=ini_carns)
-    sim.simulate(num_years=10, vis_years=1, img_years=2000)
+    # sim.add_population(population=ini_carns)
+    # sim.simulate(num_years=10, vis_years=1, img_years=2000)
 
 
