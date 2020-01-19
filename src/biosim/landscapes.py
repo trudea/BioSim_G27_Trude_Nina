@@ -16,11 +16,10 @@ class LandscapeCell:
     def __init__(self):
         self.params_set = False
         self.f = 0
-        self.species_to_class = dict(inspect.getmembers(animals, inspect.isclass))
+        self.species_to_class = dict(inspect.getmembers(animals,
+                                                        inspect.isclass))
         del self.species_to_class['Animal']
         self.pop = {'Herbivore': [], 'Carnivore': []}
-        #self.tot_w_herbivores = \
-        #    sum([herbivore.weight for herbivore in self.pop['Herbivore']])
 
     def num_specimen(self, species):
         return len(self.pop[species])
@@ -63,7 +62,6 @@ class LandscapeCell:
 
         self._rel_abundance = fodder / ((n + 1) * animal.F)
 
-
     @property
     def propensity(self):
         return self._propensity
@@ -85,7 +83,6 @@ class LandscapeCell:
     @likelihood.setter
     def likelihood(self, total):
         self._likelihood = self._propensity / total
-
 
     def migration(self, map_list):
         """
@@ -113,12 +110,13 @@ class LandscapeCell:
          or the same cell if the animal shouldn't move.
         """
         for cell in map_list:
-            cell.propensity = animal # setter verdi
+            cell.propensity = animal   # setter verdi
         total_propensity = sum([cell.propensity for cell in map_list])
         for cell in map_list:
             cell.likelihood = total_propensity
         if not sum([cell.likelihood for cell in map_list]) == approx(1):
-            print('Probabilities do not add up: ', sum([cell.likelihood for cell in map_list]))
+            print('Probabilities do not add up: ', sum([cell.likelihood for
+                                                        cell in map_list]))
         upper_limits = np.cumsum([cell.likelihood for cell in map_list])
         r = random.random()
         for i in range(len(upper_limits)):
@@ -150,7 +148,8 @@ class LandscapeCell:
     def feeding(self):
         """ Carry out feeding of each animal on the location. """
         for species in self.pop:
-            self.pop[species] = sorted(self.pop[species], key=lambda x: getattr(x, 'phi'))
+            self.pop[species] = sorted(self.pop[species],
+                                       key=lambda x: getattr(x, 'phi'))
         for herbivore in self.pop['Herbivore']:
             herbivore.feeding(self)
         for carnivore in self.pop['Carnivore']:
@@ -166,13 +165,14 @@ class LandscapeCell:
                     if animal.fertile(n):
                         animal.procreate(self)
 
-
     def dying(self):
         """
         Remove dying animals from population
         """
         for species in self.pop:
-            self.pop[species] = [animal for animal in self.pop[species] if not animal.dies()]
+            self.pop[species] = [animal for animal in self.pop[species] if
+                                 not animal.dies()]
+
 
 class Savannah(LandscapeCell):
     params = {'f_max': 300.0, 'alpha': 0.3}
@@ -184,7 +184,6 @@ class Savannah(LandscapeCell):
             self.params_set = True
 
         self.f = self.f_max
-
 
     @classmethod
     def set_params(cls, new_params=None):
