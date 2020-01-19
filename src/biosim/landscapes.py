@@ -88,6 +88,11 @@ class LandscapeCell:
 
 
     def migration(self, map_list):
+        """
+        Move each animal if the conditions require so.
+
+        :param map_list: List of potential destinations for animal
+        """
         for species in self.pop:
             for animal in self.pop[species]:
                 if len(map_list) == 0:
@@ -99,6 +104,14 @@ class LandscapeCell:
                     animal.move(self, new_cell)
 
     def new_cell(self, animal, map_list):
+        """
+        Find which cell the animal should move to, if it should move.
+
+        :param animal: Instance of animal class
+        :param map_list: List of potential destinations for animal
+        :return: landscape instance. Either the cell the animal should move to,
+         or the same cell if the animal shouldn't move.
+        """
         for cell in map_list:
             cell.propensity = animal # setter verdi
         total_propensity = sum([cell.propensity for cell in map_list])
@@ -113,6 +126,12 @@ class LandscapeCell:
                 return map_list[i]
 
     def place_animals(self, pop_list):
+        """
+        Place animals on a location.
+
+        :param pop_list: List of dictionaries, each dictionary specifying
+        characteristics of the individual animal to be placed.
+        """
         for individual_dict in pop_list:
             if individual_dict['species'] not in self.pop:
                 self.pop[individual_dict['species']] = []
@@ -120,9 +139,11 @@ class LandscapeCell:
             self.pop[individual_dict['species']].append(new_animal)
 
     def replenish(self):
+        """Replenish plant fodder if required. """
         pass
 
     def feeding(self):
+        """ Carry out feeding of each animal on the location. """
         for species in self.pop:
             self.pop[species] = sorted(self.pop[species], key=lambda x: getattr(x, 'phi'))
         for herbivore in self.pop['Herbivore']:
@@ -137,15 +158,8 @@ class LandscapeCell:
                 n = self.num_specimen(species)
                 if n >= 2:
                     if animal.fertile(n):
-                        newborn = type(animal)()
-                        if animal.weight >= animal.zeta * (newborn.weight + animal.sigma_birth):
-                            q = len(pop_list)
-                            self.pop[species].append(newborn)
-                            if len(pop_list) <= q:
-                                print('Pop list not updated')
-                            animal.weight -= animal.zeta * newborn.weight
-                            if animal.weight <0:
-                                print('animal weight too small after birth')
+                        animal.procreate(self)
+
 
     def dying(self):
         for species in self.pop:

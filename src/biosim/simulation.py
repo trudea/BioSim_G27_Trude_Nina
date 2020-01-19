@@ -4,6 +4,12 @@
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
+"""
+Implements a biological simulation of an island with population of herbivores
+and carnivores. Landscape types consist of savannah, jungle, desert and
+mountain, with surrounding ocean.
+"""
+
 import inspect
 import textwrap
 import matplotlib.pyplot as plt
@@ -13,6 +19,8 @@ import pandas as pd
 
 
 class BioSim:
+    """Define and run a biological simulation. """
+
     def __init__(
         self,
         island_map,
@@ -76,6 +84,18 @@ class BioSim:
         self.fmt = img_fmt
 
     def str_to_dict(self, txt):
+        """
+        Parameters
+        ----------
+        txt: String with letters coding for type of landscape in particular
+        cell of the island.
+
+        Returns
+        -------
+
+        Dict: Dictionary with (y, x) as key, and instances of active landscape
+        as value
+        """
         txt = txt.split('\n')
         if not txt[-1].isalpha():
             txt.pop()
@@ -91,6 +111,16 @@ class BioSim:
         return dict
     
     def check_txt(self, txt):
+        """
+
+        Parameters
+        ----------
+        txt
+
+        Returns
+        -------
+        int
+        """
         left_column = [line[0] for line in txt]
         right_column = [line[-1] for line in txt]
         to_check = [txt[0], txt[-1], left_column, right_column]
@@ -150,6 +180,8 @@ class BioSim:
             print(self.year, ' ', self.num_animals_per_species)
 
     def one_year(self):
+        """ Implement one annual cycle. """
+
         self.all_cells('replenish')
         self.all_cells('feeding')
         self.all_cells('procreation')
@@ -226,11 +258,19 @@ class BioSim:
                     getattr(animal, myfunc)()
 
     def place_animals(self, input_list):
+        """
+        Place animals on specified locations.
+
+        :param input_list: List where every element is a dictonary, consisting
+        of a location, and also containing a list of secondary dictionaries
+        describing attributes of each animal to be placed on said location
+        """
         for placement_dict in input_list:
             pos = placement_dict['loc']
             self.map[pos].place_animals(placement_dict['pop'])
 
     def migration(self):
+        """Execute migration step in annual cycle."""
         for pos, cell in self.map.items():
             if type(cell) == Ocean or type(cell) == Mountain:
                 pass

@@ -36,6 +36,12 @@ class Animal:
 
     @property
     def phi(self):
+        """
+
+        Returns
+        -------
+        Float,
+        """
         q_plus = 1.0 / (1 + exp(self.params['phi_age'] *
                                 (self.age - self.params['a_half'])))
 
@@ -46,15 +52,20 @@ class Animal:
         return q_plus * q_minus
 
     def aging(self):
+        """ Make animal instance age by one year. """
         self.age += 1
 
     def weightloss(self):
+        """ Execute annual weight loss for animal instance. """
         if (self.eta * self.weight) <= self.weight:
             self.weight -= (self.eta * self.weight)
         elif (self.eta * self.weight) > self.weight:
             self.weight = 0
 
     def dies(self):
+        """
+
+        """
         probability = self.params['omega'] * (1 - self.phi)
         if self.weight <= 0:
             return True
@@ -87,6 +98,15 @@ class Animal:
             return True
         else:
             return False
+
+    def procreate(self, cell):
+        newborn = type(self)()
+        if self.weight >= self.zeta * (
+                newborn.weight + self.sigma_birth):
+            cell.pop[type(self).__name__].append(newborn)
+            self.weight -= self.zeta * newborn.weight
+            if self.weight < 0:
+                print('animal weight too small after birth')
 
 class Herbivore(Animal):
     params = {'w_birth': 8.0,
