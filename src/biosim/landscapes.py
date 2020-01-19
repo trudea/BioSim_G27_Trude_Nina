@@ -152,6 +152,7 @@ class LandscapeCell:
             carnivore.feeding(self)
 
     def procreation(self):
+        """Carry out procreation of animals on the location. """
         for species, pop_list in self.pop.items():
             copy = pop_list
             for animal in copy:
@@ -162,6 +163,9 @@ class LandscapeCell:
 
 
     def dying(self):
+        """
+        Remove dying animals from population
+        """
         for species in self.pop:
             self.pop[species] = [animal for animal in self.pop[species] if not animal.dies()]
 
@@ -186,6 +190,7 @@ class Savannah(LandscapeCell):
         cls.params_set = True
 
     def replenish(self):
+        """Replenish plant fodder at the start of every season. """
         self.f = self.alpha * (self.f_max - self.f) + self.f
 
 
@@ -208,6 +213,7 @@ class Jungle(LandscapeCell):
             setattr(cls, param, cls.params[param])
 
     def replenish(self):
+        """Replenish plant fodder at the start of every season. """
         self.f = self.f_max
 
 

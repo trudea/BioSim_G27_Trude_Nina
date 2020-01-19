@@ -85,17 +85,14 @@ class BioSim:
 
     def str_to_dict(self, txt):
         """
-        Parameters
-        ----------
-        txt: String with letters coding for type of landscape in particular
-        cell of the island.
+        Turn string into dictionary if requirements for a map string are met.
 
-        Returns
-        -------
-
-        Dict: Dictionary with (y, x) as key, and instances of active landscape
-        as value
+        :param txt: String of letters, each signifying the type of landscape at
+         corresponding location.
+        :return: dict: Dictionary with tuples of y- and x-coordinate as keys,
+        and instance of landscape class as values
         """
+
         txt = txt.split('\n')
         if not txt[-1].isalpha():
             txt.pop()
@@ -112,15 +109,11 @@ class BioSim:
     
     def check_txt(self, txt):
         """
+        Check if string meets requirements for a map string.
 
-        Parameters
-        ----------
-        txt
-
-        Returns
-        -------
-        int
+        :param txt: String of letters
         """
+
         left_column = [line[0] for line in txt]
         right_column = [line[-1] for line in txt]
         to_check = [txt[0], txt[-1], left_column, right_column]
@@ -248,10 +241,21 @@ class BioSim:
         """Create MPEG4 movie from visualization images saved."""
 
     def all_cells(self, myfunc):
+        """
+        Execute method for every active location.
+
+        :param myfunc: Method to be executed
+        """
         for cell in self.map.values():
             getattr(cell, myfunc)()
 
     def all_animals(self, myfunc):
+        """
+        Execute method for all animals.
+
+        :param myfunc: Method to be executed.
+        """
+
         for cell in self.map.values():
             for species in cell.pop:
                 for animal in cell.pop[species]:
@@ -270,7 +274,7 @@ class BioSim:
             self.map[pos].place_animals(placement_dict['pop'])
 
     def migration(self):
-        """Execute migration step in annual cycle."""
+        """Execute migration step of annual cycle."""
         for pos, cell in self.map.items():
             if type(cell) == Ocean or type(cell) == Mountain:
                 pass

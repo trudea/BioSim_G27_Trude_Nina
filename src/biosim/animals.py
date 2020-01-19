@@ -37,11 +37,11 @@ class Animal:
     @property
     def phi(self):
         """
+        Evaluate the fitness of animal.
 
-        Returns
-        -------
-        Float,
+        :return: Float, signifying level fitness with a number between 0 and 1.
         """
+
         q_plus = 1.0 / (1 + exp(self.params['phi_age'] *
                                 (self.age - self.params['a_half'])))
 
@@ -52,11 +52,11 @@ class Animal:
         return q_plus * q_minus
 
     def aging(self):
-        """ Make animal instance age by one year. """
+        """ Make animal age by one year. """
         self.age += 1
 
     def weightloss(self):
-        """ Execute annual weight loss for animal instance. """
+        """ Execute annual weight loss for animal. """
         if (self.eta * self.weight) <= self.weight:
             self.weight -= (self.eta * self.weight)
         elif (self.eta * self.weight) > self.weight:
@@ -64,7 +64,9 @@ class Animal:
 
     def dies(self):
         """
+        Check if animal is dying.
 
+        :return: Boolean value
         """
         probability = self.params['omega'] * (1 - self.phi)
         if self.weight <= 0:
@@ -77,6 +79,11 @@ class Animal:
             return False
 
     def movable(self):
+        """
+        Check if animal will move.
+
+        :return: Boolean value
+        """
         probability = self.mu * self.phi
         if random.random() <= probability:
             return True
@@ -84,22 +91,32 @@ class Animal:
             return False
 
     def move(self, old_cell, new_cell):
+        """
+        Move animal.
+
+        :param old_cell: Landscape instance, location of animal before move
+        :param new_cell: Landscape instance, destination of animal
+        """
+
         new_cell.pop[type(self).__name__].append(self)
         old_cell.pop[type(self).__name__].remove(self)
 
-    def remove(self, cell):
-        cell.pop[type(self).__name__].remove(self)
-
     def fertile(self, n):
+        """Check if animal is fertile.
+
+        :return: Boolean value
+        """
         probability = self.lambdah * self.phi * (n-1)
         if probability > 1.0:
             probability = 1.0
-        elif random.random() <= probability:
+        if random.random() <= probability:
             return True
         else:
             return False
 
     def procreate(self, cell):
+        """Animal gives birth to newborn if conditions are met. """
+
         newborn = type(self)()
         if self.weight >= self.zeta * (
                 newborn.weight + self.sigma_birth):
@@ -143,6 +160,8 @@ class Herbivore(Animal):
 
 
     def feeding(self, cell):
+        """ Carry out feeding of herbivore. """
+
         if cell.f >= self.F:
             cell.f -= self.F
             m = self.weight
@@ -201,6 +220,7 @@ class Carnivore(Animal):
                 return False
 
     def feeding(self, cell):
+        """Carry out feeding of carnivore """
         eaten = 0
         dead = []
         for prey in cell.pop['Herbivore']:
