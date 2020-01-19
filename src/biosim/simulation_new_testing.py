@@ -7,6 +7,8 @@ from src.biosim.island import Island as isl
 from src.biosim.animals import Animal, Herbivore, Carnivore
 from src.biosim.run import Run
 from src.biosim.landscapes import Savannah, Jungle, Mountain, Desert, Ocean
+from biosim.simulation import BioSim
+import matplotlib.pyplot as plt
 __author__ = ""
 __email__ = ""
 
@@ -47,41 +49,67 @@ class BioSim:
         self.cmax_animals = cmax_animals
         self.img_base = img_base
         self.img_fmt = img_fmt
+        self.year = 0
+        self.fig = None
+        self.ax1 = None
+        self.ax2 = None
+        self.ax3 = None
+        self.ax4 = None
+        self.x_lim = (0, 500)
+        self.y_lim = (0, 10000)
+        self.last_simulation = None
 
-    def set_animal_parameters(self, species, params):
+    def biosimmap(self):
         """
-        Set parameters for animal species.
-        :param species: String, name of animal species
-        :param params: Dict with valid parameter specification for species
-        """
-        pass
+        Method that creates an RGB map from string
 
-    def set_landscape_parameters(self, landscape, params):
-        """
-        Set parameters for landscape type.
-        :param landscape: String, code letter for landscape
-        :param params: Dict with valid parameter specification for landscape
-        """
-        pass
+        :return: figure of map
 
-    def simulate(self, num_years, vis_years=1, img_years=None):
+        source: yngvem / INF200-2019/lectures/J05/mapping.py on github
         """
-        Run simulation while visualizing the result.
-        :param num_years: number of years to simulate
-        :param vis_years: years between visualization updates
-        :param img_years: years between visualizations saved to files
-        (default: vis_years)
-        Image files will be numbered consecutively.
-        """
-        pass
+        #                   R    G    B
+        rgb_value = {'O': (0.0, 0.0, 1.0),  # blue
+                     'M': (0.5, 0.5, 0.5),  # grey
+                     'J': (0.0, 0.6, 0.0),  # dark green
+                     'S': (0.5, 1.0, 0.5),  # light green
+                     'D': (1.0, 1.0, 0.5)}  # light yellow
 
-    def add_population(self, population):
+        kart_rgb = [[rgb_value[column] for column in row]
+                    for row in self.island_map.splitlines()]
+
+        fig = plt.figure()
+
+        self.ax1 = fig.add_axes([0.1, 0.1, 0.7, 0.8])  # llx, lly, w, h
+        self.ax1.imshow(kart_rgb)
+        self.ax1.set_xticks(range(len(kart_rgb[0])))
+        self.ax1.set_xticklabels(range(1, len(kart_rgb[0])))
+        self.ax1.set_yticks(range(len(kart_rgb)))
+        self.ax1.set_yticklabels(range(1, len(kart_rgb)))
+        self.ax1.set_title('Map of the island')
+        plt.grid(color='black', linestyle='-', linewidth=0.5)
+
+        axlg = fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
+        axlg.axis('off')
+        for ix, name in enumerate(('Ocean', 'Mountain', 'Jungle',
+                                   'Savannah', 'Desert')):
+            axlg.add_patch(plt.Rectangle((0., ix * 0.2), 0.3, 0.1,
+                                         edgecolor='none',
+                                         facecolor=rgb_value[name[0]]))
+            axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
+        plt.show()
+
+    def lineplot(self):
         """
-        Add a population to the island
-        :param population: List of dictionaries specifying population
+        Method for creating the line plot of population
+        :return:
         """
-        self.Island().place_animals(population)
-        pass
+        if self.last_simulation is None:
+            self.last_simulation = 500
+        self.ax2.set_xlim(0, self.last_simulation + 1)
+        self.ax2.set_ylim(self.y_lim)
+
+        self.ax2.set_title('Population overview')
+        self.ax2.plot(#pandas dataframe)
 
     @property
     def year(self):
@@ -110,5 +138,10 @@ class BioSim:
     def make_movie(self):
         """Create MPEG4 movie from visualization images saved."""
         pass
+
+    @year.setter
+    def year(self, value):
+        self._year = value
+
 
 if __name__ == '__main__':
