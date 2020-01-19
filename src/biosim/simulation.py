@@ -231,19 +231,27 @@ class BioSim:
                     cell.pop[species])
         return _num_animals_per_species
 
-    @property
     def animal_distribution(self):
-        """Pandas DataFrame with animal count per species
-         for each cell on island."""
-        print("Getting")
-        return pd.DataFrame(data)
+        coordinates = [cell for cell in self.map]
+        dictionary = {}
+        for cell in sim.map.values():
+            herbivore = 0
+            carnivore = 0
+            for species in cell.pop:
+                if species == 'Herbivore':
+                    herbivore += len(cell.pop[species])
+                if species == 'Carnivore':
+                    carnivore += len(cell.pop[species])
+            dictionary[cell] = \
+                (carnivore + herbivore), herbivore, carnivore
 
-    @animal_distribution.setter
-    def animal_distribution(self, num_animals_per_species):
-        data = num_animals_per_species
-        data = {'Population': self.num_animals, 'Herbivores':
-                num_animals_per_species['Herbivore'],
-                'Carnivore': self.num_animals_per_species['Carnivore']}
+        population = [dictionary[cell][0] for cell in dictionary]
+        herbivores = [dictionary[cell][1] for cell in dictionary]
+        carnivores = [dictionary[cell][2] for cell in dictionary]
+        coordinates = [cell for cell in self.map]
+        data = {'Cell': coordinates, 'Population': population,
+                'Herbivores': herbivores, 'Carnivores': carnivores}
+        return pd.DataFrame(data)
 
     def make_movie(self):
         """Create MPEG4 movie from visualization images saved."""

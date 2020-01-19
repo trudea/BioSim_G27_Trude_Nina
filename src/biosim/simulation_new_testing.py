@@ -116,13 +116,26 @@ class BioSim:
         """Number of animals per species in island, as dictionary."""
         return self.num_animals_per_species
 
-    @property
     def animal_distribution(self):
-        """Pandas DataFrame with animal count
-        per species for each cell on island."""
-        data = {'Population': self.num_animals, 'Herbivores':
-                self.num_animals_per_species['Herbivore'], 'Carnivores':
-                self.num_animals_per_species['Carnivore']}
+        coordinates = [cell for cell in self.map]
+        dictionary = {}
+        for cell in sim.map.values():
+            herbivore = 0
+            carnivore = 0
+            for species in cell.pop:
+                if species == 'Herbivore':
+                    herbivore += len(cell.pop[species])
+                if species == 'Carnivore':
+                    carnivore += len(cell.pop[species])
+            dictionary[cell] = \
+                (carnivore + herbivore), herbivore, carnivore
+
+        population = [dictionary[cell][0] for cell in dictionary]
+        herbivores = [dictionary[cell][1] for cell in dictionary]
+        carnivores = [dictionary[cell][2] for cell in dictionary]
+        coordinates = [cell for cell in self.map]
+        data = {'Cell': coordinates, 'Population': population,
+                'Herbivores': herbivores, 'Carnivores': carnivores}
         return pd.DataFrame(data)
 
     def plot_update(self, years, c_herb, c_carn):
