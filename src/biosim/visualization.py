@@ -139,18 +139,37 @@ def biosimmap(kart):
     plt.show()
 
 
-def plotting_simulation(years, map, seed):
+def plotting_simulation(map, seed):
     fig = plt.figure()
-    ax = fig.add_subplot(211)
-    px = fig.add_subplot(212)
-    fig.show()
+    ax1 = fig.add_subplot(221)
+    ax2 = fig.add_subplot(222)
+    ax3 = fig.add_subplot(223)
+    ax4 = fig.add_subplot(224)
+
     simulation = BioSim(herbivore_input, map, seed)
+    for i in range(50):
+        simulation.map[(2, 2)].pop['Herbivore'].append(Herbivore())
+    fig.show()
+
+
+def update(years, simulation, carnivore_year=50):
+    plt.ion()
+    fig = plt.figure()
+    ax1 = fig.add_subplot(221)
+    ax2 = fig.add_subplot(222)
+    ax3 = fig.add_subplot(223)
+    ax4 = fig.add_subplot(224)
+
+    ax1.set_xlim(0, years), ax1.set_ylim(0, 500)
+    ax2.set_xlim(0, years), ax2.set_ylim(0, 500)
+    ax3.set_xlim(0, years), ax3.set_ylim(0, 500)
+    ax4.set_xlim(0, years), ax4.set_ylim(0, 500)
 
     x, y = [], []
     y_herb, y_carn = [], []
-    for i in range(50):
-        simulation.map[(2, 2)].pop['Herbivore'].append(Herbivore())
-    while True:
+
+    for rounds in range(years):
+
         simulation.one_year()
         x.append(simulation.year)
         y.append(simulation.num_animals_results[-1])
@@ -161,7 +180,8 @@ def plotting_simulation(years, map, seed):
         px.plot(x, y_carn, color='red')
         fig.canvas.draw()
         plt.pause(0.1)
-        if simulation.year == 50:
+
+        if simulation.year == carnivore_year:
             for i in range(5):
                 simulation.map[(2, 2)].pop['Carnivore'].append(
                     Carnivore())
@@ -169,7 +189,9 @@ def plotting_simulation(years, map, seed):
 
 def scatterplot_map(years):
     # Hent animal abundance pd
-
+    fig = pt.figure()
+    ax = fig.add_axes()
+    ax.scatter()
     girls_grades = [89, 90, 70, 89, 100, 80, 90, 100, 80, 34]
     boys_grades = [30, 29, 49, 48, 100, 48, 38, 45, 20, 30]
     grades_range = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
@@ -182,8 +204,7 @@ def scatterplot_map(years):
     ax.set_title('scatter plot')
     plt.show()
 
-
 if __name__ == '__main__':
-    rossum = open('rossum.txt').read()
+    rossum = 'OOOOO\nODJSO\nOJSJO\nOOOOO'
     biosimmap(rossum)
-    plotting_simulation(10, rossum, None)
+    plotting_simulation(rossum, 1)
