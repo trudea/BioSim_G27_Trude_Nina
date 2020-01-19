@@ -14,18 +14,18 @@ import random
 @pytest.fixture
 def input_list():
     return [
-        {'loc': (3, 4),
+        {'loc': (1, 1),
          'pop': [
          {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
          {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
          {'species': 'Carnivore', 'age': 14, 'weight': 10.3},
          {'species': 'Carnivore', 'age': 5, 'weight': 10.1}]},
-        {'loc': (4, 4),
+        {'loc': (1, 2),
          'pop': [
           {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
           {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
           {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]},
-        {'loc': (2, 2),
+        {'loc': (1, 2),
          'pop': [{'species': 'Herbivore', 'age': 10, 'weight': 12.6}]}]
 
 
@@ -95,13 +95,13 @@ class TestIsland:
         tiles surrounding the island.
         """
         with pytest.raises(ValueError):
-            isl.Island('SSS\nOOO') and \
-                isl.Island('OOO\nOSS') and \
-                isl.Island('OOO\nOSO\nOSO')
+            sim.BioSim('SSS\nOOO', None, None) and \
+                sim.BioSim('OOO\nOSS', None, None) and \
+                sim.BioSim('OOO\nOSO\nOSO', None, None)
 
     def test_invalid_landscape(self):
         with pytest.raises(ValueError):
-            isl.Island("OOO\nORO\nOOO")
+            sim.BioSim("OOO\nORO\nOOO", None, None)
 
 
 class TestLandscapes:
@@ -111,12 +111,12 @@ class TestLandscapes:
         Checks if a change of parameters actually applies to class instance
         and replaces standard values
         """
-        original_dict = land.Savannah.param_dict.copy()
+        original_dict = land.Savannah.params.copy()
         jungle = land.Jungle(param_dict={'f_max': 500})
-        savannah = land.Savannah(param_dict={'f_max': 200})
-        assert jungle.param_dict['f_max'] is not 800 \
-            and savannah.param_dict['f_max'] is not 300
-        land.Savannah.param_dict = original_dict
+        savannah = land.Savannah({'f_max': 200})
+        assert jungle.params['f_max'] is not 800 \
+            and savannah.params['f_max'] is not 300
+        land.Savannah.params = original_dict
 
     def test_jungle_instance(self, example_jungle):
         """
@@ -163,22 +163,21 @@ class TestLandscapes:
         """
         example_jungle.f = 500
         example_jungle.replenish()
-        assert example_jungle.f == example_jungle.param_dict['f_max']
+        assert example_jungle.f == example_jungle.params['f_max']
+
+    def test_num_animals(self, input_list, example_map):
+        island = sim.BioSim(example_map, input_list, None)
+        island.add_population(input_list)
+        assert island.num_animals == 8
 
     def test_num_animals_per_species(self, input_list, example_map):
-        island = isl.Island()
-        island.place_animals(input_list)
+        island = sim.BioSim(example_map, input_list, None)
         assert island.num_animals_per_species['Herbivore'] == 4
-
-    def test_num_specimen(self, input_list):
-        isl.Island().place_animals(input_list)
-        isl.Island().update_num_animals()
-        assert isl.Island().map[(2, 2)].num_specimen("Herbivore") == 1
 
     def test_relative_abundance(self, input_list, example_carnivore):
         isl.Island().place_animals(input_list)
         isl.Island().update_num_animals()
-        assert isl.Island().map[(3, 4)].get_rel_abundance(example_carnivore) \
+        assert isl.Island().map[(1, 2)].get_rel_abundance(example_carnivore) \
         == 22.8
 
 
