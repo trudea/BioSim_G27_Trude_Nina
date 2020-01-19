@@ -12,32 +12,10 @@ import random
 
 
 class Animal:
-    parameters_set = False
-
-    """
-    def evaluate_fitness(self):
-        q_plus = 1.0 / (1 + exp(self.param_dict['phi_age'] *
-                                (self.age - self.param_dict['a_half'])))
-
-        q_minus = 1.0 / (1 + exp(-self.param_dict['phi_weight'] *
-                                 (self.weight - self.param_dict['w_half'])))
-
-        self.phi = q_plus * q_minus
-    """
 
     def __init__(self, attribute_dict):
-
-        if not self.parameters_set:
-            for parameter in self.param_dict:
-                if parameter == 'lambda':
-                    self.lambdah = self.param_dict['lambda']
-                else:
-                    exec("self.%s = %s" % (parameter,
-                                           self.param_dict[parameter]))
-            self.parameters_set = True
         self.age = None
         self.weight = None
-        # self.phi = None
 
         if attribute_dict is not None:
             if 'weight' in attribute_dict:
@@ -52,49 +30,45 @@ class Animal:
 
         if self.weight is None:
             statistic_population = \
-                np.random.normal(self.param_dict['w_birth'],
-                                 self.param_dict['sigma_birth'], 1000)
+                np.random.normal(self.params['w_birth'],
+                                 self.params['sigma_birth'], 1000)
             self.weight = np.random.choice(statistic_population)
-
-
-    """
-        if not self.parameters_set:
-            self.set_parameters()
-    """
-    """
-
-    @classmethod
-    def set_parameters(cls, params=None):
-        for parameter in cls.param_dict:
-            # self.w_birth = default_param_dict[]
-            setattr(cls, parameter, cls.param_dict[parameter])
-
-        cls.parameters_set = True
-
-    """
 
     @property
     def phi(self):
-        q_plus = 1.0 / (1 + exp(self.param_dict['phi_age'] *
-                                (self.age - self.param_dict['a_half'])))
+        """
+        Evaluate the fitness of animal.
 
-        q_minus = 1.0 / (1 + exp(-self.param_dict['phi_weight'] *
-                                 (self.weight - self.param_dict[
+        :return: Float, signifying level fitness with a number between 0 and 1.
+        """
+
+        q_plus = 1.0 / (1 + exp(self.params['phi_age'] *
+                                (self.age - self.params['a_half'])))
+
+        q_minus = 1.0 / (1 + exp(-self.params['phi_weight'] *
+                                 (self.weight - self.params[
                                      'w_half'])))
 
         return q_plus * q_minus
 
     def aging(self):
+        """ Make animal age by one year. """
         self.age += 1
 
     def weightloss(self):
+        """ Execute annual weight loss for animal. """
         if (self.eta * self.weight) <= self.weight:
             self.weight -= (self.eta * self.weight)
         elif (self.eta * self.weight) > self.weight:
             self.weight = 0
 
     def dies(self):
-        probability = self.param_dict['omega'] * (1 - self.phi)
+        """
+        Check if animal is dying.
+
+        :return: Boolean value
+        """
+        probability = self.params['omega'] * (1 - self.phi)
         if self.weight <= 0:
             return True
         elif self.phi <= 0:
@@ -105,6 +79,11 @@ class Animal:
             return False
 
     def movable(self):
+        """
+        Check if animal will move.
+
+        :return: Boolean value
+        """
         probability = self.mu * self.phi
         if random.random() <= probability:
             return True
@@ -112,23 +91,42 @@ class Animal:
             return False
 
     def move(self, old_cell, new_cell):
+        """
+        Move animal.
+
+        :param old_cell: Landscape instance, location of animal before move
+        :param new_cell: Landscape instance, destination of animal
+        """
+
         new_cell.pop[type(self).__name__].append(self)
         old_cell.pop[type(self).__name__].remove(self)
 
-    def remove(self, cell):
-        cell.pop[type(self).__name__].remove(self)
-
     def fertile(self, n):
+        """Check if animal is fertile.
+
+        :return: Boolean value
+        """
         probability = self.lambdah * self.phi * (n-1)
         if probability > 1.0:
             probability = 1.0
-        elif random.random() <= probability:
+        if random.random() <= probability:
             return True
         else:
             return False
 
+    def procreate(self, cell):
+        """Animal gives birth to newborn if conditions are met. """
+
+        newborn = type(self)()
+        if self.weight >= self.zeta * (
+                newborn.weight + self.sigma_birth):
+            cell.pop[type(self).__name__].append(newborn)
+            self.weight -= self.zeta * newborn.weight
+            if self.weight < 0:
+                print('animal weight too small after birth')
+
 class Herbivore(Animal):
-    param_dict = {'w_birth': 8.0,
+    params = {'w_birth': 8.0,
                   'sigma_birth': 1.5,
                   'beta': 0.9,
                   'eta': 0.05,
@@ -144,11 +142,26 @@ class Herbivore(Animal):
                   'omega': 0.4,
                   'F': 10.0
                   }
+    params_set = False
 
     def __init__(self, attribute_dict=None):
         super().__init__(attribute_dict)
+        if not self.params_set:
+            self.set_params()
+            self.params_set = True
+
+    @classmethod
+    def set_params(cls, params=None):
+        for param in cls.params:
+            if param == 'lambda':
+                cls.lambdah = cls.params['lambda']
+            else:
+                setattr(cls, param, cls.params[param])
+
 
     def feeding(self, cell):
+        """ Carry out feeding of herbivore. """
+
         if cell.f >= self.F:
             cell.f -= self.F
             m = self.weight
@@ -156,14 +169,12 @@ class Herbivore(Animal):
             if m >= self.weight:
                 print('weight not gained')
 
-
-
         elif cell.f < self.F:
             cell.f = 0
             self.weight += (self.beta * cell.f)
 
 class Carnivore(Animal):
-    param_dict = {'w_birth': 6.0,
+    params = {'w_birth': 6.0,
                   'sigma_birth': 1.0,
                   'beta': 0.75,
                   'eta': 0.125,
@@ -180,9 +191,23 @@ class Carnivore(Animal):
                   'F': 50.0,
                   'DeltaPhiMax': 10.0
                   }
+    params_set = False
 
     def __init__(self, attribute_dict=None):
         super().__init__(attribute_dict)
+        if not self.params_set:
+            self.set_params()
+            self.params_set = True
+
+
+    @classmethod
+    def set_params(cls, params=None):
+        for param in cls.params:
+            if param == 'lambda':
+                cls.lambdah = cls.params['lambda']
+            else:
+                setattr(cls, param, cls.params[param])
+
 
     def check_if_kills(self, herbivore):
         if self.phi <= herbivore.phi:
@@ -195,6 +220,7 @@ class Carnivore(Animal):
                 return False
 
     def feeding(self, cell):
+        """Carry out feeding of carnivore """
         eaten = 0
         dead = []
         for prey in cell.pop['Herbivore']:

@@ -14,45 +14,54 @@ from .animals import Herbivore, Carnivore
 
 class LandscapeCell:
     def __init__(self):
+        self.params_set = False
         self.f = 0
         self.species_to_class = dict(inspect.getmembers(animals, inspect.isclass))
         del self.species_to_class['Animal']
         self.pop = {'Herbivore': [], 'Carnivore': []}
-        self.tot_w_herbivores = \
-            sum([herbivore.weight for herbivore in self.pop['Herbivore']])
+        #self.tot_w_herbivores = \
+        #    sum([herbivore.weight for herbivore in self.pop['Herbivore']])
 
     def num_specimen(self, species):
         return len(self.pop[species])
 
-
+    """
     @property
     def num_animals_per_species(self):
         num_dict = {}
         for species in self.pop:
             num_dict[species] = len(self.pop[species])
         return num_dict
+    """
 
+    """
     @property
     def num_animals(self):
         total = 0
         for species in self.pop:
             total += len(self.pop[species])
         return total
+    """
+
+    @property
+    def tot_w_herbivores(self):
+        return sum([herbivore.weight for herbivore in self.pop['Herbivore']])
 
     @property
     def rel_abundance(self):
-        animal = Herbivore()
-        animaltype = type(animal)
+        return self._rel_abundance
+
+    @rel_abundance.setter
+    def rel_abundance(self, animal):
         fodder = 0
-        if animaltype == Herbivore:
+        if type(animal) == Herbivore:
             fodder = self.f
+        elif type(animal) == Carnivore:
 
-        elif animaltype == Carnivore:
             fodder = self.tot_w_herbivores
+        n = self.num_specimen(type(animal).__name__)
 
-        n = self.num_specimen(animaltype.__name__)
-
-        return fodder / ((n + 1) * animal.F)
+        self._rel_abundance = fodder / ((n + 1) * animal.F)
 
 
     @property
@@ -66,7 +75,8 @@ class LandscapeCell:
         elif type(self) == Mountain:
             self._propensity = 0
         else:
-            self._propensity = exp(animal.lambdah * self.rel_abundance)
+            self.rel_abundance = animal
+            self._propensity = exp(animal.lambdah * self._rel_abundance)
 
     @property
     def likelihood(self):
@@ -78,6 +88,11 @@ class LandscapeCell:
 
 
     def migration(self, map_list):
+        """
+        Move each animal if the conditions require so.
+
+        :param map_list: List of potential destinations for animal
+        """
         for species in self.pop:
             for animal in self.pop[species]:
                 if len(map_list) == 0:
@@ -89,6 +104,14 @@ class LandscapeCell:
                     animal.move(self, new_cell)
 
     def new_cell(self, animal, map_list):
+        """
+        Find which cell the animal should move to, if it should move.
+
+        :param animal: Instance of animal class
+        :param map_list: List of potential destinations for animal
+        :return: landscape instance. Either the cell the animal should move to,
+         or the same cell if the animal shouldn't move.
+        """
         for cell in map_list:
             cell.propensity = animal # setter verdi
         total_propensity = sum([cell.propensity for cell in map_list])
@@ -103,18 +126,24 @@ class LandscapeCell:
                 return map_list[i]
 
     def place_animals(self, pop_list):
+        """
+        Place animals on a location.
+
+        :param pop_list: List of dictionaries, each dictionary specifying
+        characteristics of the individual animal to be placed.
+        """
         for individual_dict in pop_list:
             if individual_dict['species'] not in self.pop:
                 self.pop[individual_dict['species']] = []
             new_animal = eval(individual_dict['species'])(individual_dict)
             self.pop[individual_dict['species']].append(new_animal)
-            if individual_dict['species'] == 'Herbivore':
-                self.tot_w_herbivores += new_animal.weight
 
     def replenish(self):
+        """Replenish plant fodder if required. """
         pass
 
     def feeding(self):
+        """ Carry out feeding of each animal on the location. """
         for species in self.pop:
             self.pop[species] = sorted(self.pop[species], key=lambda x: getattr(x, 'phi'))
         for herbivore in self.pop['Herbivore']:
@@ -123,74 +152,68 @@ class LandscapeCell:
             carnivore.feeding(self)
 
     def procreation(self):
+        """Carry out procreation of animals on the location. """
         for species, pop_list in self.pop.items():
             copy = pop_list
             for animal in copy:
                 n = self.num_specimen(species)
                 if n >= 2:
                     if animal.fertile(n):
-                        newborn = type(animal)()
-                        if animal.weight >= animal.zeta * (newborn.weight + animal.sigma_birth):
-                            q = len(pop_list)
-                            self.pop[species].append(newborn)
-                            if len(pop_list) <= q:
-                                print('Pop list not updated')
-                            animal.weight -= animal.zeta * newborn.weight
-                            if animal.weight <0:
-                                print('animal weight too small after birth')
+                        animal.procreate(self)
+
 
     def dying(self):
+        """
+        Remove dying animals from population
+        """
         for species in self.pop:
             self.pop[species] = [animal for animal in self.pop[species] if not animal.dies()]
 
 class Savannah(LandscapeCell):
     params = {'f_max': 300.0, 'alpha': 0.3}
-    params_set = False
 
-    def __init__(self, param_dict=None):
+    def __init__(self, new_params=None):
         super().__init__()
         if not self.params_set:
-            for param in self.params:
-                exec("self.%s = %s" % (param, self.params[param]))
-            self.f = self.f_max
+            self.set_params()
+            self.params_set = True
+
+        self.f = self.f_max
 
 
     @classmethod
-    def set_parameter(cls, new_params):
-        print (cls.params)
+    def set_params(cls, new_params=None):
         if new_params is not None:
             cls.params.update(new_params)
         for param in cls.params:
-            exec("cls.%s = %s" % (param, cls.params[param]))
+            setattr(cls, param, cls.params[param])
         cls.params_set = True
 
     def replenish(self):
+        """Replenish plant fodder at the start of every season. """
         self.f = self.alpha * (self.f_max - self.f) + self.f
-
-
 
 
 class Jungle(LandscapeCell):
     params = {'f_max': 800.0}
-    params_set = False
 
     def __init__(self, param_dict=None):
         super().__init__()
         if not self.params_set:
-            for param in self.params:
-                exec("self.%s = %s" % (param, self.params[param]))
-            self.f = self.f_max
+            self.set_params()
+            self.params_set = True
 
+        self.f = self.f_max
 
     @classmethod
-    def set_parameter(cls, new_params):
+    def set_params(cls, new_params=None):
         if new_params is not None:
             cls.params.update(new_params)
         for param in cls.params:
-            exec("cls.%s = %s" % (param, cls.params[param]))
-        cls.params_set = True
+            setattr(cls, param, cls.params[param])
 
     def replenish(self):
+        """Replenish plant fodder at the start of every season. """
         self.f = self.f_max
 
 

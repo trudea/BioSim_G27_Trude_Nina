@@ -4,16 +4,23 @@
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
+"""
+Implements a biological simulation of an island with population of herbivores
+and carnivores. Landscape types consist of savannah, jungle, desert and
+mountain, with surrounding ocean.
+"""
+
 import inspect
 import textwrap
 import matplotlib.pyplot as plt
 import random
-from src.biosim.animals import Herbivore, Carnivore
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
 import pandas as pd
 
 
 class BioSim:
+    """Define and run a biological simulation. """
+
     def __init__(
         self,
         island_map,
@@ -49,29 +56,16 @@ class BioSim:
         img_base should contain a path and beginning of a file name.
         """
         self.land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M': Mountain, 'D': Desert}
-        self.map = island_map
+        self.active = {Savannah: 0, Jungle: 0, Desert: 0}
         self._year = 0
-        self.default_pop = [{'loc': (3, 4), 'pop': [
-            {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
-            {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
-            {'species': 'Carnivore', 'age': 14, 'weight': 10.3},
-            {'species': 'Carnivore', 'age': 5, 'weight': 10.1}]},
-                            {'loc': (4, 4),
-                             'pop': [
-                                 {'species': 'Herbivore', 'age': 10,
-                                  'weight': 12.5},
-                                 {'species': 'Carnivore', 'age': 3,
-                                  'weight': 7.3},
-                                 {'species': 'Carnivore', 'age': 5,
-                                  'weight': 8.1}]}]
-        """
-        if ini_pop is None:
-            self.ini_pop = self.default_pop
-        """
-
         self.map = self.str_to_dict(island_map)
-
-        #self.place_animals(self.default_pop)
+        for cell in self.map.values():
+            if type(cell) in self.active:
+                self.active[type(cell)] += 1
+        # print(self.active)
+        self.map_active = {key:value for (key, value) in self.map.items() if type(value) in self.active}
+        self.map = self.map_active
+        self.place_animals(ini_pop)
 
         random.seed(seed)
 
@@ -88,9 +82,17 @@ class BioSim:
             pass
         self.img_base = img_base
         self.fmt = img_fmt
-        # lage img_no?
-    
+
     def str_to_dict(self, txt):
+        """
+        Turn string into dictionary if requirements for a map string are met.
+
+        :param txt: String of letters, each signifying the type of landscape at
+         corresponding location.
+        :return: dict: Dictionary with tuples of y- and x-coordinate as keys,
+        and instance of landscape class as values
+        """
+
         txt = txt.split('\n')
         if not txt[-1].isalpha():
             txt.pop()
@@ -106,6 +108,12 @@ class BioSim:
         return dict
     
     def check_txt(self, txt):
+        """
+        Check if string meets requirements for a map string.
+
+        :param txt: String of letters
+        """
+
         left_column = [line[0] for line in txt]
         right_column = [line[-1] for line in txt]
         to_check = [txt[0], txt[-1], left_column, right_column]
@@ -120,8 +128,7 @@ class BioSim:
             for letter in row:
                 if letter not in self.land_dict:
                     raise ValueError
-    
-    
+
     def set_animal_parameters(self, species, params):
         """
         Set parameters for animal species.
@@ -132,7 +139,6 @@ class BioSim:
         self.name = species
         # self.land_dict[].set_parameter(params)
 
-
     def set_landscape_parameters(self, landscape, params):
         """
         Set parameters for landscape type.
@@ -140,7 +146,7 @@ class BioSim:
         :param landscape: String, code letter for landscape
         :param params: Dict with valid parameter specification for landscape
         """
-        self.land_dict[landscape].set_parameter(params)
+        self.land_dict[landscape].set_params(params)
 
     def simulate(self, num_years, vis_years=1, img_years=None):
         """
@@ -164,9 +170,11 @@ class BioSim:
         while (self.sim_years < self.num_years):
             self.one_year()
             self.sim_years += 1
-            print(self.num_animals_per_species)
+            print(self.year, ' ', self.num_animals_per_species)
 
     def one_year(self):
+        """ Implement one annual cycle. """
+
         self.all_cells('replenish')
         self.all_cells('feeding')
         self.all_cells('procreation')
@@ -174,7 +182,6 @@ class BioSim:
         self.all_animals('aging')
         self.all_animals('weightloss')
         self.all_cells('dying')
-        # self.update_num_animals()
         self.num_animals_results.append(self.num_animals)
         self.per_species_results.append(self.num_animals_per_species)
         self.year = 1
@@ -189,7 +196,6 @@ class BioSim:
             loc = self.map[loc_dict['loc']]
             loc.place_animals(loc_dict['pop'])
 
-
     @property
     def year(self):
         """Last year simulated."""
@@ -198,7 +204,6 @@ class BioSim:
     @year.setter
     def year(self, n):
         self._year += n
-
 
     @property
     def num_animals(self):
@@ -232,47 +237,51 @@ class BioSim:
                 num_animals_per_species['Herbivore'],
                 'Carnivore': self.num_animals_per_species['Carnivore']}
 
-
-
-
     def make_movie(self):
         """Create MPEG4 movie from visualization images saved."""
 
-    """
-    default_pop = [{'loc': (3, 4), 'pop': [
-        {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
-        {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
-        {'species': 'Carnivore', 'age': 14, 'weight': 10.3},
-        {'species': 'Carnivore', 'age': 5, 'weight': 10.1}]},
-                   {'loc': (4, 4),
-                    'pop': [
-                        {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
-                        {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
-                        {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
-    """
     def all_cells(self, myfunc):
+        """
+        Execute method for every active location.
+
+        :param myfunc: Method to be executed
+        """
         for cell in self.map.values():
             getattr(cell, myfunc)()
 
     def all_animals(self, myfunc):
+        """
+        Execute method for all animals.
+
+        :param myfunc: Method to be executed.
+        """
+
         for cell in self.map.values():
             for species in cell.pop:
                 for animal in cell.pop[species]:
                     getattr(animal, myfunc)()
 
     def place_animals(self, input_list):
+        """
+        Place animals on specified locations.
+
+        :param input_list: List where every element is a dictonary, consisting
+        of a location, and also containing a list of secondary dictionaries
+        describing attributes of each animal to be placed on said location
+        """
         for placement_dict in input_list:
             pos = placement_dict['loc']
             self.map[pos].place_animals(placement_dict['pop'])
 
-    def migration(self): # husk filtering
+    def migration(self):
+        """Execute migration step of annual cycle."""
         for pos, cell in self.map.items():
             if type(cell) == Ocean or type(cell) == Mountain:
                 pass
             else:
                 y, x = pos
                 adjecent_pos = [(y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)]
-                map_list = [self.map[element] for element in adjecent_pos]
+                map_list = [self.map[element] for element in adjecent_pos if element in self.map]
                 copy = map_list
                 for element in copy:
                     if type(element) == Ocean or type(element) == Mountain:
@@ -281,6 +290,7 @@ class BioSim:
 
 
 if __name__ == '__main__':
+    """
     default_seed = 33
     default_txt = open('rossum.txt').read()
     default_pop = [{'loc': (3, 4), 'pop': [
@@ -293,11 +303,65 @@ if __name__ == '__main__':
                           {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
                           {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
                           {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
+    """
 
-    sim = BioSim(default_txt, default_pop, default_seed)
-    sim.add_population(default_pop)
-    sim.simulate(10)
-    print(sim.year)
+    # sim = BioSim(default_txt, default_pop, default_seed)
+    # sim.simulate(10)
+    """
+    geogr = '\
+               OOOOOOOOOOOOOOOOOOOOO
+               OOOOOOOOSMMMMJJJJJJJO
+               OSSSSSJJJJMMJJJJJJJOO
+               OSSSSSSSSSMMJJJJJJOOO
+               OSSSSSJJJJJJJJJJJJOOO
+               OSSSSSJJJDDJJJSJJJOOO
+               OSSJJJJJDDDJJJSSSSOOO
+               OOSSSSJJJDDJJJSOOOOOO
+               OSSSJJJJJDDJJJJJJJOOO
+               OSSSSJJJJDDJJJJOOOOOO
+               OOSSSSJJJJJJJJOOOOOOO
+               OOOSSSSJJJJJJJOOOOOOO
+               OOOOOOOOOOOOOOOOOOOOO'
+    geogr = textwrap.dedent(geogr)
+    """
+    default_txt = open('rossum.txt').read()
+    ini_herbs = [
+        {
+            "loc": (10, 10),
+            "pop": [
+                {"species": "Herbivore", "age": 5, "weight": 20}
+                for _ in range(150)
+            ],
+        }
+    ]
+    ini_carns = [
+        {
+            "loc": (10, 10),
+            "pop": [
+                {"species": "Carnivore", "age": 5, "weight": 20}
+                for _ in range(40)
+            ],
+        }
+    ]
 
+    sim = BioSim(default_txt, ini_herbs, 123456)
+
+    sim.set_animal_parameters("Herbivore", {"zeta": 3.2, "xi": 1.8})
+    sim.set_animal_parameters(
+        "Carnivore",
+        {
+            "a_half": 70,
+            "phi_age": 0.5,
+            "omega": 0.3,
+            "F": 65,
+            "DeltaPhiMax": 9.0,
+        },
+    )
+    sim.set_landscape_parameters("J", {"f_max": 700})
+
+    sim.simulate(num_years=50, vis_years=1, img_years=2000)
+
+    sim.add_population(population=ini_carns)
+    sim.simulate(num_years=10, vis_years=1, img_years=2000)
 
 
