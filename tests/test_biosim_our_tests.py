@@ -31,21 +31,21 @@ def input_list():
 
 @pytest.fixture
 def example_herbivore():
-    default_params = ani.Herbivore.param_dict.copy()
+    default_params = ani.Herbivore.params.copy()
     yield ani.Herbivore()
-    ani.Herbivore.param_dict = default_params
+    ani.Herbivore.params = default_params
 
 
 @pytest.fixture
 def example_carnivore():
-    default_params = ani.Carnivore.param_dict.copy()
+    default_params = ani.Carnivore.params.copy()
     yield ani.Carnivore()
-    ani.Herbivore.param_dict = default_params
+    ani.Herbivore.params = default_params
 
 
 @pytest.fixture
 def example_savannah():
-    params = land.Savannah.param_dict.copy()
+    params = land.Savannah.params.copy()
     yield land.Savannah()
     land.Savannah.params = params
 
@@ -69,7 +69,7 @@ class TestIsland:
         A test to check if an instance of island class is created
         without input
         """
-        s = sim.BioSim(example_map, input_list, 333)
+        s = sim.BioSim(None, None, None)
         assert isinstance(s, sim.BioSim)
 
     def test_constructor_input(self, example_map):
@@ -77,16 +77,16 @@ class TestIsland:
         A test to check if an instance of island class is created
         with input
         """
-        i = isl.Island(example_map)
-        assert isinstance(i, isl.Island)
+        i = sim.BioSim(example_map, None, None)
+        assert isinstance(i, sim.BioSim)
 
     def test_map_coordinate_instance(self, example_map):
         """
         A test to check if an instance of Island given initial coordinates
         return the true biome-letter.
         """
-        island = isl.Island(example_map)
-        coordinate = island.map[(0, 0)]
+        island = sim.BioSim(example_map, None, None)
+        coordinate = island.map([0, 0])
         assert type(coordinate).__name__ is 'Ocean'
 
     def test_map_ocean(self):
