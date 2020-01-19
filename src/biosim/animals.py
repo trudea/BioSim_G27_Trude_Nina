@@ -151,12 +151,18 @@ class Herbivore(Animal):
             self.params_set = True
 
     @classmethod
-    def set_params(cls, params=None):
+    def set_params(cls, new_params=None):
+        if new_params is not None:
+            for param in new_params:
+                if param not in cls.params:
+                    raise ValueError
+            cls.params.update(new_params)
         for param in cls.params:
             if param == 'lambda':
                 cls.lambdah = cls.params['lambda']
             else:
                 setattr(cls, param, cls.params[param])
+        cls.params_set = True
 
 
     def feeding(self, cell):
@@ -197,16 +203,19 @@ class Carnivore(Animal):
         super().__init__(attribute_dict)
         if not self.params_set:
             self.set_params()
-            self.params_set = True
 
-
-    @classmethod
-    def set_params(cls, params=None):
+    def set_params(cls, new_params=None):
+        if new_params is not None:
+            for param in new_params:
+                if param not in cls.params:
+                    raise ValueError
+            cls.params.update(new_params)
         for param in cls.params:
             if param == 'lambda':
                 cls.lambdah = cls.params['lambda']
             else:
                 setattr(cls, param, cls.params[param])
+        cls.params_set = True
 
 
     def check_if_kills(self, herbivore):

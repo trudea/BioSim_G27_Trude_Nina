@@ -139,7 +139,7 @@ class LandscapeCell:
                 raise ValueError
             if individual_dict['weight'] <= 0:
                 raise ValueError
-            
+
             new_animal = eval(individual_dict['species'])(individual_dict)
             self.pop[individual_dict['species']].append(new_animal)
 
@@ -189,6 +189,11 @@ class Savannah(LandscapeCell):
     @classmethod
     def set_params(cls, new_params=None):
         if new_params is not None:
+            for param in new_params:
+                if param not in cls.params:
+                    raise ValueError
+                if param == 'f_max' and new_params[param] < 0:
+                    raise ValueError
             cls.params.update(new_params)
         for param in cls.params:
             setattr(cls, param, cls.params[param])
@@ -206,16 +211,21 @@ class Jungle(LandscapeCell):
         super().__init__()
         if not self.params_set:
             self.set_params()
-            self.params_set = True
 
         self.f = self.f_max
 
     @classmethod
     def set_params(cls, new_params=None):
         if new_params is not None:
+            for param in new_params:
+                if param not in cls.params:
+                    raise ValueError
+                if param == 'f_max' and new_params[param] < 0:
+                    raise ValueError
             cls.params.update(new_params)
         for param in cls.params:
             setattr(cls, param, cls.params[param])
+        cls.params_set = True
 
     def replenish(self):
         """Replenish plant fodder at the start of every season. """
