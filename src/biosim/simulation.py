@@ -62,10 +62,9 @@ class BioSim:
         for cell in self.map.values():
             if type(cell) in self.active:
                 self.active[type(cell)] += 1
-        # print(self.active)
         self.map_active = {key:value for (key, value) in self.map.items() if type(value) in self.active}
         self.map = self.map_active
-        self.place_animals(ini_pop)
+        self.add_population(ini_pop)
 
         random.seed(seed)
 
@@ -193,8 +192,11 @@ class BioSim:
         :param population: List of dictionaries specifying population
         """
         for loc_dict in population:
+            if loc_dict['loc'] not in self.map:
+                raise ValueError
             loc = self.map[loc_dict['loc']]
             loc.place_animals(loc_dict['pop'])
+
 
     @property
     def year(self):
@@ -260,18 +262,6 @@ class BioSim:
             for species in cell.pop:
                 for animal in cell.pop[species]:
                     getattr(animal, myfunc)()
-
-    def place_animals(self, input_list):
-        """
-        Place animals on specified locations.
-
-        :param input_list: List where every element is a dictonary, consisting
-        of a location, and also containing a list of secondary dictionaries
-        describing attributes of each animal to be placed on said location
-        """
-        for placement_dict in input_list:
-            pos = placement_dict['loc']
-            self.map[pos].place_animals(placement_dict['pop'])
 
     def migration(self):
         """Execute migration step of annual cycle."""

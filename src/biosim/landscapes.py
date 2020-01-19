@@ -135,6 +135,11 @@ class LandscapeCell:
         for individual_dict in pop_list:
             if individual_dict['species'] not in self.pop:
                 self.pop[individual_dict['species']] = []
+            if individual_dict['age'] < 0:
+                raise ValueError
+            if individual_dict['weight'] <= 0:
+                raise ValueError
+            
             new_animal = eval(individual_dict['species'])(individual_dict)
             self.pop[individual_dict['species']].append(new_animal)
 
