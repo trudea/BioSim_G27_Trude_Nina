@@ -242,7 +242,8 @@ class TestAnimal:
         accordingly
         """
         random.seed(1)
-        example_herbivore.phi = 1  # asserts probability of moving is high
+        example_herbivore.params_set['phi'] = 1  # asserts probability of
+        # moving is high
         assert example_herbivore.movable()
 
     def test_migration(self, example_carnivore):
