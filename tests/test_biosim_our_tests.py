@@ -72,21 +72,21 @@ class TestIsland:
         s = sim.BioSim(None, None, None)
         assert isinstance(s, sim.BioSim)
 
-    def test_constructor_input(self, example_map):
+    def test_constructor_input(self, example_map, input_list):
         """
         A test to check if an instance of island class is created
         with input
         """
-        i = sim.BioSim(example_map, None, None)
+        i = sim.BioSim(example_map, input_list, None)
         assert isinstance(i, sim.BioSim)
 
-    def test_map_coordinate_instance(self, example_map):
+    def test_map_coordinate_instance(self, example_map, input_list):
         """
         A test to check if an instance of Island given initial coordinates
         return the true biome-letter.
         """
-        island = sim.BioSim(example_map, None, None)
-        coordinate = island.map([0, 0])
+        island = sim.BioSim(example_map, input_list, None)
+        coordinate = island.map[(0, 0)]
         assert type(coordinate).__name__ is 'Ocean'
 
     def test_map_ocean(self):
@@ -102,6 +102,10 @@ class TestIsland:
     def test_invalid_landscape(self):
         with pytest.raises(ValueError):
             sim.BioSim("OOO\nORO\nOOO", None, None)
+
+    def test_different_length(self):
+        with pytest.raises(ValueError):
+            sim.BioSim("OOOO\nOMO\nOOO", None, None)
 
 
 class TestLandscapes:
@@ -174,11 +178,8 @@ class TestLandscapes:
         island = sim.BioSim(example_map, input_list, None)
         assert island.num_animals_per_species['Herbivore'] == 4
 
-    def test_relative_abundance(self, input_list, example_carnivore):
-        isl.Island().place_animals(input_list)
-        isl.Island().update_num_animals()
-        assert isl.Island().map[(1, 2)].get_rel_abundance(example_carnivore) \
-        == 22.8
+    def test_relative_abundance(self, example_jungle):
+        assert example_jungle._rel_abundance == 700
 
 
 class TestAnimal:
@@ -224,27 +225,25 @@ class TestAnimal:
         example_herbivore.feeding(example_savannah)
         assert previous_weight < example_herbivore.weight
 
-    def test_place_animal(self, input_list):
-        i = isl.Island()
-        i.place_animals(input_list)
-        herbivore_list = i.map[4, 4]
-        assert len(herbivore_list.pop) == 2
+    def test_place_animal(self, input_list, example_map):
+        i = sim.BioSim(example_map, input_list, None)
+        herbivore_list = i.map[(1, 1)]
+        assert len(herbivore_list.pop['Herbivore']) == 2
 
-    def test_tot_w_herbivores(self, input_list):
-        i = isl.Island()
-        i.place_animals(input_list)
-        c = i.map[3, 4]
+    def test_tot_w_herbivores(self, input_list, example_map):
+        i = sim.BioSim(example_map, input_list, None)
+        c = i.map[(1, 1)]
         assert c.tot_w_herbivores == 22.8
 
-    def test_move_check(self, example_herbivore):
+    def test_move_check(self):
         """
         A test that ensures that the boolean check_if_animal_moves behaves
         accordingly
         """
         random.seed(1)
-        example_herbivore.params_set['phi'] = 1  # asserts probability of
+        harold = ani.Herbivore({'phi': 0})  # asserts probability of
         # moving is high
-        assert example_herbivore.movable()
+        assert harold.movable()
 
     def test_migration(self, example_carnivore):
         cell1, cell2 = land.Savannah(), land.Savannah()
@@ -255,7 +254,7 @@ class TestAnimal:
     def test_eat_in_order_fitness(self, example_savannah):
         herbert, herman = ani.Herbivore(), ani.Herbivore()
         herbert.weight, herbert.phi, herman.weight, herman.phi = 10, 10, 1, 0.5
-        example_savannah.f = (herbert.param_dict['F'] - 1)
+        example_savannah.f = (herbert.params['F'] - 1)
         example_savannah.pop['Herbivore'].append(herbert)
         example_savannah.pop['Herbivore'].append(herman)
         example_savannah.feeding()
@@ -263,21 +262,20 @@ class TestAnimal:
 
     def test_check_kills(self, example_herbivore, example_carnivore):
         random.seed(999)
-        example_herbivore.phi = 0.1
-        example_carnivore.param_dict["DeltaPhiMax"] = 1
+        herman = ani.Herbivore({'phi': 0})
         # asserts that the probability of killing is high
-        example_carnivore.phi = 1
-        assert example_carnivore.check_if_kills(example_herbivore)
+        carnie = ani.Carnivore({'phi': 1})
+        assert carnie.check_if_kills(herman)
 
-    def test_animal_dead(self, example_herbivore):
-        example_herbivore.phi = 0
-        assert example_herbivore.dies()
+    def test_animal_dead(self):
+        herbert = ani.Herbivore({'phi': 0})
+        assert herbert.dies()
 
-    def test_animal_dead_is_removed(self, example_herbivore, example_savannah):
-        example_savannah.pop['Herbivore'].append(example_herbivore)
-        example_herbivore.phi = 0
+    def test_animal_dead_is_removed(self):
+        herman = ani.Herbivore({'phi': 0})
+        example_savannah.pop['Herbivore'].append(herman)
         example_savannah.dying()
-        assert example_herbivore not in example_savannah.pop['Herbivore']
+        assert herman not in example_savannah.pop['Herbivore']
 
     def test_little_fodder(self, example_herbivore):
         herbivore = example_herbivore
@@ -304,40 +302,31 @@ class TestAnimal:
         assert new_pop > old_pop
 
     def test_parameter_change(self, example_carnivore):
-        old_parameter = example_carnivore.param_dict["w_birth"]
-        example_carnivore.param_dict["w_birth"] = 10
-        assert example_carnivore.param_dict["w_birth"] is not old_parameter
+        old_parameter = example_carnivore.params["w_birth"]
+        example_carnivore.params["w_birth"] = 10
+        assert example_carnivore.params["w_birth"] is not old_parameter
 
     def test_value_error_raised_placement_mountain_ocean(self):
-        cell_mountain = land.Mountain()
-        cell_ocean = land.Ocean()
+        test_map = 'OOOO\nOMDO\nOOO'
+        input = [{'loc': (1, 1), 'pop': [{'species': 'Herbivore', 'age': 10,
+                                          'weight': 12.5}]}]
         with pytest.raises(ValueError):
-            cell_mountain.pop['Herbivore'].append(ani.Herbivore) and \
-                cell_ocean.pop['Herbivore'].append(ani.Herbivore)
+            sim.BioSim(test_map, input, None)
 
     def test_kill_order_fitness(self):
         cell = land.Jungle()
-        herb, herman = ani.Herbivore(), ani.Herbivore()
-        herb.phi, herman.phi = 0.4, 0.3
-        killer, killer.phi = ani.Carnivore(), 1.0
+        herb, herman = ani.Herbivore({'phi': 0.5}), ani.Herbivore({'phi': 1})
+        killer = ani.Carnivore({'phi': 1})
         cell.pop.add(herb, herman, killer)
-        isl.Island().feeding()
+        land.LandscapeCell.feeding(cell)
         assert cell.pop == 2
 
 
-class TestRun:
-    def test_do_collectively(self):
-        pass
+class TestSimulation:
 
-    def test_one_cycle(self):
-        r = run.Run()
-        r.one_cycle()
-        assert r.years == 1
-
-    def test_run(self):
-        t = run.Run()
-        t.run()
-        assert t.years == t.desired_years
+    def test_one_year(self):
+        t = sim.BioSim(None, None, None).one_year()
+        assert sim.BioSim.year == 1
 
     def test_kill_check(mocker):
         mocker.patch('random.random', return_value=0.001)
@@ -349,8 +338,5 @@ class TestRun:
         assert not c2.check_if_kills(h)
         assert not c3.check_if_kills(h)
 
-
-class TestSimulation:
     def test_animal_distribution(self):
-        sim.animal_distribution.get
         pass
