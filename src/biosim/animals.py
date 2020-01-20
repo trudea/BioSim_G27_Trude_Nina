@@ -14,6 +14,7 @@ import random
 class Animal:
 
     def __init__(self, attribute_dict):
+        self.params_set = False
         self.age = None
         self.weight = None
 
@@ -34,6 +35,20 @@ class Animal:
                 np.random.normal(self.params['w_birth'],
                                  self.params['sigma_birth'], 1000)
             self.weight = np.random.choice(statistic_population)
+
+    @classmethod
+    def set_params(cls, new_params=None):
+        if new_params is not None:
+            for param in new_params:
+                if param not in cls.params:
+                    raise ValueError
+            cls.params.update(new_params)
+        for param in cls.params:
+            if param == 'lambda':
+                cls.lambdah = cls.params['lambda']
+            else:
+                setattr(cls, param, cls.params[param])
+        cls.params_set = True
 
     @property
     def phi(self):
@@ -144,27 +159,12 @@ class Herbivore(Animal):
               'omega': 0.4,
               'F': 10.0
               }
-    params_set = False
 
     def __init__(self, attribute_dict=None):
         super().__init__(attribute_dict)
         if not self.params_set:
             self.set_params()
             self.params_set = True
-
-    @classmethod
-    def set_params(cls, new_params=None):
-        if new_params is not None:
-            for param in new_params:
-                if param not in cls.params:
-                    raise ValueError
-            cls.params.update(new_params)
-        for param in cls.params:
-            if param == 'lambda':
-                cls.lambdah = cls.params['lambda']
-            else:
-                setattr(cls, param, cls.params[param])
-        cls.params_set = True
 
     def feeding(self, cell):
         """ Carry out feeding of herbivore. """
@@ -199,25 +199,11 @@ class Carnivore(Animal):
               'F': 50.0,
               'DeltaPhiMax': 10.0
               }
-    params_set = False
 
     def __init__(self, attribute_dict=None):
         super().__init__(attribute_dict)
         if not self.params_set:
             self.set_params()
-
-    def set_params(cls, new_params=None):
-        if new_params is not None:
-            for param in new_params:
-                if param not in cls.params:
-                    raise ValueError
-            cls.params.update(new_params)
-        for param in cls.params:
-            if param == 'lambda':
-                cls.lambdah = cls.params['lambda']
-            else:
-                setattr(cls, param, cls.params[param])
-        cls.params_set = True
 
     def check_if_kills(self, herbivore):
         if self.phi <= herbivore.phi:

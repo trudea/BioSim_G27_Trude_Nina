@@ -63,6 +63,14 @@ class BioSim:
                           Mountain, 'D': Desert}
         self.active = {Savannah: 0, Jungle: 0, Desert: 0}
         self._year = 0
+
+        self.num_years = 0
+        self.vis_years = 0
+        self.img_years = 0
+        self.sim_years = 0
+
+        self.num_animals_results = []
+        self.per_species_results = []
         self.map = self.str_to_dict(island_map)
         for cell in self.map.values():
             if type(cell) in self.active:
@@ -71,7 +79,8 @@ class BioSim:
                            type(value) in self.active}
         self.map = self.map_active
         self.add_population(ini_pop)
-        self.change = {'Herbivores born': 0, 'Herbivores dead': 0, 'Carnivores born': 0, 'Carnivores dead': 0,}
+        self.change = {'Born' : {'Herbivore': 0, 'Carnivore': 0}, 'Dead' : {'Herbivore': 0, 'Carnivore': 0}}
+
 
         random.seed(seed)
 
@@ -175,18 +184,12 @@ class BioSim:
         while (self.sim_years < self.num_years):
             self.one_year()
             self.sim_years += 1
-            print(self.year, ' ', self.num_animals_per_species)
+            # print(self.year, ' ', self.num_animals_per_species)
             for cell in self.map.values():
-                # print(self.change)
+                for key in self.change:
+                    for species in self.change[key]:
+                        self.change[key][species] += cell.change[key][species]
 
-                self.change['Herbivores born'] += cell.change['Herbivores born']
-                self.change['Herbivores dead'] += cell.change['Herbivores dead']
-                self.change['Carnivores born'] += cell.change[
-                    'Carnivores born']
-                self.change['Herbivores dead'] += cell.change[
-                    'Carnivores dead']
-
-            # print(self.change)
 
     def one_year(self):
         """ Implement one annual cycle. """
@@ -194,14 +197,17 @@ class BioSim:
         self.all_cells('replenish')
         self.all_cells('feeding')
         self.all_cells('procreation')
-        #print('Num animals before: ', self.num_animals_per_species)
+        # print('Num animals before: ', self.num_animals_per_species)
         self.migration()
+        # print('Num animals after: ', self.num_animals_per_species)
         self.all_animals('aging')
         self.all_animals('weightloss')
         self.all_cells('dying')
         self.num_animals_results.append(self.num_animals)
         self.per_species_results.append(self.num_animals_per_species)
         self.year = 1
+        print(self.num_animals_per_species)
+        # print(self.year, ' ', self.change)
 
     def add_population(self, population):
         """
@@ -362,9 +368,11 @@ if __name__ == '__main__':
     ]
 
     sim = BioSim(default_txt, ini_herbs, 123456)
+    sim.one_year()
 
-    sim.set_animal_parameters("Herbivore", {"zeta": 3.2, "xi": 1.8})
-    sim.set_animal_parameters(
+    #sim.set_animal_parameters("Herbivore", {"zeta": 3.2, "xi": 1.8})
+    #sim.set_animal_parameters(
+    """
         "Carnivore",
         {
             "a_half": 70,
@@ -374,12 +382,17 @@ if __name__ == '__main__':
             "DeltaPhiMax": 9.0,
         },
     )
-    sim.set_landscape_parameters("J", {"f_max": 700})
+    """
+    #sim.set_landscape_parameters("J", {"f_max": 700})
 
-    sim.simulate(num_years=2, vis_years=1, img_years=2000)
+    #sim.simulate(num_years=2, vis_years=1, img_years=2000)
 
 
-    sim.add_population(population=ini_carns)
-    sim.simulate(num_years=10, vis_years=1, img_years=2000)
+    #sim.add_population(population=ini_carns)
+    #sim.simulate(num_years=2, vis_years=1, img_years=2000)
+
+
+
+
 
 
