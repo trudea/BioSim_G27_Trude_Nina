@@ -17,7 +17,7 @@ import random
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
 import pandas as pd
 import numpy as np
-# import seaborn as sns
+import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import subprocess
@@ -252,29 +252,27 @@ class BioSim:
         while self._step < self._final_step:
 
             if self._step % vis_steps == 0:
-                """ self._update_graphics()"""
-                pass
+                self._update_graphics()
 
-            #if self._step % img_steps == 0:
-            #    self._save_graphics()
+            if self._step % img_steps == 0:
+                self._save_graphics()
 
-            #self._system.update()
-            #self._step += 1
+            self._system.update()
+            self._step += 1
 
         while (self.sim_years < self.num_years):
             self.one_year()
             self.sim_years += 1
             # print(self.year, ' ', self.num_animals_per_species)
-
-
+            for cell in self.map.values():
+                for key in self.change:
+                    for species in self.change[key]:
+                        self.change[key][species] += cell.change[key][species]
 
     def _setup_graphics(self):
         """Creates subplots."""
 
         # create new figure window
-
-        pass
-        """
         if self._fig is None:
             self._fig = plt.figure()
 
@@ -288,7 +286,6 @@ class BioSim:
 
         # needs updating on subsequent calls to simulate()
         self._mean_ax2.set_xlim(0, self._final_step + 1)
-        """
 
 
     def one_year(self):
@@ -308,11 +305,6 @@ class BioSim:
         self.year = 1
         # print(self.num_animals_per_species)
         # print(self.year, ' ', self.change)
-        for cell in self.map.values():
-            for key in self.change:
-                for species in self.change[key]:
-                    self.change[key][species] += cell.change[key][species]
-        print(self.change)
 
     def add_population(self, population):
         """
@@ -459,15 +451,15 @@ if __name__ == '__main__':
                OOOOOOOOOOOOOOOOOOOOO'
     geogr = textwrap.dedent(geogr)
     """
-    default_txt = open('rossum.txt').read()
-    # default_txt = 'OOOOO\nOJJJO\nOJJJO\nOJJJO\nOOOOO'
+    # default_txt = open('rossum.txt').read()
+    default_txt = 'OOOOO\nOJJJO\nOJJJO\nOJJJO\nOOOOO'
 
     ini_herbs = [
         {
             "loc": (2, 2),
             "pop": [
                 {"species": "Herbivore", "age": 5, "weight": 20}
-                for _ in range(150)
+                for _ in range(3)
             ],
         }
     ]
@@ -476,12 +468,12 @@ if __name__ == '__main__':
             "loc": (2, 2),
             "pop": [
                 {"species": "Carnivore", "age": 5, "weight": 20}
-                for _ in range(150)
+                for _ in range(3)
             ],
         }
     ]
 
-    sim = BioSim(default_txt, ini_herbs, 1)
-
-    sim.simulate(num_years=100, vis_years=1, img_years=2000)
+    sim = BioSim('OOOOO\nODJMO\nOJJSO\nOJSDO\nOOOOO', ini_herbs, 1)
+    sim.add_population(ini_carns)
+    sim.one_year()
 

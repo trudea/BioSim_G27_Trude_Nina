@@ -127,7 +127,7 @@ class TestSimulation:
                len(new_jungle_sim.map[(2, 2)].pop['Carnivore']) == 6
 
     @pytest.fixture
-    def island(self, new_jungle_sim):
+    def jungle(self, new_jungle_sim):
         new_pop = [{'species': 'Carnivore', 'age': 6, 'weight': 20} for i in
                    range(2)]
         new_pop += [{'species': 'Herbivore', 'age': 6, 'weight': 20} for i in
@@ -135,40 +135,29 @@ class TestSimulation:
         new_jungle_sim.add_population([{'loc': (2, 3), 'pop': new_pop}])
         yield new_jungle_sim
 
-    def test_num_animals_two_cells(self, island):
-        assert island.num_animals == 12
+    def test_num_animals_two_cells(self, jungle):
+        assert jungle.num_animals == 12
 
-    def test_num_per_species(self, island):
-        assert island.num_animals_per_species['Herbivore'] == 7
+    def test_num_per_species(self, jungle):
+        assert jungle.num_animals_per_species['Herbivore'] == 7
         assert jungle.num_animals_per_species['Carnivore'] == 5
 
-    def test_animal_num_stable(self, island):
-        """Check that number of animals stays unchanged through certain cycle
-        stages."""
-        remembered = island.num_animals_per_species
-        rem_n = island.num_animals
-        island.all_cells('replenish')
-        assert  island.num_animals_per_species == remembered
-        island.all_cells('feeding')
-        assert  island.num_animals_per_species == remembered
-        island.migration()
-        assert  island.num_animals_per_species == remembered
-        island.all_animals('aging')
-        assert island.num_animals_per_species == remembered
-        island.all_animals('weightloss')
-        assert island.num_animals_per_species == remembered
-        assert rem_n == island.num_animals
+    def test_animal_num_stable(self, jungle):
+        remembered = jungle.num_animals_per_species
+        rem_n = jungle.num_animals
+        jungle.all_cells('replenish')
+        assert  jungle.num_animals_per_species == remembered
+        jungle.all_cells('feeding')
+        assert  jungle.num_animals_per_species == remembered
+        jungle.migration()
+        assert  jungle.num_animals_per_species == remembered
+        jungle.all_animals('aging')
+        assert jungle.num_animals_per_species == remembered
+        jungle.all_animals('weightloss')
+        assert jungle.num_animals_per_species == remembered
+        assert rem_n == jungle.num_animals
 
-    def test_cycle(self, island):
-        assert island.change['Born']['Herbivore'] == 0
-        assert island.change['Born']['Carnivore'] == 0
-        assert island.change['Dead']['Herbivore'] == 0
-        assert island.change['Dead']['Carnivore'] == 0
-        island.one_year()
-        assert island.change['Born']['Herbivore'] == 0
-        assert island.change['Born']['Carnivore'] == 0
-        assert island.change['Dead']['Herbivore'] == 0
-        assert island.change['Dead']['Carnivore'] == 0
+
 
 
 
