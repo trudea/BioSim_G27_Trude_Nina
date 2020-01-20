@@ -586,5 +586,5 @@ if __name__ == '__main__':
 
     sim = BioSim('OOOOO\nODJMO\nOJJSO\nOJSDO\nOOOOO', ini_herbs, 1)
     sim.add_population(ini_carns)
-    sim.one_year()
-
+    sim.simulate(3)
+    print(sim.per_species_results)
