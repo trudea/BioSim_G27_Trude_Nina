@@ -16,6 +16,9 @@ import matplotlib.pyplot as plt
 import random
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
 import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 class BioSim:
@@ -361,7 +364,7 @@ if __name__ == '__main__':
         }
     ]
 
-    sim = BioSim(default_txt, ini_herbs, 123456)
+    sim = BioSim(default_txt, ini_herbs, 1)
 
     sim.set_animal_parameters("Herbivore", {"zeta": 3.2, "xi": 1.8})
     sim.set_animal_parameters(

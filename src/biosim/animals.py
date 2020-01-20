@@ -126,6 +126,10 @@ class Animal:
             if self.weight < 0:
                 print('animal weight too small after birth')
 
+    @phi.setter
+    def phi(self, value):
+        self._phi = value
+
 
 class Herbivore(Animal):
     params = {'w_birth': 8.0,

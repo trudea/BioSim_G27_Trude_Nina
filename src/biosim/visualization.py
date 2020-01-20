@@ -10,8 +10,6 @@ import math
 from numpy import arange, sin, pi
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from biosim.island import Island
-import biosim.run as r
 import matplotlib.pyplot as plt
 import numpy as np
 import random
@@ -71,17 +69,17 @@ sys.exit(qApp.exec_())
 # https://realpython.com/python-pyqt-gui-calculator/
 """
 
-"""
+
 def plot(years):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     herbivores = []
     carnivores = []
-    simulation = r.Run()
-    for i in range(years):
-        simulation.one_cycle()
-        if i == years / 2:
-            simulation.island.place_animals(carnivore_list)
+    simulation = sim.BioSim('OOO\nOJO\nOOO', herbivore_input, 123456)
+    for i in range(100):
+        simulation.one_year()
+        if i == 50:
+            simulation.add_population(ini_carns)
         plt.pause(1e-6)
         species = simulation.per_species_results
         ax.plot(species)
@@ -104,7 +102,7 @@ def plot(years):
     plt.ylabel("Population")
     plt.title("Biosimulator")
     plt.legend()
-"""
+
 
 
 def biosimmap(kart):
@@ -139,54 +137,69 @@ def biosimmap(kart):
     plt.show()
 
 
-def plotting_simulation(kart, seed):
-    fig = plt.figure()
-    ax1 = fig.add_subplot(221)
-    ax2 = fig.add_subplot(222)
-    ax3 = fig.add_subplot(223)
-    ax4 = fig.add_subplot(224)
+class Plot:
+    def __init__(self, map, input_list, seed,  years):
+        fig = plt.figure()
+        self.ax1 = fig.add_subplot(221)
+        self.ax2 = fig.add_subplot(222)
+        self.ax3 = fig.add_subplot(223)
+        self.ax4 = fig.add_subplot(224)
+        self.map = map
+        self.input = input_list
+        self.plotting_simulation()
+        self.simulation = BioSim(self.map, self.input, self.seed)
+        self.seed = seed
+        self.update(years, self.simulation)
 
-    simulation = BioSim(kart, herbivore_input, seed)
-    for i in range(50):
-        simulation.map[(2, 2)].pop['Herbivore'].append(Herbivore())
-    fig.show()
+    def plotting_simulation(self):
+        fig = plt.figure()
+        if self.input is None:
+            for i in range(50):
+                self.simulation.map[(2, 2)].pop['Herbivore'].append(
+                    Herbivore())
+        fig.show()
 
+    def update(self, years, simulation, carnivore_year=50):
+        plt.ion()
+        fig = plt.figure()
+        self.ax1 = fig.add_subplot(221)
+        self.ax2 = fig.add_subplot(222)
+        self.ax3 = fig.add_subplot(223)
+        self.ax4 = fig.add_subplot(224)
 
-def update(years, simulation, carnivore_year=50):
-    plt.ion()
-    fig = plt.figure()
-    ax1 = fig.add_subplot(221)
-    ax2 = fig.add_subplot(222)
-    ax3 = fig.add_subplot(223)
-    ax4 = fig.add_subplot(224)
+        self.ax1.set_xlim(0, years), self.ax1.set_ylim(0, 500)
+        self.ax2.set_xlim(0, years), self.ax2.set_ylim(0, 500)
+        self.ax3.set_xlim(0, years), self.ax3.set_ylim(0, 500)
+        self.ax4.set_xlim(0, years), self.ax4.set_ylim(0, 500)
 
-    ax1.set_xlim(0, years), ax1.set_ylim(0, 500)
-    ax2.set_xlim(0, years), ax2.set_ylim(0, 500)
-    ax3.set_xlim(0, years), ax3.set_ylim(0, 500)
-    ax4.set_xlim(0, years), ax4.set_ylim(0, 500)
+        x, y = [], []
+        y_herb, y_carn = [], []
 
-    x, y = [], []
-    y_herb, y_carn = [], []
-
-    for rounds in range(years):
-
-        simulation.one_year()
-        x.append(simulation.year)
-        y.append(simulation.num_animals.get)
-        y_herb.append(simulation.per_species_results[-1]['Herbivore'])
-        y_carn.append(simulation.per_species_results[-1]['Carnivore'])
-        ax.plot(x, y, color='cyan')
-        px.plot(x, y_herb, color='green')
-        px.plot(x, y_carn, color='red')
-        fig.canvas.draw()
-        plt.pause(0.1)
+        for rounds in range(years):
+            simulation.one_year()
+            x.append(simulation.year)
+            y.append(simulation.num_animals.get)
+            y_herb.append(simulation.per_species_results[-1]['Herbivore'])
+            y_carn.append(simulation.per_species_results[-1]['Carnivore'])
+            self.ax2.plot(x, y, color='cyan')
+            self.ax3.plot(x, y_herb, color='green')
+            self.ax4.plot(x, y_carn, color='red')
+            fig.canvas.draw()
+            plt.pause(0.1)
 
         if simulation.year == carnivore_year:
             for i in range(5):
                 simulation.map[(2, 2)].pop['Carnivore'].append(
                     Carnivore())
 
-
+def simple_plot(years, input, seed, map):
+    simulator = BioSim(map, input, seed)
+    herbivores = []
+    carnivores = []
+    for i in range(years):
+        simulator.one_year()
+        pd = simulator.animal_distribution()
+        herbivores.append(pd['Herbivores'])
 def scatterplot_map(years):
     # Hent animal abundance pd
     fig = pt.figure()
@@ -208,5 +221,4 @@ def scatterplot_map(years):
 if __name__ == '__main__':
     rossum = 'OOOOO\nODJSO\nOJSJO\nOOOOO'
     biosimmap(rossum)
-    plotting_simulation(rossum, 1)
-    update(100, BioSim(rossum, herbivore_input, None))
+    plot(300)
