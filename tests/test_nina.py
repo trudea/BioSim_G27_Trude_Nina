@@ -196,11 +196,15 @@ class TestSimulation:
         herbivores =   [{'species': 'Herbivore', 'age': 5, 'weight': 20.0} for i in range(31)]
         island = sim.BioSim(simple_map, [{'loc': (1, 1), 'pop': herbivores}],
                             123)
-        island.all_cells('feeding')
         cell = island.map[(1, 1)]
-        for herbivore in cell.pop['Herbivore'][0:-2]:
+        old_phi = [herbivore.phi for herbivore in cell.pop['Herbivore']]
+        island.all_cells('feeding')
+        for i, herbivore in enumerate(cell.pop['Herbivore'][0:-2]):
             assert cell.pop['Herbivore'][-2].weight > 20.0
+            assert herbivore.phi > old_phi[i]
         assert cell.pop['Herbivore'][-1].weight == 20.0
+        assert cell.pop['Herbivore'][-1].phi == old_phi[-1]
+
 
     def test_jungle_feeding(self, jungle):
         """Check if herbivores gain weight feeding in jungle, and if fodder
@@ -209,18 +213,25 @@ class TestSimulation:
         herbivores = [{'species': 'Herbivore', 'age': 5, 'weight': 20.0}
                       for i in range(81)]
         jungle.add_population([{'loc': (1, 1), 'pop': herbivores}])
-        jungle.all_cells('feeding')
         cell = jungle.map[(1, 1)]
-        for herbivore in cell.pop['Herbivore'][0:-2]:
-            assert cell.pop['Herbivore'][-2].weight > 20.0
+        old_phi = [herbivore.phi for herbivore in cell.pop['Herbivore']]
+        jungle.all_cells('feeding')
+        for i, herbivore in enumerate(cell.pop['Herbivore'][0:-2]):
+            assert herbivore.weight > 20.0
+            assert herbivore.phi > old_phi[i]
         assert cell.pop['Herbivore'][-1].weight == 20.0
+        assert cell.pop['Herbivore'][-1].phi == old_phi[-1]
 
     def test_desert_feeding(self, desert):
+        """Check that herbivore doesn't gain weight in desert."""
         desert.add_population([{'loc': (1, 1), 'pop':
             [{'species': 'Herbivore', 'age': 5, 'weight': 20.0}]}])
-        desert.all_cells('feeding')
         cell = desert.map[(1, 1)]
+        old_phi = cell.pop['Herbivore'][0].phi
+        desert.all_cells('feeding')
         assert cell.pop['Herbivore'][0].weight == 20.0
+        assert cell.pop['Herbivore'][0].phi == old_phi
+
 
     def test_unsuitable_placements(self, mountain, ocean):
         """Check that population can't be placed on mountain or in the
@@ -231,6 +242,24 @@ class TestSimulation:
         with pytest.raises(ValueError):
             mountain.add_population([{'loc': (0, 0), 'pop':
                 [{'species': 'Herbivore', 'age': 5, 'weight': 20}]}])
+
+    def test_carnivore_feeding(self, desert, mocker):
+        """Test if carnivore gains weight and increases fitness in cell with
+        herbivores, and if herbivore population is diminished. """
+        mocker.patch('random.random', return_value=0.0001)
+        herb_pop = [{'species': 'Herbivore', 'age': 5, 'weight': 20} for i in range(200)]
+        carn_pop = [{'species': 'Carnivore', 'age': 5, 'weight': 20}]
+        ini_pop = herb_pop + carn_pop
+        desert.add_population([{'loc': (1,1), 'pop': ini_pop}])
+        cell = desert.map[(1, 1)]
+        old_phi = cell.pop['Carnivore'][0].phi
+        old_num_herbivores = len(cell.pop['Herbivore'])
+        old_tot_w = cell.tot_w_herbivores
+        desert.all_cells('feeding')
+        assert cell.pop['Carnivore'][0].weight > 20
+        assert cell.pop['Carnivore'][0].phi > old_phi
+        assert len(cell.pop['Herbivore']) < old_num_herbivores
+        assert cell.tot_w_herbivores < old_tot_w
 
 
 

@@ -15,6 +15,7 @@ import textwrap
 import matplotlib.pyplot as plt
 import random
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
+from src.biosim.animals import Herbivore, Carnivore
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -526,7 +527,15 @@ if __name__ == '__main__':
     sim.all_cells('procreation')
     print(sim.change['Born']['Carnivore'])
     """
-    str = 'OOO\nOJO\nOOO'
-    jungle = BioSim(str)
-    jungle.simulate(3)
-    print(jungle.num_animals_per_species)
+    savannah = BioSim('OOO\nOSO\nOOO')
+    herb_pop = [{'species': 'Herbivore', 'age': 5, 'weight': 20} for i in range(4)]
+    carn_pop = [{'species': 'Carnivore', 'age': 5, 'weight': 20}]
+    ini_pop = herb_pop + carn_pop
+    savannah.add_population([{'loc': (1, 1), 'pop': ini_pop}])
+    cell = savannah.map[(1, 1)]
+    old_phi = cell.pop['Carnivore'][0].phi
+    old_num_herbivores = len(cell.pop['Herbivore'])
+    old_tot_w = cell.tot_w_herbivores
+    savannah.all_cells('feeding')
+    print(cell.pop['Carnivore'][0].weight > 20)
+    print( cell.pop['Carnivore'][0].phi > old_phi)
