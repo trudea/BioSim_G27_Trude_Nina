@@ -112,10 +112,13 @@ class TestSimulation:
         assert len(cell.pop['Herbivore']) == 3
         assert len(cell.pop['Carnivore']) == 3
 
-    @pytest.fixture(big_sim)
-    def new_sim(self, big):
-        
-
+    @pytest.fixture
+    def new_sim(self, big_sim, carn_tribe):
+        new_pop = [{'loc': (2, 2), 'pop': carn_tribe}]
+        cell = big_sim.map[(2, 2)]
+        big_sim.add_population(new_pop)
+        new_sim = big_sim.copy()
+        yield new_sim
 
     def test_num_animals(self, big_sim, carn_tribe):
         new_pop = [{'loc': (2, 2), 'pop': carn_tribe}]
