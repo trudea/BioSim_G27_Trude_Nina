@@ -214,7 +214,7 @@ class Carnivore(Animal):
             return False
         elif 0 < self.phi - herbivore.phi < 1.0:
             probability = (self.phi - herbivore.phi) / self.DeltaPhiMax
-            if np.random() <= probability:
+            if np.random.random() <= probability:
                 return True
             else:
                 return False

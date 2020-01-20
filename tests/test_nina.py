@@ -70,8 +70,8 @@ def test_herbivore_weight():
 """
 class TestSimulation:
     @pytest.fixture
-    def big_map(self):
-        return """OOOOO\nOJJJO\nOJJJO\nOJJJO\nOOOOO"""
+    def jungle_map(self):
+        return 'OOOOO\nODJMO\nOJJSO\nOJSDO\nOOOOO'
 
 
     @pytest.fixture
@@ -94,43 +94,68 @@ class TestSimulation:
 
 
     @pytest.fixture
-    def big_sim(self, big_map, herb_tribe):
-        big_sim = sim.BioSim(big_map, [{'loc': (2,2), 'pop': herb_tribe}], 123)
-        yield big_sim
+    def jungle_sim(self, jungle_map, herb_tribe):
+        jungle_sim = sim.BioSim(jungle_map, [{'loc': (2,2), 'pop': herb_tribe}], 123)
+        yield jungle_sim
 
-    def test_place_herbivores(self, big_sim):
-        cell = big_sim.map[(2,2)]
+
+    def test_place_herbivores(self, jungle_sim, carn_tribe):
+        cell = jungle_sim.map[(2,2)]
         assert len(cell.pop) == 2
         assert len(cell.pop['Herbivore']) == 3
         assert len(cell.pop['Carnivore']) == 0
 
-    def test_place_carnivores(self, big_sim, carn_tribe):
+    def test_place_carnivores(self, jungle_sim, carn_tribe):
         new_pop = [{'loc': (2,2), 'pop': carn_tribe}]
-        cell = big_sim.map[(2, 2)]
-        big_sim.add_population(new_pop)
+        cell = jungle_sim.map[(2, 2)]
+        jungle_sim.add_population(new_pop)
         assert len(cell.pop) == 2
         assert len(cell.pop['Herbivore']) == 3
         assert len(cell.pop['Carnivore']) == 3
 
+
     @pytest.fixture
-    def new_sim(self, big_sim, carn_tribe):
+    def new_jungle_sim(self, jungle_sim, carn_tribe):
         new_pop = [{'loc': (2, 2), 'pop': carn_tribe}]
-        cell = big_sim.map[(2, 2)]
-        big_sim.add_population(new_pop)
-        new_sim = big_sim.copy()
-        yield new_sim
-
-    def test_num_animals(self, big_sim, carn_tribe):
-        new_pop = [{'loc': (2, 2), 'pop': carn_tribe}]
-        cell = big_sim.map[(2, 2)]
-        big_sim.add_population(new_pop)
-        assert big_sim.num_animals == 6
+        jungle_sim.add_population(new_pop)
+        yield jungle_sim
 
 
+    def test_simple_num_animals(self, new_jungle_sim):
+        assert new_jungle_sim.num_animals == 6
+        assert len(new_jungle_sim.map[(2, 2)].pop['Herbivore']) +\
+               len(new_jungle_sim.map[(2, 2)].pop['Carnivore']) == 6
 
+    @pytest.fixture
+    def jungle(self, new_jungle_sim):
+        new_pop = [{'species': 'Carnivore', 'age': 6, 'weight': 20} for i in
+                   range(2)]
+        new_pop += [{'species': 'Herbivore', 'age': 6, 'weight': 20} for i in
+                    range(4)]
+        new_jungle_sim.add_population([{'loc': (2, 3), 'pop': new_pop}])
+        yield new_jungle_sim
 
+    def test_num_animals_two_cells(self, jungle):
+        assert jungle.num_animals == 12
 
+    def test_num_per_species(self, jungle):
+        assert jungle.num_animals_per_species['Herbivore'] == 7
+        assert jungle.num_animals_per_species['Carnivore'] == 5
 
+    def test_animal_num_stable(self, jungle):
+        remembered = jungle.num_animals_per_species
+        rem_n = jungle.num_animals
+        jungle.all_cells('replenish')
+        assert  jungle.num_animals_per_species == remembered
+        jungle.all_cells('feeding')
+        assert  jungle.num_animals_per_species == remembered
+        jungle.migration()
+        assert  jungle.num_animals_per_species == remembered
+        jungle.all_animals('aging')
+        assert jungle.num_animals_per_species == remembered
+        jungle.all_animals('weightloss')
+        assert jungle.num_animals_per_species == remembered
+        assert rem_n == jungle.num_animals
 
 
 

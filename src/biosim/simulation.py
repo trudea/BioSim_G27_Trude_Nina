@@ -73,7 +73,7 @@ class BioSim:
         """
         self.land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M':
                           Mountain, 'D': Desert}
-        self.active = {Savannah: 0, Jungle: 0, Desert: 0}
+        self.active = {Savannah: 0, Jungle: 0}
         self._year = 0
 
         self.num_years = 0
@@ -290,7 +290,7 @@ class BioSim:
         self.num_animals_results.append(self.num_animals)
         self.per_species_results.append(self.num_animals_per_species)
         self.year = 1
-        print(self.num_animals_per_species)
+        # print(self.num_animals_per_species)
         # print(self.year, ' ', self.change)
 
     def add_population(self, population):
@@ -460,6 +460,7 @@ if __name__ == '__main__':
         }
     ]
 
-    sim = BioSim(default_txt, ini_herbs, 1)
+    sim = BioSim('OOOOO\nODJMO\nOJJSO\nOJSDO\nOOOOO', ini_herbs, 1)
     sim.add_population(ini_carns)
+    sim.one_year()
 
