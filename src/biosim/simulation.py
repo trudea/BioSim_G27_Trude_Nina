@@ -79,6 +79,7 @@ class BioSim:
                            type(value) in self.active}
         self.map_inactive = {key: value for (key, value) in self.map.items() if
                            type(value) in self.active}
+        self.map_copy = self.map.copy()
         self.map = self.map_active
         self.add_population(ini_pop)
         self.change = {'Born' : {'Herbivore': 0, 'Carnivore': 0}, 'Dead' : {'Herbivore': 0, 'Carnivore': 0}}
