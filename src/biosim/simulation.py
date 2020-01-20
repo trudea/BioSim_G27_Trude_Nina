@@ -168,6 +168,103 @@ class BioSim:
         """
         self.land_dict[landscape].set_params(params)
 
+<<<<<<< HEAD
+=======
+
+
+
+        axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
+        axlg.axis('off')
+        for ix, name in enumerate(('Ocean', 'Mountain', 'Jungle',
+                                   'Savannah', 'Desert')):
+            axlg.add_patch(plt.Rectangle((0., ix * 0.2), 0.3, 0.1,
+                                         edgecolor='none',
+                                         facecolor=rgb_value[name[0]]))
+            axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
+
+    def population_line_plot(self):
+        self.ax2.set_xlim(0, self.n_steps)
+        self.ax2.set_ylim(self.y_lim[0], self.y_lim[1])
+        self.ax2.set_title('Population')
+
+        if self.line_herbivore is None:
+            self.line_herbivore = self.ax2.plot(
+                np.arange(0, self.n_steps + 1, vis_steps),
+                np.nan * np.ones(
+                    len(np.arange(0, self.n_steps + 1, vis_steps))),'g-')
+
+            self.line_carnivore = self.ax2.plot(
+                np.arange(0, self.n_steps + 1, vis_steps),
+                np.nan * np.ones(
+                    len(np.arange(0, self.n_steps + 1, vis_steps))), 'r-')
+            self.ax2.legend(['Herbivore', 'Carnivore'])
+
+        else:
+            x, y = self.line_herbivore.get_data()
+            new_x = np.arange(x[-1] + 1, self.n_steps + 1, vis_steps)
+            if len(new_x > 0):
+                new_y = np.nan * np.ones_like(new_x)
+                self.line_herbivore.set_data(new_x, new_y)
+
+            x, y = self.line_carnivore.get_data()
+            new_x = np.arange(x[-1] + 1, self.n_steps + 1, vis_steps)
+            if len(new_x > 0):
+                new_y = np.nan * np.ones_like(new_x)
+                self.line_carnivore.set_data(new_x, new_y)
+
+    def update_population_line_plot(self):
+        y = self.line_herbivore.get_ydata()
+    def simulate(self, num_steps, vis_steps=1, img_steps=None):
+        """
+        Run simulation while visualizing the result.
+        :param num_steps: number of simulation steps to execute
+        :param vis_steps: interval between visualization updates
+        :param img_steps: interval between visualizations saved to files
+                          (default: vis_steps)
+        .. note:: Image files will be numbered consecutively.
+        """
+
+        if img_steps is None:
+            img_steps = vis_steps
+
+        self._final_step = self._step + num_steps
+        self._setup_graphics()
+
+        while self._step < self._final_step:
+
+            if self._step % vis_steps == 0:
+                self._update_graphics()
+
+            if self._step % img_steps == 0:
+                self._save_graphics()
+
+            self._system.update()
+            self._step += 1
+
+        while (self.sim_years < self.num_years):
+            self.one_year()
+            self.sim_years += 1
+            # print(self.year, ' ', self.num_animals_per_species)
+            for cell in self.map.values():
+                for key in self.change:
+                    for species in self.change[key]:
+                        self.change[key][species] += cell.change[key][species]
+
+    def _setup_graphics(self):
+        """Creates subplots."""
+
+        # create new figure window
+        if self._fig is None:
+            self._fig = plt.figure()
+
+
+
+
+        # Add top right subplot for line graph of mean.
+        if self._mean_ax2 is None:
+            self._mean_ax2 = self._fig.add_subplot(2, 2, 2)
+            self._mean_ax2.set_ylim(0, 0.02)
+>>>>>>> master
 
 
 
@@ -318,6 +415,7 @@ class BioSim:
         self.ax1.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
         self.ax1.set_yticks(range(len(kart_rgb)))
         self.ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))
+<<<<<<< HEAD
 
         axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
         axlg.axis('off')
@@ -339,6 +437,29 @@ class BioSim:
                 np.nan * np.ones(
                     len(np.arange(0, self.n_steps + 1, vis_steps))), 'g-')
 
+=======
+
+        axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
+        axlg.axis('off')
+        for ix, name in enumerate(('Ocean', 'Mountain', 'Jungle',
+                                   'Savannah', 'Desert')):
+            axlg.add_patch(plt.Rectangle((0., ix * 0.2), 0.3, 0.1,
+                                         edgecolor='none',
+                                         facecolor=rgb_value[name[0]]))
+            axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
+
+    def population_line_plot(self):
+        self.ax2.set_xlim(0, self.n_steps)
+        self.ax2.set_ylim(self.y_lim[0], self.y_lim[1])
+        self.ax2.set_title('Population')
+
+        if self.line_herbivore is None:
+            self.line_herbivore = self.ax2.plot(
+                np.arange(0, self.n_steps + 1, vis_steps),
+                np.nan * np.ones(
+                    len(np.arange(0, self.n_steps + 1, vis_steps))), 'g-')
+
+>>>>>>> master
             self.line_carnivore = self.ax2.plot(
                 np.arange(0, self.n_steps + 1, vis_steps),
                 np.nan * np.ones(
