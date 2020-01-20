@@ -29,10 +29,10 @@ class BioSim:
     """Define and run a biological simulation. """
 
     def __init__(
-        self,
-        island_map=None,
-        ini_pop=None,
-        seed=None):
+            self,
+            island_map=None,
+            ini_pop=None,
+            seed=None):
         """
         :param island_map: Multi-line string specifying island geography
         :param ini_pop: List of dictionaries specifying initial population
@@ -61,7 +61,7 @@ class BioSim:
         img_base should contain a path and beginning of a file name.
         """
         self.land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M':
-                          Mountain, 'D': Desert}
+            Mountain, 'D': Desert}
         self.active = {Savannah: 0, Jungle: 0}
         self._year = 0
 
@@ -75,7 +75,7 @@ class BioSim:
         self.line_herbivore = None
         self.line_carnivore = None
         self.n_steps = 0
-        self.index_counter = 0
+        self.current_idx = 0
 
         self.num_animals_results = []
         self.per_species_results = []
@@ -87,12 +87,12 @@ class BioSim:
         self.map_active = {key: value for (key, value) in self.map.items() if
                            type(value) in self.active}
         self.map_inactive = {key: value for (key, value) in self.map.items() if
-                           type(value) in self.active}
+                             type(value) in self.active}
         self.map_copy = self.map.copy()
         self.map = self.map_active
         self.add_population(ini_pop)
-        self.change = {'Born' : {'Herbivore': 0, 'Carnivore': 0}, 'Dead' : {'Herbivore': 0, 'Carnivore': 0}}
-
+        self.change = {'Born': {'Herbivore': 0, 'Carnivore': 0},
+                       'Dead': {'Herbivore': 0, 'Carnivore': 0}}
 
         np.random.seed(seed)
 
@@ -103,7 +103,6 @@ class BioSim:
         self.ymax_animals = 1000
 
         self.cmax_animals = 10000
-
 
     def str_to_dict(self, txt):
         """
@@ -127,7 +126,7 @@ class BioSim:
                 x += 1
             y += 1
         return dict
-    
+
     def check_txt(self, txt):
         """
         Check if string meets requirements for a map string.
@@ -169,28 +168,8 @@ class BioSim:
         """
         self.land_dict[landscape].set_params(params)
 
-    def make_rgb_map(self):
-        # Add tp left subplot for images created with imshow().
-        # We cannot create the actual ImageAxis object before we know
-        # the size of the image, so we delay its creation.
-        ax1 = self._fig.add_subplot(221)
-        plt.title('Rossum Island')
-        #                   R    G    B
-        rgb_value = {'O': (0.0, 0.0, 1.0),  # blue
-                     'M': (0.5, 0.5, 0.5),  # grey
-                     'J': (0.0, 0.6, 0.0),  # dark green
-                     'S': (0.5, 1.0, 0.5),  # light green
-                     'D': (1.0, 1.0, 0.5)}  # light yellow
 
-        kart_rgb = [[rgb_value[column] for column in row]
-                    for row in self.island_map.splitlines()]
 
-        self.ax1 = fig.add_axes([0.1, 0.1, 0.7, 0.8])  # llx, lly, w, h
-        self.ax1.imshow(kart_rgb, interpolation='nearest')
-        self.ax1.set_xticks(range(len(kart_rgb[0])))
-        self.ax1.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
-        self.ax1.set_yticks(range(len(kart_rgb)))
-        self.ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))
 
         axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
         axlg.axis('off')
@@ -332,7 +311,7 @@ class BioSim:
         """Total number of animals on island."""
         num_animals = 0
         for cell in self.map.values():
-            num_animals += len(cell.pop['Herbivore']) +\
+            num_animals += len(cell.pop['Herbivore']) + \
                            len(cell.pop['Carnivore'])
         return num_animals
 
@@ -345,7 +324,6 @@ class BioSim:
                 _num_animals_per_species[species] += len(
                     cell.pop[species])
         return _num_animals_per_species
-
 
     @property
     def animal_distribution(self):
@@ -373,7 +351,6 @@ class BioSim:
                 'Herbivore': herbivores, 'Carnivore': carnivores}
         df = pd.DataFrame(data)
         return df
-
 
     def make_movie(self):
         """Create MPEG4 movie from visualization images saved."""
@@ -415,7 +392,141 @@ class BioSim:
                         map_list.remove(element)
                 cell.migration(map_list)
 
+    def make_rgb_map(self):
+        # Add tp left subplot for images created with imshow().
+        # We cannot create the actual ImageAxis object before we know
+        # the size of the image, so we delay its creation.
+        ax1 = self._fig.add_subplot(221)
+        plt.title('Rossum Island')
+        #                   R    G    B
+        rgb_value = {'O': (0.0, 0.0, 1.0),  # blue
+                     'M': (0.5, 0.5, 0.5),  # grey
+                     'J': (0.0, 0.6, 0.0),  # dark green
+                     'S': (0.5, 1.0, 0.5),  # light green
+                     'D': (1.0, 1.0, 0.5)}  # light yellow
 
+        kart_rgb = [[rgb_value[column] for column in row]
+                    for row in self.island_map.splitlines()]
+
+        self.ax1 = fig.add_axes([0.1, 0.1, 0.7, 0.8])  # llx, lly, w, h
+        self.ax1.imshow(kart_rgb, interpolation='nearest')
+        self.ax1.set_xticks(range(len(kart_rgb[0])))
+        self.ax1.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
+        self.ax1.set_yticks(range(len(kart_rgb)))
+        self.ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))
+
+        axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
+        axlg.axis('off')
+        for ix, name in enumerate(('Ocean', 'Mountain', 'Jungle',
+                                   'Savannah', 'Desert')):
+            axlg.add_patch(plt.Rectangle((0., ix * 0.2), 0.3, 0.1,
+                                         edgecolor='none',
+                                         facecolor=rgb_value[name[0]]))
+            axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
+
+    def population_line_plot(self):
+        self.ax2.set_xlim(0, self.n_steps)
+        self.ax2.set_ylim(self.y_lim[0], self.y_lim[1])
+        self.ax2.set_title('Population')
+
+        if self.line_herbivore is None:
+            self.line_herbivore = self.ax2.plot(
+                np.arange(0, self.n_steps + 1, vis_steps),
+                np.nan * np.ones(
+                    len(np.arange(0, self.n_steps + 1, vis_steps))), 'g-')
+
+            self.line_carnivore = self.ax2.plot(
+                np.arange(0, self.n_steps + 1, vis_steps),
+                np.nan * np.ones(
+                    len(np.arange(0, self.n_steps + 1, vis_steps))), 'r-')
+            self.ax2.legend(['Herbivore', 'Carnivore'])
+
+        else:
+            x, y = self.line_herbivore.get_data()
+            new_x = np.arange(x[-1] + 1, self.n_steps + 1, vis_steps)
+            if len(new_x > 0):
+                new_y = np.nan * np.ones_like(new_x)
+                self.line_herbivore.set_data(new_x, new_y)
+
+            x, y = self.line_carnivore.get_data()
+            new_x = np.arange(x[-1] + 1, self.n_steps + 1, vis_steps)
+            if len(new_x > 0):
+                new_y = np.nan * np.ones_like(new_x)
+                self.line_carnivore.set_data(new_x, new_y)
+
+    def update_population_line_plot(self):
+        y = self.line_herbivore.get_ydata()
+        y[self.current_idx] = self.num_animals_per_species['Herbivore']
+        self.line_herbivore.set_ydata(y)
+
+        y = self.line_carnivore.get_ydata()
+        y[self.current_idx] = self.num_animals_per_species['Carnivore']
+        self.line_carnivore.set_ydata(y)
+
+        self.current_idx += 1
+        plt.pause(1e-03)
+
+    def heatmap(self):
+        x = self.animal_distribution
+        herb = x.pivot('Row', 'Col', 'Herbivore')
+        carn = x.pivot('Row', 'Col', 'Herbivore')
+
+        self.ax3 = sns.heatmap(herb, vmax=50)
+        self.ax3.set_title('Herbivore density map')
+        self.ax4 = sns.heatmap(carn, vmax=50)
+        self.ax4.set_title('Carnivore density map')
+
+    def visualize(self):
+
+        if self._fig is None:
+            self.ax1 = self._fig.add_subplot(221)
+            self.ax2 = self._fig.add_subplot(222)
+            self.ax3 = self._fig.add_subplot(223)
+            self.ax4 = self._fig.add_subplot(224)
+
+            self.make_rgb_map()
+            self.heatmap()
+        self.population_line_plot()
+
+    def update_graphics(self):
+        self.update_population_line_plot()
+        self.heatmap()
+
+    def simulate(self, num_steps, vis_steps=1, img_steps=None):
+        """
+        Run simulation while visualizing the result.
+        :param num_steps: number of simulation steps to execute
+        :param vis_steps: interval between visualization updates
+        :param img_steps: interval between visualizations saved to files
+                          (default: vis_steps)
+        .. note:: Image files will be numbered consecutively.
+        """
+
+        if img_steps is None:
+            img_steps = vis_steps
+
+        self._final_step = self._step + num_steps
+        self._setup_graphics()
+
+        while self._step < self._final_step:
+
+            if self._step % vis_steps == 0:
+                self._update_graphics()
+
+            if self._step % img_steps == 0:
+                self._save_graphics()
+
+            self._system.update()
+            self._step += 1
+
+        while (self.sim_years < self.num_years):
+            self.one_year()
+            self.sim_years += 1
+            # print(self.year, ' ', self.num_animals_per_species)
+            for cell in self.map.values():
+                for key in self.change:
+                    for species in self.change[key]:
+                        self.change[key][species] += cell.change[key][species]
 if __name__ == '__main__':
     """
     default_seed = 33
