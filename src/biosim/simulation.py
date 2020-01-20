@@ -32,7 +32,12 @@ class BioSim:
             self,
             island_map=None,
             ini_pop=None,
-            seed=None):
+            seed=None,
+            ymax_animals=None,
+            cmax_animals=None,
+            img_base=None,
+            img_fmt="png"):
+
         """
         :param island_map: Multi-line string specifying island geography
         :param ini_pop: List of dictionaries specifying initial population
@@ -64,6 +69,10 @@ class BioSim:
             Mountain, 'D': Desert}
         self.active = {Savannah: 0, Jungle: 0}
         self._year = 0
+        self.ymax_animals = ymax_animals
+        self.cmax_animals = cmax_animals
+        self.img = img_base
+        self.img_fmt = img_fmt
 
         self.num_years = 0
         self.vis_years = 0
@@ -102,9 +111,9 @@ class BioSim:
         self._final_step = None
         self._img_ctr = 0
 
-        self.ymax_animals = 1000
+        self.ymax_animals = ymax_animals
 
-        self.cmax_animals = 10000
+        self.cmax_animals = cmax_animals
 
     def str_to_dict(self, txt):
         """
@@ -416,7 +425,7 @@ class BioSim:
         self.update_population_line_plot()
         self.heatmap()
 
-    def simulate(self, num_steps, vis_steps=1, img_steps=None):
+    def simulate(self, num_years, vis_years, img_years=None):
         """
         Run simulation while visualizing the result.
         :param num_steps: number of simulation steps to execute
@@ -425,12 +434,6 @@ class BioSim:
                           (default: vis_steps)
         .. note:: Image files will be numbered consecutively.
         """
-
-        if img_steps is None:
-            img_steps = vis_steps
-
-        self._final_step = self._step + num_steps
-        self.visualize(vis_steps)
         """
         while self._step < self._final_step:
 
@@ -443,7 +446,6 @@ class BioSim:
             self._system.update()
             self._step += 1
         """
-
         while (self.sim_years < self.num_years):
             self.one_year()
             self.sim_years += 1
@@ -452,6 +454,8 @@ class BioSim:
                 for key in self.change:
                     for species in self.change[key]:
                         self.change[key][species] += cell.change[key][species]
+
+
 if __name__ == '__main__':
     """
     default_seed = 33
