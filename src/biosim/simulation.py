@@ -75,6 +75,7 @@ class BioSim:
         self.line_herbivore = None
         self.line_carnivore = None
         self.n_steps = 0
+        self.index_counter = 0
 
         self.num_animals_results = []
         self.per_species_results = []
@@ -224,9 +225,14 @@ class BioSim:
                 new_y = np.nan * np.ones_like(new_x)
                 self.line_herbivore.set_data(new_x, new_y)
 
+            x, y = self.line_carnivore.get_data()
+            new_x = np.arange(x[-1] + 1, self.n_steps + 1, vis_steps)
+            if len(new_x > 0):
+                new_y = np.nan * np.ones_like(new_x)
+                self.line_carnivore.set_data(new_x, new_y)
 
-
-
+    def update_population_line_plot(self):
+        y = self.line_herbivore.get_ydata()
     def simulate(self, num_steps, vis_steps=1, img_steps=None):
         """
         Run simulation while visualizing the result.
