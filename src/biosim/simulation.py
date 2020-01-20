@@ -23,9 +23,9 @@ class BioSim:
 
     def __init__(
         self,
-        island_map,
-        ini_pop,
-        seed,
+        island_map=None,
+        ini_pop=None,
+        seed=None,
         ymax_animals=None,
         cmax_animals=None,
         img_base=None,
@@ -76,6 +76,8 @@ class BioSim:
             if type(cell) in self.active:
                 self.active[type(cell)] += 1
         self.map_active = {key: value for (key, value) in self.map.items() if
+                           type(value) in self.active}
+        self.map_inactive = {key: value for (key, value) in self.map.items() if
                            type(value) in self.active}
         self.map = self.map_active
         self.add_population(ini_pop)
