@@ -4,38 +4,49 @@
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
+"""
+Implements a biological simulation of an island with population of herbivores
+and carnivores. Landscape types consist of savannah, jungle, desert and
+mountain, with surrounding ocean.
+"""
+
 import inspect
 import textwrap
 import matplotlib.pyplot as plt
 import random
-from src.biosim.animals import Herbivore, Carnivore
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
 import pandas as pd
-import numpy
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+import subprocess
+import os
+import matplotlib.pyplot as plt
 
 
 class BioSim:
+    """Define and run a biological simulation. """
+
     def __init__(
             self,
-            island_map,
-            ini_pop,
-            seed,
-            ymax_animals=None,
-            cmax_animals=None,
-            img_base=None,
-            img_fmt="png",
-
-    ):
+            island_map=None,
+            ini_pop=None,
+            seed=None):
         """
         :param island_map: Multi-line string specifying island geography
         :param ini_pop: List of dictionaries specifying initial population
         :param seed: Integer used as random number seed
-        :param ymax_animals: Number specifying y-axis limit for graph showing animal numbers
-        :param cmax_animals: Dict specifying color-code limits for animal densities
-        :param img_base: String with beginning of file name for figures, including path
+        :param ymax_animals: Number specifying y-axis limit for graph showing
+        animal numbers
+        :param cmax_animals: Dict specifying color-code limits for animal
+        densities
+        :param img_base: String with beginning of file name for figures,
+        including path
         :param img_fmt: String with file type for figures, e.g. 'png'
 
-        If ymax_animals is None, the y-axis limit should be adjusted automatically.
+        If ymax_animals is None, the y-axis limit should be adjusted
+        automatically.
 
         If cmax_animals is None, sensible, fixed default values should be used.
         cmax_animals is a dict mapping species names to numbers, e.g.,
@@ -49,50 +60,59 @@ class BioSim:
         where img_no are consecutive image numbers starting from 0.
         img_base should contain a path and beginning of a file name.
         """
-        self.land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean,
-                          'M': Mountain, 'D': Desert}
-        self.map = island_map
+        self.land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M':
+            Mountain, 'D': Desert}
+        self.active = {Savannah: 0, Jungle: 0}
         self._year = 0
-        self.default_pop = [{'loc': (3, 4), 'pop': [
-            {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
-            {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
-            {'species': 'Carnivore', 'age': 14, 'weight': 10.3},
-            {'species': 'Carnivore', 'age': 5, 'weight': 10.1}]},
-                            {'loc': (4, 4),
-                             'pop': [
-                                 {'species': 'Herbivore', 'age': 10,
-                                  'weight': 12.5},
-                                 {'species': 'Carnivore', 'age': 3,
-                                  'weight': 7.3},
-                                 {'species': 'Carnivore', 'age': 5,
-                                  'weight': 8.1}]}]
-        """
-        if ini_pop is None:
-            self.ini_pop = self.default_pop
-        """
 
+        self.num_years = 0
+        self.vis_years = 0
+        self.img_years = 0
+        self.sim_years = 0
+
+        self._fig = None
+        self.ax1, self.ax2, self.ax3, self.ax4 = None, None, None, None
+        self.line_herbivore = None
+        self.line_carnivore = None
+        self.n_steps = 0
+        self.index_counter = 0
+
+        self.num_animals_results = []
+        self.per_species_results = []
+        self.island_map = island_map
         self.map = self.str_to_dict(island_map)
+        for cell in self.map.values():
+            if type(cell) in self.active:
+                self.active[type(cell)] += 1
+        self.map_active = {key: value for (key, value) in self.map.items() if
+                           type(value) in self.active}
+        self.map_inactive = {key: value for (key, value) in self.map.items() if
+                             type(value) in self.active}
+        self.map_copy = self.map.copy()
+        self.map = self.map_active
+        self.add_population(ini_pop)
+        self.change = {'Born': {'Herbivore': 0, 'Carnivore': 0},
+                       'Dead': {'Herbivore': 0, 'Carnivore': 0}}
 
-        # self.place_animals(self.default_pop)
+        np.random.seed(seed)
 
-        random.seed(seed)
+        self._step = 0
+        self._final_step = None
+        self._img_ctr = 0
 
-        if ymax_animals is None:
-            # juster automatisk
-            pass
-        self.ymax_animals = ymax_animals
-        if cmax_animals is None:
-            # automatisk
-            pass
-        self.cmax_animals = cmax_animals
-        if img_base is None:
-            # automatisk
-            pass
-        self.img_base = img_base
-        self.fmt = img_fmt
-        # lage img_no?
+        self.ymax_animals = 1000
+
+        self.cmax_animals = 10000
 
     def str_to_dict(self, txt):
+        """
+        Turn string into dictionary if requirements for a map string are met.
+
+        :param txt: String of letters, each signifying the type of landscape at
+         corresponding location.
+        :return: dict: Dictionary with tuples of y- and x-coordinate as keys,
+        and instance of landscape class as values
+        """
         txt = txt.split('\n')
         if not txt[-1].isalpha():
             txt.pop()
@@ -108,6 +128,12 @@ class BioSim:
         return dict
 
     def check_txt(self, txt):
+        """
+        Check if string meets requirements for a map string.
+
+        :param txt: String of letters
+        """
+
         left_column = [line[0] for line in txt]
         right_column = [line[-1] for line in txt]
         to_check = [txt[0], txt[-1], left_column, right_column]
@@ -131,6 +157,7 @@ class BioSim:
         :param params: Dict with valid parameter specification for species
         """
         self.name = species
+        # self.land_dict[].set_parameter(params)
 
     def set_landscape_parameters(self, landscape, params):
         """
@@ -139,43 +166,114 @@ class BioSim:
         :param landscape: String, code letter for landscape
         :param params: Dict with valid parameter specification for landscape
         """
-        self.land_dict[landscape].set_parameter(params)
+        self.land_dict[landscape].set_params(params)
 
-    def simulate(self, num_years, vis_years=1, img_years=None):
+    def make_rgb_map(self):
+        # Add tp left subplot for images created with imshow().
+        # We cannot create the actual ImageAxis object before we know
+        # the size of the image, so we delay its creation.
+        ax1 = self._fig.add_subplot(221)
+        plt.title('Rossum Island')
+        #                   R    G    B
+        rgb_value = {'O': (0.0, 0.0, 1.0),  # blue
+                     'M': (0.5, 0.5, 0.5),  # grey
+                     'J': (0.0, 0.6, 0.0),  # dark green
+                     'S': (0.5, 1.0, 0.5),  # light green
+                     'D': (1.0, 1.0, 0.5)}  # light yellow
+
+        kart_rgb = [[rgb_value[column] for column in row]
+                    for row in self.island_map.splitlines()]
+
+        self.ax1 = fig.add_axes([0.1, 0.1, 0.7, 0.8])  # llx, lly, w, h
+        self.ax1.imshow(kart_rgb, interpolation='nearest')
+        self.ax1.set_xticks(range(len(kart_rgb[0])))
+        self.ax1.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
+        self.ax1.set_yticks(range(len(kart_rgb)))
+        self.ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))
+
+        axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
+        axlg.axis('off')
+        for ix, name in enumerate(('Ocean', 'Mountain', 'Jungle',
+                                   'Savannah', 'Desert')):
+            axlg.add_patch(plt.Rectangle((0., ix * 0.2), 0.3, 0.1,
+                                         edgecolor='none',
+                                         facecolor=rgb_value[name[0]]))
+            axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
+
+    def population_line_plot(self):
+        self.ax2.set_xlim(0, self.n_steps)
+        self.ax2.set_ylim(self.y_lim[0], self.y_lim[1])
+        self.ax2.set_title('Population')
+
+        if self.line_herbivore is None:
+            self.line_herbivore = self.ax2.plot(
+                np.arange(0, self.n_steps + 1, vis_steps),
+                np.nan * np.ones(
+                    len(np.arange(0, self.n_steps + 1, vis_steps))), 'g-')
+
+            self.line_carnivore = self.ax2.plot(
+                np.arange(0, self.n_steps + 1, vis_steps),
+                np.nan * np.ones(
+                    len(np.arange(0, self.n_steps + 1, vis_steps))), 'r-')
+            self.ax2.legend(['Herbivore', 'Carnivore'])
+
+        else:
+            x, y = self.line_herbivore.get_data()
+            new_x = np.arange(x[-1] + 1, self.n_steps + 1, vis_steps)
+            if len(new_x > 0):
+                new_y = np.nan * np.ones_like(new_x)
+                self.line_herbivore.set_data(new_x, new_y)
+
+            x, y = self.line_carnivore.get_data()
+            new_x = np.arange(x[-1] + 1, self.n_steps + 1, vis_steps)
+            if len(new_x > 0):
+                new_y = np.nan * np.ones_like(new_x)
+                self.line_carnivore.set_data(new_x, new_y)
+
+    def update_population_line_plot(self):
+        y = self.line_herbivore.get_ydata()
+
+    def simulate(self, num_steps, vis_steps=1, img_steps=None):
         """
         Run simulation while visualizing the result.
-
-        :param num_years: number of years to simulate
-        :param vis_years: years between visualization updates
-        :param img_years: years between visualizations saved to files (default: vis_years)
-
-        Image files will be numbered consecutively.
+        :param num_steps: number of simulation steps to execute
+        :param vis_steps: interval between visualization updates
+        :param img_steps: interval between visualizations saved to files
+                          (default: vis_steps)
+        .. note:: Image files will be numbered consecutively.
         """
-        self.num_years = num_years
-        self.vis_years = vis_years
-        self.img_years = img_years
-        self.sim_years = 0
 
-        self.num_animals_results = []
-        self.per_species_results = []
+        if img_steps is None:
+            img_steps = vis_steps
+
+        self._final_step = self._step + num_steps
 
         while (self.sim_years < self.num_years):
             self.one_year()
             self.sim_years += 1
-            print(self.num_animals_per_species)
+            # print(self.year, ' ', self.num_animals_per_species)
+            for cell in self.map.values():
+                for key in self.change:
+                    for species in self.change[key]:
+                        self.change[key][species] += cell.change[key][species]
 
     def one_year(self):
+        """ Implement one annual cycle. """
+
         self.all_cells('replenish')
         self.all_cells('feeding')
         self.all_cells('procreation')
+        # print('Num animals before: ', self.num_animals_per_species)
         self.migration()
+        # print('Num animals after: ', self.num_animals_per_species)
         self.all_animals('aging')
         self.all_animals('weightloss')
         self.all_cells('dying')
-        # self.update_num_animals()
         self.num_animals_results.append(self.num_animals)
         self.per_species_results.append(self.num_animals_per_species)
         self.year = 1
+        # print(self.num_animals_per_species)
+        # print(self.year, ' ', self.change)
 
     def add_population(self, population):
         """
@@ -184,6 +282,8 @@ class BioSim:
         :param population: List of dictionaries specifying population
         """
         for loc_dict in population:
+            if loc_dict['loc'] not in self.map:
+                raise ValueError
             loc = self.map[loc_dict['loc']]
             loc.place_animals(loc_dict['pop'])
 
@@ -201,68 +301,81 @@ class BioSim:
         """Total number of animals on island."""
         num_animals = 0
         for cell in self.map.values():
-            num_animals += len(cell.pop['Herbivore']) + len(
-                cell.pop['Carnivore'])
+            num_animals += len(cell.pop['Herbivore']) + \
+                           len(cell.pop['Carnivore'])
         return num_animals
 
     @property
     def num_animals_per_species(self):
         """Number of animals per species in island, as dictionary."""
-        num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
+        _num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
         for cell in self.map.values():
-            for species in num_animals_per_species:
-                num_animals_per_species[species] += len(cell.pop[species])
-        return num_animals_per_species
+            for species in cell.pop:
+                _num_animals_per_species[species] += len(
+                    cell.pop[species])
+        return _num_animals_per_species
 
     @property
     def animal_distribution(self):
-        """Pandas DataFrame with animal count per species
-         for each cell on island."""
-        print("Creating table")
-        data = {'Population': self.num_animals, 'Herbivores':
-            self.num_animals_per_species['Herbivore'],
-                'Carnivore': self.num_animals_per_species['Carnivore']}
-        return pd.DataFrame(data)
+        self.map_copy.update(self.map)
+        y = [cell[0] for cell in self.map_copy]
+        x = [cell[1] for cell in self.map_copy]
+
+        dictionary = {}
+        for cell in self.map_copy.values():
+            herbivore = 0
+            carnivore = 0
+            for species in cell.pop:
+                if species == 'Herbivore':
+                    herbivore += len(cell.pop[species])
+                if species == 'Carnivore':
+                    carnivore += len(cell.pop[species])
+            dictionary[cell] = herbivore, carnivore
+
+        herbivores = \
+            [dictionary[cell][0] for cell in dictionary]
+        carnivores = \
+            [dictionary[cell][1] for cell in dictionary]
+
+        data = {'Row': y, 'Col': x,
+                'Herbivore': herbivores, 'Carnivore': carnivores}
+        df = pd.DataFrame(data)
+        return df
 
     def make_movie(self):
         """Create MPEG4 movie from visualization images saved."""
 
-    """
-    default_pop = [{'loc': (3, 4), 'pop': [
-        {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
-        {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
-        {'species': 'Carnivore', 'age': 14, 'weight': 10.3},
-        {'species': 'Carnivore', 'age': 5, 'weight': 10.1}]},
-                   {'loc': (4, 4),
-                    'pop': [
-                        {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
-                        {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
-                        {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
-    """
-
     def all_cells(self, myfunc):
+        """
+        Execute method for every active location.
+
+        :param myfunc: Method to be executed
+        """
         for cell in self.map.values():
             getattr(cell, myfunc)()
 
     def all_animals(self, myfunc):
+        """
+        Execute method for all animals.
+
+        :param myfunc: Method to be executed.
+        """
+
         for cell in self.map.values():
             for species in cell.pop:
                 for animal in cell.pop[species]:
                     getattr(animal, myfunc)()
 
-    def place_animals(self, input_list):
-        for placement_dict in input_list:
-            pos = placement_dict['loc']
-            self.map[pos].place_animals(placement_dict['pop'])
-
-    def migration(self):  # husk filtering
+    def migration(self):
+        """Execute migration step of annual cycle."""
         for pos, cell in self.map.items():
             if type(cell) == Ocean or type(cell) == Mountain:
                 pass
             else:
                 y, x = pos
                 adjecent_pos = [(y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)]
-                map_list = [self.map[element] for element in adjecent_pos]
+                map_list = [self.map[element] for element in adjecent_pos if
+                            element in self.map]
                 copy = map_list
                 for element in copy:
                     if type(element) == Ocean or type(element) == Mountain:
@@ -271,6 +384,7 @@ class BioSim:
 
 
 if __name__ == '__main__':
+    """
     default_seed = 33
     default_txt = open('rossum.txt').read()
     default_pop = [{'loc': (3, 4), 'pop': [
@@ -278,14 +392,56 @@ if __name__ == '__main__':
         {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
         {'species': 'Carnivore', 'age': 14, 'weight': 10.3},
         {'species': 'Carnivore', 'age': 5, 'weight': 10.1}]},
-                   {'loc': (4, 4),
-                    'pop': [
-                        {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
-                        {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
-                        {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
+                     {'loc': (4, 4),
+                      'pop': [
+                          {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
+                          {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
+                          {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
+    """
 
+    # sim = BioSim(default_txt, default_pop, default_seed)
+    # sim.simulate(10)
+    """
+    geogr = '\
+               OOOOOOOOOOOOOOOOOOOOO
+               OOOOOOOOSMMMMJJJJJJJO
+               OSSSSSJJJJMMJJJJJJJOO
+               OSSSSSSSSSMMJJJJJJOOO
+               OSSSSSJJJJJJJJJJJJOOO
+               OSSSSSJJJDDJJJSJJJOOO
+               OSSJJJJJDDDJJJSSSSOOO
+               OOSSSSJJJDDJJJSOOOOOO
+               OSSSJJJJJDDJJJJJJJOOO
+               OSSSSJJJJDDJJJJOOOOOO
+               OOSSSSJJJJJJJJOOOOOOO
+               OOOSSSSJJJJJJJOOOOOOO
+               OOOOOOOOOOOOOOOOOOOOO'
+    geogr = textwrap.dedent(geogr)
+    """
+    # default_txt = open('rossum.txt').read()
+    default_txt = 'OOOOO\nOJJJO\nOJJJO\nOJJJO\nOOOOO'
 
-    liste1 = [1, 2, 3]
-    liste2 = [4, 5, 6]
-    liste = liste1 + liste2
-    print(liste)
+    ini_herbs = [
+        {
+            "loc": (2, 2),
+            "pop": [
+                {"species": "Herbivore", "age": 5, "weight": 20}
+                for _ in range(3)
+            ],
+        }
+    ]
+    ini_carns = [
+        {
+            "loc": (2, 2),
+            "pop": [
+                {"species": "Carnivore", "age": 5, "weight": 20}
+                for _ in range(3)
+            ],
+        }
+    ]
+
+    sim = BioSim('OOOOO\nODJMO\nOJJSO\nOJSDO\nOOOOO', ini_herbs, 1)
+    sim.add_population(ini_carns)
+    sim.simulate(3)
+    print(sim.num_animals_per_species)
+
