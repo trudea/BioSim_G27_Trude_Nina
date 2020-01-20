@@ -76,6 +76,8 @@ class BioSim:
         self.line_carnivore = None
         self.n_steps = 0
         self.current_idx = 0
+        self.x_lim = (0, 100)
+        self.y_lim = (0, 15000)
 
         self.num_animals_results = []
         self.per_species_results = []
@@ -309,7 +311,7 @@ class BioSim:
         kart_rgb = [[rgb_value[column] for column in row]
                     for row in self.island_map.splitlines()]
 
-        self.ax1 = fig.add_axes([0.1, 0.1, 0.7, 0.8])  # llx, lly, w, h
+        self.ax1 = self._fig.add_axes([0.1, 0.1, 0.7, 0.8])  # llx, lly, w, h
         self.ax1.imshow(kart_rgb, interpolation='nearest')
         self.ax1.set_xticks(range(len(kart_rgb[0])))
         self.ax1.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
@@ -345,7 +347,7 @@ class BioSim:
                                          facecolor=rgb_value[name[0]]))
             axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
 
-    def population_line_plot(self):
+    def population_line_plot(self, vis_steps):
         self.ax2.set_xlim(0, self.n_steps)
         self.ax2.set_ylim(self.y_lim[0], self.y_lim[1])
         self.ax2.set_title('Population')
@@ -397,17 +399,18 @@ class BioSim:
         self.ax4 = sns.heatmap(carn, vmax=50)
         self.ax4.set_title('Carnivore density map')
 
-    def visualize(self):
+    def visualize(self, vis_steps):
 
         if self._fig is None:
-            self.ax1 = self._fig.add_subplot(221)
-            self.ax2 = self._fig.add_subplot(222)
-            self.ax3 = self._fig.add_subplot(223)
-            self.ax4 = self._fig.add_subplot(224)
+            self._fig = plt.figure()
+        self.ax1 = self._fig.add_subplot(221)
+        self.ax2 = self._fig.add_subplot(222)
+        self.ax3 = self._fig.add_subplot(223)
+        self.ax4 = self._fig.add_subplot(224)
 
-            self.make_rgb_map()
-            self.heatmap()
-        self.population_line_plot()
+        self.make_rgb_map()
+        self.heatmap()
+        self.population_line_plot(vis_steps)
 
     def update_graphics(self):
         self.update_population_line_plot()
@@ -427,8 +430,8 @@ class BioSim:
             img_steps = vis_steps
 
         self._final_step = self._step + num_steps
-        self.visualize()
-
+        self.visualize(vis_steps)
+        """
         while self._step < self._final_step:
 
             if self._step % vis_steps == 0:
@@ -439,6 +442,7 @@ class BioSim:
 
             self._system.update()
             self._step += 1
+        """
 
         while (self.sim_years < self.num_years):
             self.one_year()
