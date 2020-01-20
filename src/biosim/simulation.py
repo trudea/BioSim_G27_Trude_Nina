@@ -181,23 +181,6 @@ class BioSim:
         """
         self.land_dict[landscape].set_params(params)
 
-    def one_year(self):
-        """ Implement one annual cycle. """
-
-        self.all_cells('replenish')
-        self.all_cells('feeding')
-        self.all_cells('procreation')
-        # print('Num animals before: ', self.num_animals_per_species)
-        self.migration()
-        # print('Num animals after: ', self.num_animals_per_species)
-        self.all_animals('aging')
-        self.all_animals('weightloss')
-        self.all_cells('dying')
-        self.num_animals_results.append(self.num_animals)
-        self.per_species_results.append(self.num_animals_per_species)
-        self.year = 1
-        # print(self.num_animals_per_species)
-        # print(self.year, ' ', self.change)
 
     def add_population(self, population):
         """
@@ -436,6 +419,26 @@ class BioSim:
         """
         self.land_dict[landscape].set_params(params)
 
+    def one_year(self):
+        """ Implement one annual cycle. """
+
+        print(self.year, ' ', self.change)
+        print(self.year, ' ', self.num_animals_per_species)
+
+        self.all_cells('replenish')
+        self.all_cells('feeding')
+        self.all_cells('procreation')
+        # print('Num animals before: ', self.num_animals_per_species)
+        self.migration()
+        # print('Num animals after: ', self.num_animals_per_species)
+        self.all_animals('aging')
+        self.all_animals('weightloss')
+        self.all_cells('dying')
+        self.num_animals_results.append(self.num_animals)
+        self.per_species_results.append(self.num_animals_per_species)
+        self.year = 1
+
+
     def simulate(self, num_years, vis_years=1, img_years=None):
         """
         Run simulation while visualizing the result.
@@ -527,15 +530,3 @@ if __name__ == '__main__':
     sim.all_cells('procreation')
     print(sim.change['Born']['Carnivore'])
     """
-    savannah = BioSim('OOO\nOSO\nOOO')
-    herb_pop = [{'species': 'Herbivore', 'age': 5, 'weight': 20} for i in range(4)]
-    carn_pop = [{'species': 'Carnivore', 'age': 5, 'weight': 20}]
-    ini_pop = herb_pop + carn_pop
-    savannah.add_population([{'loc': (1, 1), 'pop': ini_pop}])
-    cell = savannah.map[(1, 1)]
-    old_phi = cell.pop['Carnivore'][0].phi
-    old_num_herbivores = len(cell.pop['Herbivore'])
-    old_tot_w = cell.tot_w_herbivores
-    savannah.all_cells('feeding')
-    print(cell.pop['Carnivore'][0].weight > 20)
-    print( cell.pop['Carnivore'][0].phi > old_phi)

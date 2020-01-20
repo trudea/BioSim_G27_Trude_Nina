@@ -133,12 +133,8 @@ class Animal:
     def procreate(self, cell):
         """Animal gives birth to newborn if conditions are met. """
         newborn = type(self)()
-        print('w: ', self.weight, ' ', self.zeta * (
-                newborn.weight + self.sigma_birth))
         if self.weight >= self.zeta * (
                 newborn.weight + self.sigma_birth):
-            print('hello')
-
             cell.pop[type(self).__name__].append(newborn)
             self.weight -= self.zeta * newborn.weight
             if self.weight < 0:

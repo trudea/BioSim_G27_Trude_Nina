@@ -261,6 +261,15 @@ class TestSimulation:
         assert len(cell.pop['Herbivore']) < old_num_herbivores
         assert cell.tot_w_herbivores < old_tot_w
 
+    def test_carnivore_procreation(self, desert):
+        """Test if carnivores are born"""
+        carn_pop = [{'species': 'Carnivore', 'age': 5, 'weight': 20} for i in range(50)]
+        desert.add_population([{'loc': (1,1), 'pop': carn_pop}])
+        desert.all_cells('procreation')
+        cell = desert.map[(1, 1)]
+        assert len(cell.pop['Carnivore']) > 50
+
+
 
 
 
