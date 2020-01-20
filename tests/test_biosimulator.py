@@ -61,6 +61,10 @@ def example_jungle():
 def example_map():
     return """OOOO\nOJJO\nOOOO"""
 
+@pytest.fixture
+def big_map():
+    return """OOOO\nOJJJO\nOJJJO\nOJJJO\nOOOO"""
+
 
 class TestBioSim:
 
