@@ -119,7 +119,7 @@ class LandscapeCell:
             print('Probabilities do not add up: ', sum([cell.likelihood for
                                                         cell in map_list]))
         upper_limits = np.cumsum([cell.likelihood for cell in map_list])
-        r = random.random()
+        r = np.random.random()
         for i in range(len(upper_limits)):
             if r <= upper_limits[i]:
                 return map_list[i]

@@ -88,7 +88,7 @@ class BioSim:
         self.change = {'Born' : {'Herbivore': 0, 'Carnivore': 0}, 'Dead' : {'Herbivore': 0, 'Carnivore': 0}}
 
 
-        random.seed(seed)
+        np.random.seed(seed)
 
         if ymax_animals is None:
             # juster automatisk
@@ -390,9 +390,9 @@ if __name__ == '__main__':
         },
     )
     """
-    #sim.set_landscape_parameters("J", {"f_max": 700})
+    sim.set_landscape_parameters("J", {"f_max": 700})
 
-    #sim.simulate(num_years=2, vis_years=1, img_years=2000)
+    sim.simulate(num_years=2, vis_years=1, img_years=2000)
 
     sim.add_population(population=ini_carns)
     sim.simulate(num_years=2, vis_years=1, img_years=2000)

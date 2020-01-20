@@ -129,7 +129,8 @@ class TestBioSim:
 
     @pytest.fixture
     def herb_tribe(self):
-        return [ani.Herbivore({'age': 6, 'weight': 20}) for i in range(3)]
+        herb_list = [{'species': 'Herbivore', 'age': 6, 'weight': 20} for i in range(3)]
+        return [{'loc': (2,2), 'pop': herb_list}]
 
     @pytest.fixture
     def carn_tribe(self):
