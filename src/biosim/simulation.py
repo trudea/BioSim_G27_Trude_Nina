@@ -17,7 +17,12 @@ import random
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
 import pandas as pd
 import numpy as np
-# import seaborn as sns
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+import subprocess
+import os
+from randvis.diffsys import DiffSys
 import matplotlib.pyplot as plt
 
 
@@ -33,8 +38,12 @@ class BioSim:
         cmax_animals=None,
         img_base=None,
         img_fmt="png",
-
-    ):
+        sys_size,
+        noise,
+        img_dir = None,
+        img_name = _DEFAULT_GRAPHICS_NAME,
+        img_fmt = 'png'
+        ):
         """
         :param island_map: Multi-line string specifying island geography
         :param ini_pop: List of dictionaries specifying initial population
@@ -89,6 +98,17 @@ class BioSim:
 
 
         np.random.seed(seed)
+        self._system = DiffSys(sys_size, noise)
+
+        if img_dir is not None:
+            self._img_base = os.path.join(img_dir, img_name)
+        else:
+            self._img_base = None
+        self._img_fmt = img_fmt
+
+        self._step = 0
+        self._final_step = None
+        self._img_ctr = 0
 
         if ymax_animals is None:
             # juster automatisk
@@ -168,24 +188,32 @@ class BioSim:
         """
         self.land_dict[landscape].set_params(params)
 
-    def simulate(self, num_years, vis_years=1, img_years=None):
+    def simulate(self, num_steps, vis_steps=1, img_steps=None):
         """
         Run simulation while visualizing the result.
-
-        :param num_years: number of years to simulate
-        :param vis_years: years between visualization updates
-        :param img_years: years between visualizations saved to files
-        (default: vis_years)
-
-        Image files will be numbered consecutively.
+        :param num_steps: number of simulation steps to execute
+        :param vis_steps: interval between visualization updates
+        :param img_steps: interval between visualizations saved to files
+                          (default: vis_steps)
+        .. note:: Image files will be numbered consecutively.
         """
-        self.num_years = num_years
-        self.vis_years = vis_years
-        self.img_years = img_years
-        self.sim_years = 0
 
-        self.num_animals_results = []
-        self.per_species_results = []
+        if img_steps is None:
+            img_steps = vis_steps
+
+        self._final_step = self._step + num_steps
+        self._setup_graphics()
+
+        while self._step < self._final_step:
+
+            if self._step % vis_steps == 0:
+                self._update_graphics()
+
+            if self._step % img_steps == 0:
+                self._save_graphics()
+
+            self._system.update()
+            self._step += 1
 
         while (self.sim_years < self.num_years):
             self.one_year()
@@ -196,6 +224,56 @@ class BioSim:
                     for species in self.change[key]:
                         self.change[key][species] += cell.change[key][species]
 
+    def _setup_graphics(self):
+        """Creates subplots."""
+
+        # create new figure window
+        if self._fig is None:
+            self._fig = plt.figure()
+
+        # Add tp left subplot for images created with imshow().
+        # We cannot create the actual ImageAxis object before we know
+        # the size of the image, so we delay its creation.
+        ax1 = self._fig.add_subplot(221)
+        plt.title('Rossum Island')
+        #                   R    G    B
+        rgb_value = {'O': (0.0, 0.0, 1.0),  # blue
+                     'M': (0.5, 0.5, 0.5),  # grey
+                     'J': (0.0, 0.6, 0.0),  # dark green
+                     'S': (0.5, 1.0, 0.5),  # light green
+                     'D': (1.0, 1.0, 0.5)}  # light yellow
+
+        kart_rgb = [[rgb_value[column] for column in row]
+                    for row in kart.splitlines()]
+
+        fig = plt.figure()
+
+        ax1 = fig.add_axes([0.1, 0.1, 0.7, 0.8])  # llx, lly, w, h
+        ax1.imshow(kart_rgb, interpolation='nearest')
+        ax1.set_xticks(range(len(kart_rgb[0])))
+        ax1.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
+        ax1.set_yticks(range(len(kart_rgb)))
+        ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))
+
+        axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
+        axlg.axis('off')
+        for ix, name in enumerate(('Ocean', 'Mountain', 'Jungle',
+                                   'Savannah', 'Desert')):
+            axlg.add_patch(plt.Rectangle((0., ix * 0.2), 0.3, 0.1,
+                                         edgecolor='none',
+                                         facecolor=rgb_value[name[0]]))
+            axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
+
+
+        # Add top right subplot for line graph of mean.
+        if self._mean_ax2 is None:
+            self._mean_ax2 = self._fig.add_subplot(2, 2, 2)
+            self._mean_ax2.set_ylim(0, 0.02)
+
+        # needs updating on subsequent calls to simulate()
+        self._mean_ax2.set_xlim(0, self._final_step + 1)
+
+        herbivore_line = 
 
     def one_year(self):
         """ Implement one annual cycle. """
@@ -258,11 +336,10 @@ class BioSim:
 
     @property
     def animal_distribution(self):
-        pass
-        """
         self.map_copy.update(self.map)
         y = [cell[0] for cell in self.map_copy]
         x = [cell[1] for cell in self.map_copy]
+
         dictionary = {}
         for cell in self.map_copy.values():
             herbivore = 0
@@ -274,14 +351,16 @@ class BioSim:
                     carnivore += len(cell.pop[species])
             dictionary[cell] = herbivore, carnivore
 
-        herbivores = [dictionary[cell][0] for cell in dictionary]
-        carnivores = [dictionary[cell][1] for cell in dictionary]
+        herbivores = \
+            [dictionary[cell][0] for cell in dictionary]
+        carnivores = \
+            [dictionary[cell][1] for cell in dictionary]
 
         data = {'Row': y, 'Col': x,
                 'Herbivore': herbivores, 'Carnivore': carnivores}
         df = pd.DataFrame(data)
         return df
-    """
+
 
     def make_movie(self):
         """Create MPEG4 movie from visualization images saved."""
