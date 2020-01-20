@@ -20,6 +20,8 @@ class LandscapeCell:
                                                         inspect.isclass))
         del self.species_to_class['Animal']
         self.pop = {'Herbivore': [], 'Carnivore': []}
+        self.change = {'Herbivores born': 0, 'Herbivores dead': 0, 'Carnivores born': 0, 'Carnivores dead': 0,}
+
 
     def num_specimen(self, species):
         return len(self.pop[species])
@@ -158,20 +160,25 @@ class LandscapeCell:
     def procreation(self):
         """Carry out procreation of animals on the location. """
         for species, pop_list in self.pop.items():
+            remembered_n = len(self.pop[species])
             copy = pop_list
             for animal in copy:
                 n = self.num_specimen(species)
                 if n >= 2:
                     if animal.fertile(n):
                         animal.procreate(self)
+                self.change[type(animal).__name__] = len(self.pop[species]) - n
 
     def dying(self):
         """
         Remove dying animals from population
         """
         for species in self.pop:
-            self.pop[species] = [animal for animal in self.pop[species] if
+            rem_n = len(self.pop[species])
+            if len(self.pop[species]) > 0:
+                self.pop[species] = [animal for animal in self.pop[species] if
                                  not animal.dies()]
+            self.change[species] = rem_n - len(self.pop[species])
 
 
 class Savannah(LandscapeCell):

@@ -71,6 +71,7 @@ class BioSim:
                            type(value) in self.active}
         self.map = self.map_active
         self.add_population(ini_pop)
+        self.change = {'Herbivores born': 0, 'Herbivores dead': 0, 'Carnivores born': 0, 'Carnivores dead': 0,}
 
         random.seed(seed)
 
@@ -97,7 +98,6 @@ class BioSim:
         :return: dict: Dictionary with tuples of y- and x-coordinate as keys,
         and instance of landscape class as values
         """
-        print(type(txt))
         txt = txt.split('\n')
         if not txt[-1].isalpha():
             txt.pop()
@@ -176,6 +176,17 @@ class BioSim:
             self.one_year()
             self.sim_years += 1
             print(self.year, ' ', self.num_animals_per_species)
+            for cell in self.map.values():
+                # print(self.change)
+
+                self.change['Herbivores born'] += cell.change['Herbivores born']
+                self.change['Herbivores dead'] += cell.change['Herbivores dead']
+                self.change['Carnivores born'] += cell.change[
+                    'Carnivores born']
+                self.change['Herbivores dead'] += cell.change[
+                    'Carnivores dead']
+
+            # print(self.change)
 
     def one_year(self):
         """ Implement one annual cycle. """
@@ -183,6 +194,7 @@ class BioSim:
         self.all_cells('replenish')
         self.all_cells('feeding')
         self.all_cells('procreation')
+        #print('Num animals before: ', self.num_animals_per_species)
         self.migration()
         self.all_animals('aging')
         self.all_animals('weightloss')
@@ -348,7 +360,6 @@ if __name__ == '__main__':
             ],
         }
     ]
-    default_txt = 'OOOOO\nODJSO\nOJSJO\nOOOOO'
 
     sim = BioSim(default_txt, ini_herbs, 123456)
 
@@ -365,9 +376,10 @@ if __name__ == '__main__':
     )
     sim.set_landscape_parameters("J", {"f_max": 700})
 
-    sim.simulate(num_years=50, vis_years=1, img_years=2000)
+    sim.simulate(num_years=2, vis_years=1, img_years=2000)
 
-    # sim.add_population(population=ini_carns)
-    # sim.simulate(num_years=10, vis_years=1, img_years=2000)
+
+    sim.add_population(population=ini_carns)
+    sim.simulate(num_years=10, vis_years=1, img_years=2000)
 
 

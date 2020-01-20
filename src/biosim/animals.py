@@ -25,6 +25,7 @@ class Animal:
             if 'phi' in attribute_dict:
                 self.phi = attribute_dict['phi']
 
+
         if self.age is None:
             self.age = 0
 
