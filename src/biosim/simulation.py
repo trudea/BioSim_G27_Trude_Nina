@@ -67,7 +67,7 @@ class BioSim:
         """
         self.land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M':
             Mountain, 'D': Desert}
-        self.active = {Savannah: 0, Jungle: 0}
+        self.active = {Savannah: 0, Jungle: 0, Desert: 0}
         self._year = 0
         self.ymax_animals = ymax_animals
         self.cmax_animals = cmax_animals

@@ -70,9 +70,8 @@ def test_herbivore_weight():
 """
 class TestSimulation:
     @pytest.fixture
-    def jungle_map(self):
+    def random_map(self):
         return 'OOOOO\nODJMO\nOJJSO\nOJSDO\nOOOOO'
-
 
     @pytest.fixture
     def herb_tribe(self):
@@ -94,8 +93,8 @@ class TestSimulation:
 
 
     @pytest.fixture
-    def jungle_sim(self, jungle_map, herb_tribe):
-        jungle_sim = sim.BioSim(jungle_map, [{'loc': (2,2), 'pop': herb_tribe}], 123)
+    def jungle_sim(self, random_map, herb_tribe):
+        jungle_sim = sim.BioSim(random_map, [{'loc': (2,2), 'pop': herb_tribe}], 123)
         yield jungle_sim
 
 
@@ -162,12 +161,32 @@ class TestSimulation:
         simple_map = 'OOO\nOJO\nOOO'
         yield sim.BioSim(simple_map)
 
-    def test_feeding(self):
-        simple_map = 'OOO\nOJO\nOOO'
+    @pytest.fixture
+    def savannah(self):
+        simple_map = 'OOO\nOSO\nOOO'
+        yield sim.BioSim(simple_map)
+
+    @pytest.fixture
+    def desert(self):
+        simple_map = 'OOO\nODO\nOOO'
+        yield sim.BioSim(simple_map)
+
+
+    @pytest.fixture
+    def mountain(self):
+        simple_map = 'OOO\nOMO\nOOO'
+        yield sim.BioSim(simple_map)
+
+    @pytest.fixture
+    def ocean(self):
+        simple_map = 'OOO\nOOO\nOOO'
+        yield sim.BioSim(simple_map)
+
+    def test_feeding(self, savannah):
         herbivore = {'species': 'Herbivore', 'age': 5, 'weight': 20}
-        island = sim.BioSim(simple_map, [{'loc': (1, 1), 'pop': [herbivore]}], 123)
-        island.all_cells('feeding')
-        cell = island.map[(1,1)]
+        savannah.add_population([{'loc': (1, 1), 'pop': [herbivore]}])
+        savannah.all_cells('feeding')
+        cell = savannah.map[(1,1)]
         assert cell.pop['Herbivore'][0].weight > 5
 
     def test_savannah_feeding(self, island):
@@ -184,18 +203,36 @@ class TestSimulation:
         assert cell.pop['Herbivore'][-1].weight == 20.0
 
     def test_jungle_feeding(self, jungle):
-        """Check if herbivores gain weight feeding on savannah."""
-        # simple_map = 'OOO\nOJO\nOOO'
+        """Check if herbivores gain weight feeding in jungle, and if fodder
+        runs out."""
+
         herbivores = [{'species': 'Herbivore', 'age': 5, 'weight': 20.0}
                       for i in range(81)]
-        # island = sim.BioSim(simple_map,
-                            #[{'loc': (1, 1), 'pop': herbivores}],
-                            #123)
+        jungle.add_population([{'loc': (1, 1), 'pop': herbivores}])
         jungle.all_cells('feeding')
         cell = jungle.map[(1, 1)]
         for herbivore in cell.pop['Herbivore'][0:-2]:
             assert cell.pop['Herbivore'][-2].weight > 20.0
         assert cell.pop['Herbivore'][-1].weight == 20.0
+
+    def test_desert_feeding(self, desert):
+        desert.add_population([{'loc': (1, 1), 'pop':
+            [{'species': 'Herbivore', 'age': 5, 'weight': 20.0}]}])
+        desert.all_cells('feeding')
+        cell = desert.map[(1, 1)]
+        assert cell.pop['Herbivore'][0].weight == 20.0
+
+    def test_unsuitable_placements(self, mountain, ocean):
+        """Check that population can't be placed on mountain or in the
+        ocean."""
+        with pytest.raises(ValueError):
+            mountain.add_population([{'loc': (1, 1), 'pop':
+                [{'species': 'Herbivore', 'age': 5, 'weight': 20}]}])
+        with pytest.raises(ValueError):
+            mountain.add_population([{'loc': (0, 0), 'pop':
+                [{'species': 'Herbivore', 'age': 5, 'weight': 20}]}])
+
+
 
 
 
