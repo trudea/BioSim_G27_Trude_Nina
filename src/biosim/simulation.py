@@ -273,17 +273,7 @@ class BioSim:
         # needs updating on subsequent calls to simulate()
         self._mean_ax2.set_xlim(0, self._final_step + 1)
 
-        if self._mean_line is None:
-            mean_plot = self._mean_ax2.plot(np.arange(0, self._final_step),
-                                           np.full(self._final_step, np.nan))
-            self._mean_line = mean_plot[0]
-        else:
-            xdata, ydata = self._mean_line.get_data()
-            xnew = np.arange(xdata[-1] + 1, self._final_step)
-            if len(xnew) > 0:
-                ynew = np.full(xnew.shape, np.nan)
-                self._mean_line.set_data(np.hstack((xdata, xnew)),
-                                         np.hstack((ydata, ynew)))
+        herbivore_line = 
 
     def one_year(self):
         """ Implement one annual cycle. """
