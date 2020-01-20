@@ -9,6 +9,7 @@ from src.biosim.run import Run
 from src.biosim.landscapes import Savannah, Jungle, Mountain, Desert, Ocean
 from biosim.simulation import BioSim
 import matplotlib.pyplot as plt
+import random
 __author__ = ""
 __email__ = ""
 
@@ -44,7 +45,8 @@ class BioSim:
         """
         self.island_map = island_map
         self.ini_pop = ini_pop
-        self.seed = seed
+        if seed is not None:
+            self.seed = random.seed(seed)
         self.ymax_animals = ymax_animals
         self.cmax_animals = cmax_animals
         self.img_base = img_base
@@ -98,18 +100,6 @@ class BioSim:
             axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
         plt.show()
 
-    def lineplot(self):
-        """
-        Method for creating the line plot of population
-        :return:
-        """
-        if self.last_simulation is None:
-            self.last_simulation = 500
-        self.ax2.set_xlim(0, self.last_simulation + 1)
-        self.ax2.set_ylim(self.y_lim)
-
-        self.ax2.set_title('Population overview')
-        self.ax2.plot(#pandas dataframe)
 
     @property
     def year(self):
@@ -126,14 +116,70 @@ class BioSim:
         """Number of animals per species in island, as dictionary."""
         return self.num_animals_per_species
 
-    @property
     def animal_distribution(self):
-        """Pandas DataFrame with animal count
-        per species for each cell on island."""
-        data = {'Population': self.num_animals, 'Herbivores':
-                self.num_animals_per_species['Herbivore'], 'Carnivores':
-                self.num_animals_per_species['Carnivore']}
+        coordinates = [cell for cell in self.map]
+        dictionary = {}
+        for cell in sim.map.values():
+            herbivore = 0
+            carnivore = 0
+            for species in cell.pop:
+                if species == 'Herbivore':
+                    herbivore += len(cell.pop[species])
+                if species == 'Carnivore':
+                    carnivore += len(cell.pop[species])
+            dictionary[cell] = \
+                (carnivore + herbivore), herbivore, carnivore
+
+        population = [dictionary[cell][0] for cell in dictionary]
+        herbivores = [dictionary[cell][1] for cell in dictionary]
+        carnivores = [dictionary[cell][2] for cell in dictionary]
+        coordinates = [cell for cell in self.map]
+        data = {'Cell': coordinates, 'Population': population,
+                'Herbivores': herbivores, 'Carnivores': carnivores}
         return pd.DataFrame(data)
+
+    def plot_update(self, years, c_herb, c_carn):
+        if years == 0:
+            self.fig = plt.figure()
+        plt.axis('on')
+        if self.x_lim is None:
+            self.x_lim = years
+
+        self.ax1.imshow()
+        self.ax2.axis([years, years + self.x_lim, years, self.y_lim])
+        plot_herbivore = ax2.plot(np.arange(years), pd.DataFrame[
+            'Herbivores'], 'g-', label= 'Herbivores')
+        plot_carnivore = ax2.plot(np.arange(years), pd.DataFrame['Carnivore'],
+                                  'r-', label='Carnivores')
+
+        self.ax3.plt.title("Distribution Herbivore")
+        self.ax3.set_xticks(range(0, len(self.island_map)), 2)
+        self.ax3.set_xtickslabels(range(1, 1 + len(self.island_map)), 2)
+        self.ax3.set_yticks(range(0, len(self.island_map)), 2)
+        self.ax3.set_yticklabels(range(1, 1 + len(self.island_map)), 2)
+        ax3_distr = plt.imshow([[0 for _ in range(21)] for _ in range(13)])
+        if self.years == 0:
+            plt.colorbar(ax3_distr, orientation='horizontal', ticks =[])
+
+        self.ax4.plt.title("Distribution Carnivore")
+        self.ax4.set_xticks(range(0, len(self.island_map)), 2)
+        self.ax4.set_xtickslabels(range(1, 1 + len(self.island_map)), 2)
+        self.ax4.set_yticks(range(0, len(self.island_map)), 2)
+        self.ax4.set_yticklabels(range(1, 1 + len(self.island_map)), 2)
+        ax4_distr = plt.imshow([[0 for _ in range(21)] for _ in range(13)])
+        if self.years == 0:
+            plt.colorbar(ax4_distr, orientation='horizontal', ticks=[])
+
+        for n in xrange(self.years, self.years + years):
+            heatmap #lag heatmap vha pandas = self.heatmap(
+            # self.island.one_year()
+            ax3.imshow(self.heat[0], interpolation='nearest', cmap=c_herb)
+            ax4.imshow(self.heat[1], interpolation='nearest',cmap=c_carn)
+            herbs = np.sum(pd.DataFrame['Herbivores'])
+            carns = np.sum(pd.DataFrame['Carnivores'])
+
+
+        pass
 
     def make_movie(self):
         """Create MPEG4 movie from visualization images saved."""
@@ -142,6 +188,5 @@ class BioSim:
     @year.setter
     def year(self, value):
         self._year = value
-
 
 if __name__ == '__main__':

@@ -47,12 +47,12 @@ default_input = [{'loc': (3, 4), 'pop': [
                       {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
                       {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
                       {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
-herbivore_input = [{'loc': (3, 4), 'pop': [
+herbivore_input = [{'loc': (2, 2), 'pop': [
     {'species': 'Herbivore', 'age': 10, 'weight': 42.5},
     {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
     {'species': 'Herbivore', 'age': 14, 'weight': 30.3},
     {'species': 'Herbivore', 'age': 5, 'weight': 10.1}]},
-                   {'loc': (4, 4),
+                   {'loc': (2, 2),
                     'pop': [
                         {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
                         {'species': 'Herbivore', 'age': 3, 'weight': 7.3},
@@ -139,14 +139,14 @@ def biosimmap(kart):
     plt.show()
 
 
-def plotting_simulation(map, seed):
+def plotting_simulation(kart, seed):
     fig = plt.figure()
     ax1 = fig.add_subplot(221)
     ax2 = fig.add_subplot(222)
     ax3 = fig.add_subplot(223)
     ax4 = fig.add_subplot(224)
 
-    simulation = BioSim(herbivore_input, map, seed)
+    simulation = BioSim(kart, herbivore_input, seed)
     for i in range(50):
         simulation.map[(2, 2)].pop['Herbivore'].append(Herbivore())
     fig.show()
@@ -172,7 +172,7 @@ def update(years, simulation, carnivore_year=50):
 
         simulation.one_year()
         x.append(simulation.year)
-        y.append(simulation.num_animals_results[-1])
+        y.append(simulation.num_animals.get)
         y_herb.append(simulation.per_species_results[-1]['Herbivore'])
         y_carn.append(simulation.per_species_results[-1]['Carnivore'])
         ax.plot(x, y, color='cyan')
@@ -204,7 +204,9 @@ def scatterplot_map(years):
     ax.set_title('scatter plot')
     plt.show()
 
+
 if __name__ == '__main__':
     rossum = 'OOOOO\nODJSO\nOJSJO\nOOOOO'
     biosimmap(rossum)
     plotting_simulation(rossum, 1)
+    update(100, BioSim(rossum, herbivore_input, None))
