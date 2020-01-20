@@ -11,6 +11,7 @@ import random
 from src.biosim.animals import Herbivore, Carnivore
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
 import pandas as pd
+import numpy
 
 
 class BioSim:
@@ -283,9 +284,8 @@ if __name__ == '__main__':
                         {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
                         {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
 
-    sim = BioSim(default_txt, default_pop, default_seed)
-    sim.add_population(default_pop)
-    sim.simulate(10)
-    print(sim.year)
 
-
+    liste1 = [1, 2, 3]
+    liste2 = [4, 5, 6]
+    liste = liste1 + liste2
+    print(liste)

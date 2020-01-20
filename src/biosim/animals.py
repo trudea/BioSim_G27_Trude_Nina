@@ -89,7 +89,7 @@ class Animal:
             return True
         elif self.phi <= 0:
             return True
-        elif random.random() <= probability:
+        elif np.random.random() <= probability:
             return True
         else:
             return False
@@ -101,7 +101,7 @@ class Animal:
         :return: Boolean value
         """
         probability = self.mu * self.phi
-        if random.random() <= probability:
+        if np.random() <= probability:
             return True
         else:
             return False
@@ -125,7 +125,7 @@ class Animal:
         probability = self.lambdah * self.phi * (n-1)
         if probability > 1.0:
             probability = 1.0
-        if random.random() <= probability:
+        if np.random.random() <= probability:
             return True
         else:
             return False
@@ -214,7 +214,7 @@ class Carnivore(Animal):
             return False
         elif 0 < self.phi - herbivore.phi < 1.0:
             probability = (self.phi - herbivore.phi) / self.DeltaPhiMax
-            if random.random() <= probability:
+            if np.random() <= probability:
                 return True
             else:
                 return False
