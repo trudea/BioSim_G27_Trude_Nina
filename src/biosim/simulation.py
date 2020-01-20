@@ -247,11 +247,18 @@ class BioSim:
             img_steps = vis_steps
 
         self._final_step = self._step + num_steps
+        self._setup_graphics()
 
+        while self._step < self._final_step:
 
+            if self._step % vis_steps == 0:
+                self._update_graphics()
 
+            if self._step % img_steps == 0:
+                self._save_graphics()
 
-
+            self._system.update()
+            self._step += 1
 
         while (self.sim_years < self.num_years):
             self.one_year()
@@ -262,6 +269,23 @@ class BioSim:
                     for species in self.change[key]:
                         self.change[key][species] += cell.change[key][species]
 
+    def _setup_graphics(self):
+        """Creates subplots."""
+
+        # create new figure window
+        if self._fig is None:
+            self._fig = plt.figure()
+
+
+
+
+        # Add top right subplot for line graph of mean.
+        if self._mean_ax2 is None:
+            self._mean_ax2 = self._fig.add_subplot(2, 2, 2)
+            self._mean_ax2.set_ylim(0, 0.02)
+
+        # needs updating on subsequent calls to simulate()
+        self._mean_ax2.set_xlim(0, self._final_step + 1)
 
 
     def one_year(self):
@@ -451,6 +475,5 @@ if __name__ == '__main__':
 
     sim = BioSim('OOOOO\nODJMO\nOJJSO\nOJSDO\nOOOOO', ini_herbs, 1)
     sim.add_population(ini_carns)
-    sim.simulate(3)
-    print(sim.num_animals_per_species)
+    sim.one_year()
 
