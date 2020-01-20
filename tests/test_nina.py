@@ -127,7 +127,7 @@ class TestSimulation:
                len(new_jungle_sim.map[(2, 2)].pop['Carnivore']) == 6
 
     @pytest.fixture
-    def jungle(self, new_jungle_sim):
+    def island(self, new_jungle_sim):
         new_pop = [{'species': 'Carnivore', 'age': 6, 'weight': 20} for i in
                    range(2)]
         new_pop += [{'species': 'Herbivore', 'age': 6, 'weight': 20} for i in
@@ -135,27 +135,67 @@ class TestSimulation:
         new_jungle_sim.add_population([{'loc': (2, 3), 'pop': new_pop}])
         yield new_jungle_sim
 
-    def test_num_animals_two_cells(self, jungle):
-        assert jungle.num_animals == 12
+    def test_num_animals_two_cells(self, island):
+        assert island.num_animals == 12
 
-    def test_num_per_species(self, jungle):
-        assert jungle.num_animals_per_species['Herbivore'] == 7
-        assert jungle.num_animals_per_species['Carnivore'] == 5
+    def test_num_per_species(self, island):
+        assert island.num_animals_per_species['Herbivore'] == 7
+        assert island.num_animals_per_species['Carnivore'] == 5
 
-    def test_animal_num_stable(self, jungle):
-        remembered = jungle.num_animals_per_species
-        rem_n = jungle.num_animals
-        jungle.all_cells('replenish')
-        assert  jungle.num_animals_per_species == remembered
+    def test_animal_num_stable(self, island):
+        remembered = island.num_animals_per_species
+        rem_n = island.num_animals
+        island.all_cells('replenish')
+        assert  island.num_animals_per_species == remembered
+        island.all_cells('feeding')
+        assert  island.num_animals_per_species == remembered
+        island.migration()
+        assert  island.num_animals_per_species == remembered
+        island.all_animals('aging')
+        assert island.num_animals_per_species == remembered
+        island.all_animals('weightloss')
+        assert island.num_animals_per_species == remembered
+        assert rem_n == island.num_animals
+
+    @pytest.fixture
+    def jungle(self):
+        simple_map = 'OOO\nOJO\nOOO'
+        yield sim.BioSim(simple_map)
+
+    def test_feeding(self):
+        simple_map = 'OOO\nOJO\nOOO'
+        herbivore = {'species': 'Herbivore', 'age': 5, 'weight': 20}
+        island = sim.BioSim(simple_map, [{'loc': (1, 1), 'pop': [herbivore]}], 123)
+        island.all_cells('feeding')
+        cell = island.map[(1,1)]
+        assert cell.pop['Herbivore'][0].weight > 5
+
+    def test_savannah_feeding(self, island):
+        """Check if herbivores gain weight feeding on savannah, and if fodder
+        runs out."""
+        simple_map = 'OOO\nOSO\nOOO'
+        herbivores =   [{'species': 'Herbivore', 'age': 5, 'weight': 20.0} for i in range(31)]
+        island = sim.BioSim(simple_map, [{'loc': (1, 1), 'pop': herbivores}],
+                            123)
+        island.all_cells('feeding')
+        cell = island.map[(1, 1)]
+        for herbivore in cell.pop['Herbivore'][0:-2]:
+            assert cell.pop['Herbivore'][-2].weight > 20.0
+        assert cell.pop['Herbivore'][-1].weight == 20.0
+
+    def test_jungle_feeding(self, jungle):
+        """Check if herbivores gain weight feeding on savannah."""
+        # simple_map = 'OOO\nOJO\nOOO'
+        herbivores = [{'species': 'Herbivore', 'age': 5, 'weight': 20.0}
+                      for i in range(81)]
+        # island = sim.BioSim(simple_map,
+                            #[{'loc': (1, 1), 'pop': herbivores}],
+                            #123)
         jungle.all_cells('feeding')
-        assert  jungle.num_animals_per_species == remembered
-        jungle.migration()
-        assert  jungle.num_animals_per_species == remembered
-        jungle.all_animals('aging')
-        assert jungle.num_animals_per_species == remembered
-        jungle.all_animals('weightloss')
-        assert jungle.num_animals_per_species == remembered
-        assert rem_n == jungle.num_animals
+        cell = jungle.map[(1, 1)]
+        for herbivore in cell.pop['Herbivore'][0:-2]:
+            assert cell.pop['Herbivore'][-2].weight > 20.0
+        assert cell.pop['Herbivore'][-1].weight == 20.0
 
 
 

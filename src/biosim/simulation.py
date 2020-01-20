@@ -101,7 +101,8 @@ class BioSim:
                              type(value) in self.active}
         self.map_copy = self.map.copy()
         self.map = self.map_active
-        self.add_population(ini_pop)
+        if ini_pop != None:
+            self.add_population(ini_pop)
         self.change = {'Born': {'Herbivore': 0, 'Carnivore': 0},
                        'Dead': {'Herbivore': 0, 'Carnivore': 0}}
 
@@ -519,8 +520,13 @@ if __name__ == '__main__':
             ],
         }
     ]
-
+    """
     sim = BioSim('OOOOO\nODJMO\nOJJSO\nOJSDO\nOOOOO', ini_herbs, 1)
     sim.add_population(ini_carns)
-    sim.simulate(5)
-    print(sim.num_animals_per_species)
+    sim.all_cells('procreation')
+    print(sim.change['Born']['Carnivore'])
+    """
+    str = 'OOO\nOJO\nOOO'
+    jungle = BioSim(str)
+    jungle.simulate(3)
+    print(jungle.num_animals_per_species)
