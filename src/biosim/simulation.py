@@ -16,6 +16,9 @@ import matplotlib.pyplot as plt
 import random
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
 import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 class BioSim:
@@ -252,10 +255,13 @@ class BioSim:
                     cell.pop[species])
         return _num_animals_per_species
 
+    @property
     def animal_distribution(self):
-        coordinates = [cell for cell in self.map]
+        self.map_copy.update(self.map)
+        y = [cell[0] for cell in self.map_copy]
+        x = [cell[1] for cell in self.map_copy]
         dictionary = {}
-        for cell in sim.map.values():
+        for cell in self.map_copy.values():
             herbivore = 0
             carnivore = 0
             for species in cell.pop:
@@ -263,16 +269,15 @@ class BioSim:
                     herbivore += len(cell.pop[species])
                 if species == 'Carnivore':
                     carnivore += len(cell.pop[species])
-            dictionary[cell] = \
-                (carnivore + herbivore), herbivore, carnivore
+            dictionary[cell] = herbivore, carnivore
 
-        population = [dictionary[cell][0] for cell in dictionary]
-        herbivores = [dictionary[cell][1] for cell in dictionary]
-        carnivores = [dictionary[cell][2] for cell in dictionary]
-        coordinates = [cell for cell in self.map]
-        data = {'Cell': coordinates, 'Population': population,
-                'Herbivores': herbivores, 'Carnivores': carnivores}
-        return pd.DataFrame(data)
+        herbivores = [dictionary[cell][0] for cell in dictionary]
+        carnivores = [dictionary[cell][1] for cell in dictionary]
+
+        data = {'Row': y, 'Col': x,
+                'Herbivore': herbivores, 'Carnivore': carnivores}
+        df = pd.DataFrame(data)
+        return df
 
     def make_movie(self):
         """Create MPEG4 movie from visualization images saved."""
@@ -370,8 +375,7 @@ if __name__ == '__main__':
         }
     ]
 
-    sim = BioSim(default_txt, ini_herbs, 123456)
-    sim.one_year()
+    sim = BioSim(default_txt, ini_herbs, 1)
 
     #sim.set_animal_parameters("Herbivore", {"zeta": 3.2, "xi": 1.8})
     #sim.set_animal_parameters(
@@ -390,9 +394,9 @@ if __name__ == '__main__':
 
     #sim.simulate(num_years=2, vis_years=1, img_years=2000)
 
-
-    #sim.add_population(population=ini_carns)
-    #sim.simulate(num_years=2, vis_years=1, img_years=2000)
+    sim.add_population(population=ini_carns)
+    sim.simulate(num_years=2, vis_years=1, img_years=2000)
+    print(sim.animal_distribution)
 
 
 
