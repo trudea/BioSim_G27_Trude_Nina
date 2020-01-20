@@ -285,5 +285,7 @@ if __name__ == '__main__':
                         {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
 
 
-
-    print(numpy.random.random())
+    liste1 = [1, 2, 3]
+    liste2 = [4, 5, 6]
+    liste = liste1 + liste2
+    print(liste)

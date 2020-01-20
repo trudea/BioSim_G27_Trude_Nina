@@ -89,7 +89,7 @@ class Animal:
             return True
         elif self.phi <= 0:
             return True
-        elif np.random() <= probability:
+        elif np.random.random() <= probability:
             return True
         else:
             return False
@@ -125,7 +125,7 @@ class Animal:
         probability = self.lambdah * self.phi * (n-1)
         if probability > 1.0:
             probability = 1.0
-        if np.random() <= probability:
+        if np.random.random() <= probability:
             return True
         else:
             return False

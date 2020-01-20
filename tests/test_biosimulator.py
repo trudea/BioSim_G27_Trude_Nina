@@ -129,14 +129,35 @@ class TestBioSim:
 
     @pytest.fixture
     def herb_tribe(self):
-        herb_list = [{'species': 'Herbivore', 'age': 6, 'weight': 20} for i in range(3)]
-        return [{'loc': (2,2), 'pop': herb_list}]
+        herb_list = [{'loc': (2,2), 'pop': [{'species': 'Herbivore', 'age': 6, 'weight': 20} for i in range(3)]}]
+        yield herb_list
+
 
     @pytest.fixture
     def carn_tribe(self):
-        return [ani.Carnivore({'age': 6, 'weight': 20}) for i in range(3)]
+        yield [ani.Carnivore({'age': 6, 'weight': 20}) for i in range(3)]
 
+    @pytest.fixture
+    def both_species_tribe(self, herb_tribe, carn_tribe):
+        yield herb_tribe + carn_tribe
 
-    def test_num_animals(self, big_map, herb_tribe, carn_tribe):
+    @pytest.fixture
+    def big_sim(self, big_map, herb_tribe):
         big_sim = sim.BioSim(big_map, herb_tribe, 123)
-        pass
+        default_sim = big_sim.copy()
+        yield big_sim
+        big_sim = default_sim
+
+
+    def test_place_animals(self, big_map, herb_tribe):
+        big_sim = sim.BioSim(big_map, herb_tribe, 123)
+        assert len(big_sim.map[2,2].pop['Herbivore']) == len(herb_tribe[0]['pop'])
+
+
+
+    def test_num_animals(self, big_map, both_species_tribe):
+        big_sim = sim.BioSim(big_map, both_species_tribe, 123)
+
+        default_sim = ani.Herbivore.params.copy()
+        yield ani.Herbivore()
+        ani.Herbivore.params = default_params

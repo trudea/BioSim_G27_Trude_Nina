@@ -138,7 +138,6 @@ class LandscapeCell:
                 raise ValueError
             if individual_dict['weight'] <= 0:
                 raise ValueError
-
             new_animal = eval(individual_dict['species'])(individual_dict)
             self.pop[individual_dict['species']].append(new_animal)
 

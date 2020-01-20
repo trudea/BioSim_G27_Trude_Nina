@@ -3,6 +3,7 @@ import src.biosim.animals as ani
 import src.biosim.landscapes as land
 import src.biosim.simulation as sim
 
+"""
 class TestIsland:
     rossum_string = 'OOOOOOOOOOOOOOOOOOOOO\nOSSSSSJJJJMMJJJJJJJOO\nOSSSSSJJJJMMJJJJJJJOO\nOSSSSSJJJJMMJJJJJJJOO\nOOSSJJJJJJJMMJJJJJJJO\nOOSSJJJJJJJMMJJJJJJJO\nOOOOOOOSMMMMJJJJJJJJO\nOSSSSSJJJJMMJJJJJJJOO\nOSSSSSSSSSMMJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSSDDDDDMMJJJJJOOO\nOSSSSSDDDDDJJJJOOOOOO\nOOSSSDDDDDDJJOOOOOOOO\nOOSSSSDDDDDDJJOOOOOOO\nOSSSSSDDDDDJJJJJJJOOO\nOSSSSDDDDDDJJJJOOOOOO\nOOSSSSDDDDDJJJOOOOOOO\nOOOSSSSJJJJJJJOOOOOOO\nOOOSSSSSSOOOOOOOOOOOO\nOOOOOOOOOOOOOOOOOOOOO'
 
@@ -12,45 +13,7 @@ class TestIsland:
         assert isinstance(i, bs.Island)
 
 
-    def test_construct_savannah(self):
-        s = isl.Savannah()
-        assert isinstance(s, isl.Savannah)
-
-
-    def test_place_animals(self):
-        simple_island_string = 'OOOOO\nOSSSO\nOSSSO\nOSSSO\nOOOOO'
-        i = bs.Island(simple_island_string)
-
-
-    def test_check_edges(self):
-        """
-        A test that checks if ValueError is raised if there are no ocean
-        tiles surrounding the island.
-        """
-        with pytest.raises(ValueError):
-            isl.Island('OSO\nOSO\nOOO')
-        with pytest.raises(ValueError):
-            isl.Island('OO\nJSO\nOOO')
-        with pytest.raises(ValueError):
-            isl.Island('OO\nOSJ\nOOO')
-        with pytest.raises(ValueError):
-            isl.Island('OO\nOSO\nJOO')
-
-
-
-@pytest.fixture
-def ex_herbivores():
-    yield [ani.Herbivore({'phi': 0.1}), ani.Herbivore({'phi': 0.5}),
-     ani.Herbivore({'phi': 0.9})]
-
-@pytest.fixture
-def ex_carnivores():
-    yield [ani.Carnivore({'phi': 0.1}), ani.Carnivore({'phi': 0.5}),
-                  ani.Carnivore({'phi': 0.9})]
-
-@pytest.fixture
-def ex_savannah():
-    yield land.Savannah()
+    
 
 def test_kill_check(mocker, ex_herbivores, ex_carnivores):
     mocker.patch('random.random', return_value=0.001)
@@ -96,6 +59,7 @@ def test_feed_carnivore_pop_change(mocker, ex_savannah, ex_herbivores, ex_carniv
 
 
 def test_herbivore_weight():
+    
     sim = BioSim()
     for cell in sim.map.values():
         for herbivore in cell.pop['Herbivore']:
@@ -103,6 +67,61 @@ def test_herbivore_weight():
                 assert False
 
 
+"""
+class TestSimulation:
+    @pytest.fixture
+    def big_map(self):
+        return """OOOOO\nOJJJO\nOJJJO\nOJJJO\nOOOOO"""
+
+
+    @pytest.fixture
+    def herb_tribe(self):
+        herb_list = [{'species': 'Herbivore', 'age': 6, 'weight': 20} for i in range(3)]
+        yield herb_list
+
+
+    @pytest.fixture
+    def carn_tribe(self):
+        carn_list = [{'species': 'Carnivore', 'age': 6, 'weight': 20} for i in range(3)]
+        yield carn_list
+
+
+    @pytest.fixture
+    def both_species(self, herb_tribe, carn_tribe):
+        both = herb_tribe.copy()
+        both.append(carn_tribe)
+        yield both
+
+
+    @pytest.fixture
+    def big_sim(self, big_map, herb_tribe):
+        big_sim = sim.BioSim(big_map, [{'loc': (2,2), 'pop': herb_tribe}], 123)
+        yield big_sim
+
+    def test_place_herbivores(self, big_sim):
+        cell = big_sim.map[(2,2)]
+        assert len(cell.pop) == 2
+        assert len(cell.pop['Herbivore']) == 3
+        assert len(cell.pop['Carnivore']) == 0
+
+    def test_place_carnivores(self, big_sim, carn_tribe):
+        new_pop = [{'loc': (2,2), 'pop': carn_tribe}]
+        cell = big_sim.map[(2, 2)]
+        big_sim.add_population(new_pop)
+        assert len(cell.pop) == 2
+        assert len(cell.pop['Herbivore']) == 3
+        assert len(cell.pop['Carnivore']) == 3
+
+    @pytest.fixture(big_sim)
+    def new_sim(self, big):
+        
+
+
+    def test_num_animals(self, big_sim, carn_tribe):
+        new_pop = [{'loc': (2, 2), 'pop': carn_tribe}]
+        cell = big_sim.map[(2, 2)]
+        big_sim.add_population(new_pop)
+        assert big_sim.num_animals == 6
 
 
 

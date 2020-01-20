@@ -17,7 +17,7 @@ import random
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
 import pandas as pd
 import numpy as np
-import seaborn as sns
+# import seaborn as sns
 import matplotlib.pyplot as plt
 
 
@@ -255,8 +255,11 @@ class BioSim:
                     cell.pop[species])
         return _num_animals_per_species
 
+
     @property
     def animal_distribution(self):
+        pass
+        """
         self.map_copy.update(self.map)
         y = [cell[0] for cell in self.map_copy]
         x = [cell[1] for cell in self.map_copy]
@@ -278,6 +281,7 @@ class BioSim:
                 'Herbivore': herbivores, 'Carnivore': carnivores}
         df = pd.DataFrame(data)
         return df
+    """
 
     def make_movie(self):
         """Create MPEG4 movie from visualization images saved."""
@@ -355,51 +359,28 @@ if __name__ == '__main__':
                OOOOOOOOOOOOOOOOOOOOO'
     geogr = textwrap.dedent(geogr)
     """
-    default_txt = open('rossum.txt').read()
+    # default_txt = open('rossum.txt').read()
+    default_txt = 'OOOOO\nOJJJO\nOJJJO\nOJJJO\nOOOOO'
+
     ini_herbs = [
         {
-            "loc": (1, 1),
+            "loc": (2, 2),
             "pop": [
                 {"species": "Herbivore", "age": 5, "weight": 20}
-                for _ in range(150)
+                for _ in range(3)
             ],
         }
     ]
     ini_carns = [
         {
-            "loc": (10, 10),
+            "loc": (2, 2),
             "pop": [
                 {"species": "Carnivore", "age": 5, "weight": 20}
-                for _ in range(40)
+                for _ in range(3)
             ],
         }
     ]
 
     sim = BioSim(default_txt, ini_herbs, 1)
-
-    #sim.set_animal_parameters("Herbivore", {"zeta": 3.2, "xi": 1.8})
-    #sim.set_animal_parameters(
-    """
-        "Carnivore",
-        {
-            "a_half": 70,
-            "phi_age": 0.5,
-            "omega": 0.3,
-            "F": 65,
-            "DeltaPhiMax": 9.0,
-        },
-    )
-    """
-    sim.set_landscape_parameters("J", {"f_max": 700})
-
-    sim.simulate(num_years=2, vis_years=1, img_years=2000)
-
-    sim.add_population(population=ini_carns)
-    sim.simulate(num_years=2, vis_years=1, img_years=2000)
-    print(sim.animal_distribution)
-
-
-
-
-
+    sim.add_population(ini_carns)
 
