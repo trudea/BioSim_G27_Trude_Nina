@@ -425,27 +425,34 @@ class BioSim:
         self.update_population_line_plot()
         self.heatmap()
 
-    def simulate(self, num_years, vis_years, img_years=None):
+    def set_landscape_parameters(self, landscape, params):
+        """
+        Set parameters for landscape type.
+
+        :param landscape: String, code letter for landscape
+        :param params: Dict with valid parameter specification for landscape
+        """
+        self.land_dict[landscape].set_params(params)
+
+    def simulate(self, num_years, vis_years=1, img_years=None):
         """
         Run simulation while visualizing the result.
-        :param num_steps: number of simulation steps to execute
-        :param vis_steps: interval between visualization updates
-        :param img_steps: interval between visualizations saved to files
-                          (default: vis_steps)
-        .. note:: Image files will be numbered consecutively.
-        """
-        """
-        while self._step < self._final_step:
 
-            if self._step % vis_steps == 0:
-                self._update_graphics()
+        :param num_years: number of years to simulate
+        :param vis_years: years between visualization updates
+        :param img_years: years between visualizations saved to files
+        (default: vis_years)
 
-            if self._step % img_steps == 0:
-                self._save_graphics()
-
-            self._system.update()
-            self._step += 1
+        Image files will be numbered consecutively.
         """
+        self.num_years = num_years
+        self.vis_years = vis_years
+        self.img_years = img_years
+        self.sim_years = 0
+
+        self.num_animals_results = []
+        self.per_species_results = []
+
         while (self.sim_years < self.num_years):
             self.one_year()
             self.sim_years += 1
