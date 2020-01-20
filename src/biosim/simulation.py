@@ -75,6 +75,7 @@ class BioSim:
         self.line_herbivore = None
         self.line_carnivore = None
         self.n_steps = 0
+        self.index_counter = 0
 
         self.num_animals_results = []
         self.per_species_results = []
@@ -168,7 +169,71 @@ class BioSim:
         """
         self.land_dict[landscape].set_params(params)
 
-    def simulate(self, num_years, vis_years = 1, img_years=None):
+    def make_rgb_map(self):
+        # Add tp left subplot for images created with imshow().
+        # We cannot create the actual ImageAxis object before we know
+        # the size of the image, so we delay its creation.
+        ax1 = self._fig.add_subplot(221)
+        plt.title('Rossum Island')
+        #                   R    G    B
+        rgb_value = {'O': (0.0, 0.0, 1.0),  # blue
+                     'M': (0.5, 0.5, 0.5),  # grey
+                     'J': (0.0, 0.6, 0.0),  # dark green
+                     'S': (0.5, 1.0, 0.5),  # light green
+                     'D': (1.0, 1.0, 0.5)}  # light yellow
+
+        kart_rgb = [[rgb_value[column] for column in row]
+                    for row in self.island_map.splitlines()]
+
+        self.ax1 = fig.add_axes([0.1, 0.1, 0.7, 0.8])  # llx, lly, w, h
+        self.ax1.imshow(kart_rgb, interpolation='nearest')
+        self.ax1.set_xticks(range(len(kart_rgb[0])))
+        self.ax1.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
+        self.ax1.set_yticks(range(len(kart_rgb)))
+        self.ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))
+
+        axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
+        axlg.axis('off')
+        for ix, name in enumerate(('Ocean', 'Mountain', 'Jungle',
+                                   'Savannah', 'Desert')):
+            axlg.add_patch(plt.Rectangle((0., ix * 0.2), 0.3, 0.1,
+                                         edgecolor='none',
+                                         facecolor=rgb_value[name[0]]))
+            axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
+
+    def population_line_plot(self):
+        self.ax2.set_xlim(0, self.n_steps)
+        self.ax2.set_ylim(self.y_lim[0], self.y_lim[1])
+        self.ax2.set_title('Population')
+
+        if self.line_herbivore is None:
+            self.line_herbivore = self.ax2.plot(
+                np.arange(0, self.n_steps + 1, vis_steps),
+                np.nan * np.ones(
+                    len(np.arange(0, self.n_steps + 1, vis_steps))),'g-')
+
+            self.line_carnivore = self.ax2.plot(
+                np.arange(0, self.n_steps + 1, vis_steps),
+                np.nan * np.ones(
+                    len(np.arange(0, self.n_steps + 1, vis_steps))), 'r-')
+            self.ax2.legend(['Herbivore', 'Carnivore'])
+
+        else:
+            x, y = self.line_herbivore.get_data()
+            new_x = np.arange(x[-1] + 1, self.n_steps + 1, vis_steps)
+            if len(new_x > 0):
+                new_y = np.nan * np.ones_like(new_x)
+                self.line_herbivore.set_data(new_x, new_y)
+
+            x, y = self.line_carnivore.get_data()
+            new_x = np.arange(x[-1] + 1, self.n_steps + 1, vis_steps)
+            if len(new_x > 0):
+                new_y = np.nan * np.ones_like(new_x)
+                self.line_carnivore.set_data(new_x, new_y)
+
+    def update_population_line_plot(self):
+        y = self.line_herbivore.get_ydata()
+    def simulate(self, num_steps, vis_steps=1, img_steps=None):
         """
         Run simulation while visualizing the result.
         :param num_steps: number of simulation steps to execute
