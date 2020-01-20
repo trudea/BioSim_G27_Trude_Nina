@@ -168,6 +168,8 @@ class BioSim:
         """
         self.land_dict[landscape].set_params(params)
 
+<<<<<<< HEAD
+=======
 
 
 
@@ -262,9 +264,8 @@ class BioSim:
         if self._mean_ax2 is None:
             self._mean_ax2 = self._fig.add_subplot(2, 2, 2)
             self._mean_ax2.set_ylim(0, 0.02)
+>>>>>>> master
 
-        # needs updating on subsequent calls to simulate()
-        self._mean_ax2.set_xlim(0, self._final_step + 1)
 
 
     def one_year(self):
@@ -414,6 +415,7 @@ class BioSim:
         self.ax1.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
         self.ax1.set_yticks(range(len(kart_rgb)))
         self.ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))
+<<<<<<< HEAD
 
         axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
         axlg.axis('off')
@@ -435,6 +437,29 @@ class BioSim:
                 np.nan * np.ones(
                     len(np.arange(0, self.n_steps + 1, vis_steps))), 'g-')
 
+=======
+
+        axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
+        axlg.axis('off')
+        for ix, name in enumerate(('Ocean', 'Mountain', 'Jungle',
+                                   'Savannah', 'Desert')):
+            axlg.add_patch(plt.Rectangle((0., ix * 0.2), 0.3, 0.1,
+                                         edgecolor='none',
+                                         facecolor=rgb_value[name[0]]))
+            axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
+
+    def population_line_plot(self):
+        self.ax2.set_xlim(0, self.n_steps)
+        self.ax2.set_ylim(self.y_lim[0], self.y_lim[1])
+        self.ax2.set_title('Population')
+
+        if self.line_herbivore is None:
+            self.line_herbivore = self.ax2.plot(
+                np.arange(0, self.n_steps + 1, vis_steps),
+                np.nan * np.ones(
+                    len(np.arange(0, self.n_steps + 1, vis_steps))), 'g-')
+
+>>>>>>> master
             self.line_carnivore = self.ax2.plot(
                 np.arange(0, self.n_steps + 1, vis_steps),
                 np.nan * np.ones(
