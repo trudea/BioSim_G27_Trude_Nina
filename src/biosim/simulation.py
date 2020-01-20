@@ -22,7 +22,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import subprocess
 import os
-from randvis.diffsys import DiffSys
 import matplotlib.pyplot as plt
 
 
@@ -33,17 +32,7 @@ class BioSim:
         self,
         island_map=None,
         ini_pop=None,
-        seed=None,
-        ymax_animals=None,
-        cmax_animals=None,
-        img_base=None,
-        img_fmt="png",
-        sys_size,
-        noise,
-        img_dir = None,
-        img_name = _DEFAULT_GRAPHICS_NAME,
-        img_fmt = 'png'
-        ):
+        seed=None):
         """
         :param island_map: Multi-line string specifying island geography
         :param ini_pop: List of dictionaries specifying initial population
@@ -81,8 +70,15 @@ class BioSim:
         self.img_years = 0
         self.sim_years = 0
 
+        self._fig = None
+        self.ax1, self.ax2, self.ax3, self.ax4 = None, None, None, None
+        self.line_herbivore = None
+        self.line_carnivore = None
+        self.n_steps = 0
+
         self.num_animals_results = []
         self.per_species_results = []
+        self.island_map = island_map
         self.map = self.str_to_dict(island_map)
         for cell in self.map.values():
             if type(cell) in self.active:
@@ -98,31 +94,15 @@ class BioSim:
 
 
         np.random.seed(seed)
-        self._system = DiffSys(sys_size, noise)
-
-        if img_dir is not None:
-            self._img_base = os.path.join(img_dir, img_name)
-        else:
-            self._img_base = None
-        self._img_fmt = img_fmt
 
         self._step = 0
         self._final_step = None
         self._img_ctr = 0
 
-        if ymax_animals is None:
-            # juster automatisk
-            pass
-        self.ymax_animals = ymax_animals
-        if cmax_animals is None:
-            # automatisk
-            pass
-        self.cmax_animals = cmax_animals
-        if img_base is None:
-            # automatisk
-            pass
-        self.img_base = img_base
-        self.fmt = img_fmt
+        self.ymax_animals = 1000
+
+        self.cmax_animals = 10000
+
 
     def str_to_dict(self, txt):
         """
@@ -188,6 +168,65 @@ class BioSim:
         """
         self.land_dict[landscape].set_params(params)
 
+    def make_rgb_map(self):
+        # Add tp left subplot for images created with imshow().
+        # We cannot create the actual ImageAxis object before we know
+        # the size of the image, so we delay its creation.
+        ax1 = self._fig.add_subplot(221)
+        plt.title('Rossum Island')
+        #                   R    G    B
+        rgb_value = {'O': (0.0, 0.0, 1.0),  # blue
+                     'M': (0.5, 0.5, 0.5),  # grey
+                     'J': (0.0, 0.6, 0.0),  # dark green
+                     'S': (0.5, 1.0, 0.5),  # light green
+                     'D': (1.0, 1.0, 0.5)}  # light yellow
+
+        kart_rgb = [[rgb_value[column] for column in row]
+                    for row in self.island_map.splitlines()]
+
+        self.ax1 = fig.add_axes([0.1, 0.1, 0.7, 0.8])  # llx, lly, w, h
+        self.ax1.imshow(kart_rgb, interpolation='nearest')
+        self.ax1.set_xticks(range(len(kart_rgb[0])))
+        self.ax1.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
+        self.ax1.set_yticks(range(len(kart_rgb)))
+        self.ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))
+
+        axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
+        axlg.axis('off')
+        for ix, name in enumerate(('Ocean', 'Mountain', 'Jungle',
+                                   'Savannah', 'Desert')):
+            axlg.add_patch(plt.Rectangle((0., ix * 0.2), 0.3, 0.1,
+                                         edgecolor='none',
+                                         facecolor=rgb_value[name[0]]))
+            axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
+
+    def population_line_plot(self):
+        self.ax2.set_xlim(0, self.n_steps)
+        self.ax2.set_ylim(self.y_lim[0], self.y_lim[1])
+        self.ax2.set_title('Population')
+
+        if self.line_herbivore is None:
+            self.line_herbivore = self.ax2.plot(
+                np.arange(0, self.n_steps + 1, vis_steps),
+                np.nan * np.ones(
+                    len(np.arange(0, self.n_steps + 1, vis_steps))),'g-')
+
+            self.line_carnivore = self.ax2.plot(
+                np.arange(0, self.n_steps + 1, vis_steps),
+                np.nan * np.ones(
+                    len(np.arange(0, self.n_steps + 1, vis_steps))), 'r-')
+            self.ax2.legend(['Herbivore', 'Carnivore'])
+
+        else:
+            x, y = self.line_herbivore.get_data()
+            new_x = np.arange(x[-1] + 1, self.n_steps + 1, vis_steps)
+            if len(new_x > 0):
+                new_y = np.nan * np.ones_like(new_x)
+                self.line_herbivore.set_data(new_x, new_y)
+
+
+
+
     def simulate(self, num_steps, vis_steps=1, img_steps=None):
         """
         Run simulation while visualizing the result.
@@ -231,38 +270,7 @@ class BioSim:
         if self._fig is None:
             self._fig = plt.figure()
 
-        # Add tp left subplot for images created with imshow().
-        # We cannot create the actual ImageAxis object before we know
-        # the size of the image, so we delay its creation.
-        ax1 = self._fig.add_subplot(221)
-        plt.title('Rossum Island')
-        #                   R    G    B
-        rgb_value = {'O': (0.0, 0.0, 1.0),  # blue
-                     'M': (0.5, 0.5, 0.5),  # grey
-                     'J': (0.0, 0.6, 0.0),  # dark green
-                     'S': (0.5, 1.0, 0.5),  # light green
-                     'D': (1.0, 1.0, 0.5)}  # light yellow
 
-        kart_rgb = [[rgb_value[column] for column in row]
-                    for row in kart.splitlines()]
-
-        fig = plt.figure()
-
-        ax1 = fig.add_axes([0.1, 0.1, 0.7, 0.8])  # llx, lly, w, h
-        ax1.imshow(kart_rgb, interpolation='nearest')
-        ax1.set_xticks(range(len(kart_rgb[0])))
-        ax1.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
-        ax1.set_yticks(range(len(kart_rgb)))
-        ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))
-
-        axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
-        axlg.axis('off')
-        for ix, name in enumerate(('Ocean', 'Mountain', 'Jungle',
-                                   'Savannah', 'Desert')):
-            axlg.add_patch(plt.Rectangle((0., ix * 0.2), 0.3, 0.1,
-                                         edgecolor='none',
-                                         facecolor=rgb_value[name[0]]))
-            axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
 
 
         # Add top right subplot for line graph of mean.
@@ -273,7 +281,6 @@ class BioSim:
         # needs updating on subsequent calls to simulate()
         self._mean_ax2.set_xlim(0, self._final_step + 1)
 
-        herbivore_line = 
 
     def one_year(self):
         """ Implement one annual cycle. """
