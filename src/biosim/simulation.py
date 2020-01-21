@@ -518,4 +518,6 @@ if __name__ == '__main__':
     print(sim.change['Born']['Carnivore'])
     """
     sim = BioSim(default_txt, ini_herbs, ymax_animals=(0, 300))
-  
+    sim.simulate()
+
+

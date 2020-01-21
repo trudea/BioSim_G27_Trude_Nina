@@ -25,24 +25,6 @@ class LandscapeCell:
     def num_specimen(self, species):
         return len(self.pop[species])
 
-    """
-    @property
-    def num_animals_per_species(self):
-        num_dict = {}
-        for species in self.pop:
-            num_dict[species] = len(self.pop[species])
-        return num_dict
-    """
-
-    """
-    @property
-    def num_animals(self):
-        total = 0
-        for species in self.pop:
-            total += len(self.pop[species])
-        return total
-    """
-
     @property
     def tot_w_herbivores(self):
         return sum([herbivore.weight for herbivore in self.pop['Herbivore']])
@@ -85,7 +67,7 @@ class LandscapeCell:
     def likelihood(self, total):
         self._likelihood = self._propensity / total
 
-    def migration(self, map_list):
+    def migration(self, neighbours):
         """
         Move each animal if the conditions require so.
 
@@ -93,13 +75,16 @@ class LandscapeCell:
         """
         for species in self.pop:
             for animal in self.pop[species]:
-                if len(map_list) == 0:
+                animal.migrate(self, neighbours)
+                """
+                if len(neighbours) == 0:
                     pass
-                elif len(map_list) == 1:
-                    animal.move(self, map_list[0])
+                elif len(neighbours) == 1:
+                    animal.move(self, neighbours[0])
                 else:
-                    new_cell = self.new_cell(animal, map_list)
+                    new_cell = self.new_cell(animal, neighbours)
                     animal.move(self, new_cell)
+                """
 
     def new_cell(self, animal, map_list):
         """

@@ -9,6 +9,7 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 import numpy as np
 from math import exp
 import random
+import pytest
 
 
 class Animal:
@@ -114,8 +115,39 @@ class Animal:
         else:
             return False
 
-    def migrate(self, cell, neighbours):
-        pass
+    def migrate(self, current_cell, neighbours):
+        if len(neighbours) == 0:
+            return
+        elif len(neighbours) == 1:
+            new_cell = neighbours[0]
+        else:
+            new_cell = self.choose_new_cell(current_cell, neighbours)
+            self.move(current_cell, new_cell)
+
+    def choose_new_cell(self, current_cell, neighbours):
+        """
+        Find which cell the animal should move to, if it should move.
+
+        :param animal: Instance of animal class
+        :param map_list: List of potential destinations for animal
+        :return: landscape instance. Either the cell the animal should move to,
+         or the same cell if the animal shouldn't move.
+        """
+        for current_cell in neighbours:
+            current_cell.propensity = self   # setter verdi
+        total_propensity = sum([cell.propensity for cell in neighbours])
+        for cell in neighbours:
+            cell.likelihood = total_propensity
+        """
+        if not sum([cell.likelihood for cell in map_list]) == approx(1):
+            print('Probabilities do not add up: ', sum([cell.likelihood for
+                                                        cell in map_list]))
+        """
+        upper_limits = np.cumsum([cell.likelihood for cell in neighbours])
+        r = np.random.random()
+        for i in range(len(upper_limits)):
+            if r <= upper_limits[i]:
+                return neighbours[i]
 
     def move(self, old_cell, new_cell):
         """
