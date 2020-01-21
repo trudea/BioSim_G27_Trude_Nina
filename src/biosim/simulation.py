@@ -177,8 +177,8 @@ class BioSim:
         """Total number of animals on island."""
         num_animals = 0
         for cell in self.map.values():
-            num_animals += len(cell.pop['Herbivore']) + \
-                           len(cell.pop['Carnivore'])
+            num_animals += len(cell.population['Herbivore']) + \
+                           len(cell.population['Carnivore'])
         return num_animals
 
     @property
@@ -186,9 +186,9 @@ class BioSim:
         """Number of animals per species in island, as dictionary."""
         _num_animals_per_species = {'Herbivore': 0, 'Carnivore': 0}
         for cell in self.map.values():
-            for species in cell.pop:
+            for species in cell.population:
                 _num_animals_per_species[species] += len(
-                    cell.pop[species])
+                    cell.population[species])
         return _num_animals_per_species
 
     @property
@@ -201,11 +201,11 @@ class BioSim:
         for cell in self.map_copy.values():
             herbivore = 0
             carnivore = 0
-            for species in cell.pop:
+            for species in cell.population:
                 if species == 'Herbivore':
-                    herbivore += len(cell.pop[species])
+                    herbivore += len(cell.population[species])
                 if species == 'Carnivore':
-                    carnivore += len(cell.pop[species])
+                    carnivore += len(cell.population[species])
             dictionary[cell] = herbivore, carnivore
 
         herbivores = \
@@ -235,8 +235,8 @@ class BioSim:
         """
 
         for cell in self.map.values():
-            for species in cell.pop:
-                for animal in cell.pop[species]:
+            for species in cell.population:
+                for animal in cell.population[species]:
                     getattr(animal, myfunc)()
 
     def migration(self):
@@ -300,10 +300,7 @@ class BioSim:
             # print(self.year, ' ', self.num_animals_per_species)
             self.Vis.update_graphics()
             self.Vis._save_graphics()
-            for cell in self.map.values():
-                for key in self.change:
-                    for species in self.change[key]:
-                        self.change[key][species] += cell.change[key][species]
+            
 
 
 if __name__ == '__main__':
