@@ -15,6 +15,7 @@ import textwrap
 import matplotlib.pyplot as plt
 import random
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
+from src.biosim.animals import Herbivore, Carnivore
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -32,7 +33,12 @@ class BioSim:
             self,
             island_map=None,
             ini_pop=None,
-            seed=None):
+            seed=None,
+            ymax_animals=None,
+            cmax_animals=None,
+            img_base=None,
+            img_fmt="png"):
+
         """
         :param island_map: Multi-line string specifying island geography
         :param ini_pop: List of dictionaries specifying initial population
@@ -62,8 +68,12 @@ class BioSim:
         """
         self.land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M':
             Mountain, 'D': Desert}
-        self.active = {Savannah: 0, Jungle: 0}
+        self.active = {Savannah: 0, Jungle: 0, Desert: 0}
         self._year = 0
+        self.ymax_animals = ymax_animals
+        self.cmax_animals = cmax_animals
+        self.img = img_base
+        self.img_fmt = img_fmt
 
         self.num_years = 0
         self.vis_years = 0
@@ -76,6 +86,8 @@ class BioSim:
         self.line_carnivore = None
         self.n_steps = 0
         self.current_idx = 0
+        self.x_lim = (0, 100)
+        self.y_lim = (0, 15000)
 
         self.num_animals_results = []
         self.per_species_results = []
@@ -90,7 +102,8 @@ class BioSim:
                              type(value) in self.active}
         self.map_copy = self.map.copy()
         self.map = self.map_active
-        self.add_population(ini_pop)
+        if ini_pop != None:
+            self.add_population(ini_pop)
         self.change = {'Born': {'Herbivore': 0, 'Carnivore': 0},
                        'Dead': {'Herbivore': 0, 'Carnivore': 0}}
 
@@ -100,9 +113,9 @@ class BioSim:
         self._final_step = None
         self._img_ctr = 0
 
-        self.ymax_animals = 1000
+        self.ymax_animals = ymax_animals
 
-        self.cmax_animals = 10000
+        self.cmax_animals = cmax_animals
 
     def str_to_dict(self, txt):
         """
@@ -168,123 +181,6 @@ class BioSim:
         """
         self.land_dict[landscape].set_params(params)
 
-<<<<<<< HEAD
-=======
-
-
-
-        axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
-        axlg.axis('off')
-        for ix, name in enumerate(('Ocean', 'Mountain', 'Jungle',
-                                   'Savannah', 'Desert')):
-            axlg.add_patch(plt.Rectangle((0., ix * 0.2), 0.3, 0.1,
-                                         edgecolor='none',
-                                         facecolor=rgb_value[name[0]]))
-            axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
-
-    def population_line_plot(self):
-        self.ax2.set_xlim(0, self.n_steps)
-        self.ax2.set_ylim(self.y_lim[0], self.y_lim[1])
-        self.ax2.set_title('Population')
-
-        if self.line_herbivore is None:
-            self.line_herbivore = self.ax2.plot(
-                np.arange(0, self.n_steps + 1, vis_steps),
-                np.nan * np.ones(
-                    len(np.arange(0, self.n_steps + 1, vis_steps))),'g-')
-
-            self.line_carnivore = self.ax2.plot(
-                np.arange(0, self.n_steps + 1, vis_steps),
-                np.nan * np.ones(
-                    len(np.arange(0, self.n_steps + 1, vis_steps))), 'r-')
-            self.ax2.legend(['Herbivore', 'Carnivore'])
-
-        else:
-            x, y = self.line_herbivore.get_data()
-            new_x = np.arange(x[-1] + 1, self.n_steps + 1, vis_steps)
-            if len(new_x > 0):
-                new_y = np.nan * np.ones_like(new_x)
-                self.line_herbivore.set_data(new_x, new_y)
-
-            x, y = self.line_carnivore.get_data()
-            new_x = np.arange(x[-1] + 1, self.n_steps + 1, vis_steps)
-            if len(new_x > 0):
-                new_y = np.nan * np.ones_like(new_x)
-                self.line_carnivore.set_data(new_x, new_y)
-
-    def update_population_line_plot(self):
-        y = self.line_herbivore.get_ydata()
-    def simulate(self, num_steps, vis_steps=1, img_steps=None):
-        """
-        Run simulation while visualizing the result.
-        :param num_steps: number of simulation steps to execute
-        :param vis_steps: interval between visualization updates
-        :param img_steps: interval between visualizations saved to files
-                          (default: vis_steps)
-        .. note:: Image files will be numbered consecutively.
-        """
-
-        if img_steps is None:
-            img_steps = vis_steps
-
-        self._final_step = self._step + num_steps
-        self._setup_graphics()
-
-        while self._step < self._final_step:
-
-            if self._step % vis_steps == 0:
-                self._update_graphics()
-
-            if self._step % img_steps == 0:
-                self._save_graphics()
-
-            self._system.update()
-            self._step += 1
-
-        while (self.sim_years < self.num_years):
-            self.one_year()
-            self.sim_years += 1
-            # print(self.year, ' ', self.num_animals_per_species)
-            for cell in self.map.values():
-                for key in self.change:
-                    for species in self.change[key]:
-                        self.change[key][species] += cell.change[key][species]
-
-    def _setup_graphics(self):
-        """Creates subplots."""
-
-        # create new figure window
-        if self._fig is None:
-            self._fig = plt.figure()
-
-
-
-
-        # Add top right subplot for line graph of mean.
-        if self._mean_ax2 is None:
-            self._mean_ax2 = self._fig.add_subplot(2, 2, 2)
-            self._mean_ax2.set_ylim(0, 0.02)
->>>>>>> master
-
-
-
-    def one_year(self):
-        """ Implement one annual cycle. """
-
-        self.all_cells('replenish')
-        self.all_cells('feeding')
-        self.all_cells('procreation')
-        # print('Num animals before: ', self.num_animals_per_species)
-        self.migration()
-        # print('Num animals after: ', self.num_animals_per_species)
-        self.all_animals('aging')
-        self.all_animals('weightloss')
-        self.all_cells('dying')
-        self.num_animals_results.append(self.num_animals)
-        self.per_species_results.append(self.num_animals_per_species)
-        self.year = 1
-        # print(self.num_animals_per_species)
-        # print(self.year, ' ', self.change)
 
     def add_population(self, population):
         """
@@ -397,7 +293,6 @@ class BioSim:
         # Add tp left subplot for images created with imshow().
         # We cannot create the actual ImageAxis object before we know
         # the size of the image, so we delay its creation.
-        ax1 = self._fig.add_subplot(221)
         plt.title('Rossum Island')
         #                   R    G    B
         rgb_value = {'O': (0.0, 0.0, 1.0),  # blue
@@ -409,13 +304,12 @@ class BioSim:
         kart_rgb = [[rgb_value[column] for column in row]
                     for row in self.island_map.splitlines()]
 
-        self.ax1 = fig.add_axes([0.1, 0.1, 0.7, 0.8])  # llx, lly, w, h
+        self.ax1 = self._fig.add_axes([0.1, 0.1, 0.7, 0.8])  # llx, lly, w, h
         self.ax1.imshow(kart_rgb, interpolation='nearest')
         self.ax1.set_xticks(range(len(kart_rgb[0])))
         self.ax1.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
         self.ax1.set_yticks(range(len(kart_rgb)))
         self.ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))
-<<<<<<< HEAD
 
         axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
         axlg.axis('off')
@@ -427,7 +321,7 @@ class BioSim:
             axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
 
     def population_line_plot(self):
-        self.ax2.set_xlim(0, self.n_steps)
+        self.ax2.set_xlim(0, self.num_years)
         self.ax2.set_ylim(self.y_lim[0], self.y_lim[1])
         self.ax2.set_title('Population')
 
@@ -436,8 +330,6 @@ class BioSim:
                 np.arange(0, self.n_steps + 1, vis_steps),
                 np.nan * np.ones(
                     len(np.arange(0, self.n_steps + 1, vis_steps))), 'g-')
-
-=======
 
         axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
         axlg.axis('off')
@@ -448,33 +340,33 @@ class BioSim:
                                          facecolor=rgb_value[name[0]]))
             axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
 
-    def population_line_plot(self):
-        self.ax2.set_xlim(0, self.n_steps)
+
+    def population_line_plot(self, vis_steps):
+        self.ax2.set_xlim(0, self.num_years)
         self.ax2.set_ylim(self.y_lim[0], self.y_lim[1])
         self.ax2.set_title('Population')
 
         if self.line_herbivore is None:
-            self.line_herbivore = self.ax2.plot(
-                np.arange(0, self.n_steps + 1, vis_steps),
+            self.line_herbivore, = self.ax2.plot(
+                np.arange(0, self.num_years + 1, vis_steps),
                 np.nan * np.ones(
-                    len(np.arange(0, self.n_steps + 1, vis_steps))), 'g-')
+                    len(np.arange(0, self.num_years + 1, vis_steps))), 'g-')
 
->>>>>>> master
-            self.line_carnivore = self.ax2.plot(
-                np.arange(0, self.n_steps + 1, vis_steps),
+            self.line_carnivore, = self.ax2.plot(
+                np.arange(0, self.num_years + 1, vis_steps),
                 np.nan * np.ones(
-                    len(np.arange(0, self.n_steps + 1, vis_steps))), 'r-')
+                    len(np.arange(0, self.num_years + 1, vis_steps))), 'r-')
             self.ax2.legend(['Herbivore', 'Carnivore'])
 
         else:
             x, y = self.line_herbivore.get_data()
-            new_x = np.arange(x[-1] + 1, self.n_steps + 1, vis_steps)
+            new_x = np.arange(x[-1] + 1, self.num_years + 1, vis_steps)
             if len(new_x > 0):
                 new_y = np.nan * np.ones_like(new_x)
                 self.line_herbivore.set_data(new_x, new_y)
 
             x, y = self.line_carnivore.get_data()
-            new_x = np.arange(x[-1] + 1, self.n_steps + 1, vis_steps)
+            new_x = np.arange(x[-1] + 1, self.num_years + 1, vis_steps)
             if len(new_x > 0):
                 new_y = np.nan * np.ones_like(new_x)
                 self.line_carnivore.set_data(new_x, new_y)
@@ -491,67 +383,99 @@ class BioSim:
         self.current_idx += 1
         plt.pause(1e-03)
 
-    def heatmap(self):
+    def heatmap_herbivore(self):
         x = self.animal_distribution
         herb = x.pivot('Row', 'Col', 'Herbivore')
-        carn = x.pivot('Row', 'Col', 'Herbivore')
-
-        self.ax3 = sns.heatmap(herb, vmax=50)
+        most_herbivore = max(self.animal_distribution['Herbivore'])
+        self.ax3 = sns.heatmap(herb, vmax=most_herbivore)
         self.ax3.set_title('Herbivore density map')
-        self.ax4 = sns.heatmap(carn, vmax=50)
+
+    def heatmap_carnivore(self):
+        x_carn = self.animal_distribution
+        carn = x_carn.pivot('Row', 'Col', 'Herbivore')
+        most_carnivore = max(self.animal_distribution['Carnivore'])
+        self.ax4 = sns.heatmap(carn, vmax=most_carnivore)
         self.ax4.set_title('Carnivore density map')
 
-    def visualize(self):
-
+    def visualize(self, vis_steps):
+        plt.cla()
         if self._fig is None:
-            self.ax1 = self._fig.add_subplot(221)
-            self.ax2 = self._fig.add_subplot(222)
-            self.ax3 = self._fig.add_subplot(223)
-            self.ax4 = self._fig.add_subplot(224)
+            self._fig = plt.figure()
+        self.ax1 = self._fig.add_subplot(221)
+        self.ax2 = self._fig.add_subplot(222)
+        self.ax3 = self._fig.add_subplot(223)
+        self.ax4 = self._fig.add_subplot(224)
 
-            self.make_rgb_map()
-            self.heatmap()
-        self.population_line_plot()
+        self.make_rgb_map()
+        self.heatmap_herbivore()
+        self.heatmap_carnivore()
+        self.population_line_plot(vis_steps)
+        plt.show()
 
     def update_graphics(self):
+        self.heatmap_herbivore()
+        self.heatmap_carnivore()
         self.update_population_line_plot()
-        self.heatmap()
 
-    def simulate(self, num_steps, vis_steps=1, img_steps=None):
+    def set_landscape_parameters(self, landscape, params):
+        """
+        Set parameters for landscape type.
+
+        :param landscape: String, code letter for landscape
+        :param params: Dict with valid parameter specification for landscape
+        """
+        self.land_dict[landscape].set_params(params)
+
+    def one_year(self):
+        """ Implement one annual cycle. """
+
+        print(self.year, ' ', self.change)
+        print(self.year, ' ', self.num_animals_per_species)
+
+        self.all_cells('replenish')
+        self.all_cells('feeding')
+        self.all_cells('procreation')
+        # print('Num animals before: ', self.num_animals_per_species)
+        self.migration()
+        # print('Num animals after: ', self.num_animals_per_species)
+        self.all_animals('aging')
+        self.all_animals('weightloss')
+        self.all_cells('dying')
+        self.num_animals_results.append(self.num_animals)
+        self.per_species_results.append(self.num_animals_per_species)
+        self.year = 1
+
+
+    def simulate(self, num_years, vis_years=1, img_years=None):
         """
         Run simulation while visualizing the result.
-        :param num_steps: number of simulation steps to execute
-        :param vis_steps: interval between visualization updates
-        :param img_steps: interval between visualizations saved to files
-                          (default: vis_steps)
-        .. note:: Image files will be numbered consecutively.
+
+        :param num_years: number of years to simulate
+        :param vis_years: years between visualization updates
+        :param img_years: years between visualizations saved to files
+        (default: vis_years)
+
+        Image files will be numbered consecutively.
         """
+        self.num_years = num_years
+        self.vis_years = vis_years
+        self.img_years = img_years
+        self.sim_years = 0
 
-        if img_steps is None:
-            img_steps = vis_steps
-
-        self._final_step = self._step + num_steps
-        self._setup_graphics()
-
-        while self._step < self._final_step:
-
-            if self._step % vis_steps == 0:
-                self._update_graphics()
-
-            if self._step % img_steps == 0:
-                self._save_graphics()
-
-            self._system.update()
-            self._step += 1
+        self.num_animals_results = []
+        self.per_species_results = []
 
         while (self.sim_years < self.num_years):
             self.one_year()
+            self.visualize(num_years)
             self.sim_years += 1
             # print(self.year, ' ', self.num_animals_per_species)
             for cell in self.map.values():
                 for key in self.change:
                     for species in self.change[key]:
                         self.change[key][species] += cell.change[key][species]
+
+
 if __name__ == '__main__':
     """
     default_seed = 33
@@ -608,8 +532,10 @@ if __name__ == '__main__':
             ],
         }
     ]
-
+    """
     sim = BioSim('OOOOO\nODJMO\nOJJSO\nOJSDO\nOOOOO', ini_herbs, 1)
     sim.add_population(ini_carns)
-    sim.one_year()
+    sim.all_cells('procreation')
+    print(sim.change['Born']['Carnivore'])
+    """
 
