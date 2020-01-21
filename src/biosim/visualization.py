@@ -16,37 +16,36 @@ import numpy as np
 
 # update these variables to point to your ffmpeg and convert binaries
 _FFMPEG_BINARY = 'FFMPEG'
-# _CONVERT_BINARY = 'magick'
+_CONVERT_BINARY = 'magick'
 
 # update this to the directory and file-name beginning
 # for the graphics files
 _DEFAULT_GRAPHICS_DIR = os.path.join('..', 'data')
-_DEFAULT_GRAPHICS_NAME = 'Rossumøya'
+_DEFAULT_GRAPHICS_NAME = 'Rossumoya'
 _DEFAULT_MOVIE_FORMAT = 'mp4'   # alternatives: mp4, gif
 
 
 class Visualization:
     def __init__(self,
-                simulator,
-                cmax_animals,
-                ymax_animals,
-                img_base=None,
-                img_name=_DEFAULT_GRAPHICS_NAME,
-                img_fmt='png',
-                ):
+                 simulator,
+                 cmax_animals,
+                 ymax_animals,
+                 img_base=None,
+                 img_name=_DEFAULT_GRAPHICS_NAME,
+                 img_fmt='png',
+                 ):
         """
-        :param ymax_animals:
-        :param cmax_animals:
-        :param img_base:
-        :param sys_size:
-        :param noise:
-        :param seed:
-        :param img_dir:
-        :param img_name:
-        :param img_fmt:
+        :param simulator: Simulator that contains specific attributes
+        :param cmax_animals: Dictionary specifying vmax value of heatmap for
+        different plotlines
+        :param ymax_animals: Tuple with minimum and maximum y values of the
+        lineplot
+        :param img_base:  String with beginning of file name for figures,
+        including path
+        :param img_name: Name of the graphic created
+        :param img_fmt: Format of the graphic we want
         """
 
-        self.island_map = None
         if img_base is not None:
             self.img_base = os.path.join(img_base, img_name)
         else:
@@ -59,7 +58,7 @@ class Visualization:
         self._final_step = None
         self._img_ctr = 0
 
-        self._year = 0
+        self.sim = simulator
 
         # The plots
         self._fig = None
@@ -73,14 +72,17 @@ class Visualization:
         self.ymax_animals = ymax_animals
         if self.cmax_animals is None:
             self.cmax_animals = {'Herbivore': 50, 'Carnivore': 20}
+
         if self.ymax_animals is None:
-            self.ymax_animals = (0, 1000)
-        self.sim = simulator
+            self.ymax_animals = (0, self.sim.num_animals + 100)
 
     def make_rgb_map(self):
-        # Add tp left subplot for images created with imshow().
-        # We cannot create the actual ImageAxis object before we know
-        # the size of the image, so we delay its creation.
+        """
+        code from github repository
+        yngvem/INF200-2019/lectures/J05/Plotting/mapping.py
+        edited slightly for own use. Creates an island based
+        on string input
+        """
         plt.title('Rossum Island')
         #                   R    G    B
         rgb_value = {'O': (0.0, 0.0, 1.0),  # blue
@@ -109,11 +111,16 @@ class Visualization:
             axlg.text(0.2, ix * 0.05, name, transform=axlg.transAxes)
 
     def population_line_plot(self, vis_years):
-        self.ax2.set_xlim(0, self.sim.num_years)
-        self.ax2.set_ylim(self.ymax_animals[0], self.ymax_animals[1])
+        """
+        Creates an array of NaN for y in the range of the array
+        num_years if lines are not already made.
+        If the lines are made the data from array and number of
+        new points are merged together to a new array of data
+        :param vis_years: number of years between each plot update
+        """
         self.ax2.set_title('Population')
 
-        if self.line_herbivore is None:
+        if self.line_herbivore is None and self.sim.sim_years % vis_years == 0:
             self.line_herbivore, = self.ax2.plot(
                 np.arange(0, self.sim.num_years + 1, vis_years),
                 np.nan * np.ones(
@@ -133,16 +140,25 @@ class Visualization:
                               vis_years)
             if len(new_x > 0):
                 new_y = np.nan * np.ones_like(new_x)
-                self.line_herbivore.set_data(new_x, new_y)
+                self.line_herbivore.set_data(np.hstack((new_x, x)),
+                                             np.hstack((new_y, y)))
 
             x, y = self.line_carnivore.get_data()
             new_x = np.arange(x[-1] + 1, self.sim.num_years + 1,
                               vis_years)
             if len(new_x > 0):
                 new_y = np.nan * np.ones_like(new_x)
-                self.line_carnivore.set_data(new_x, new_y)
+                self.line_carnivore.set_data(np.hstack((new_x, x)),
+                                             np.hstack((new_y, y)))
 
     def update_population_line_plot(self):
+        """
+        Updates the array of NaN in y with real data from simulation.
+        Two plots are created one for herbivore and one for carnivore
+        """
+        self.ymax_animals = (0, self.sim.num_animals + 100)
+        self.ax2.set_ylim(self.ymax_animals[0], self.ymax_animals[1])
+        self.ax2.set_xlim(0, self.sim._year + self.sim.sim_years + 10)
         if self.sim.num_animals_per_species['Herbivore'] > 0:
             y = self.line_herbivore.get_ydata()
             y[self.sim.sim_years] = \
@@ -156,28 +172,45 @@ class Visualization:
             self.line_carnivore.set_ydata(y)
 
     def heatmap_herbivore(self):
+        """
+        Creates a heatmap over herbivore location with input from
+        a pandas dataframe
+        """
         x = self.sim.animal_distribution
         herb = x.pivot('Row', 'Col', 'Herbivore').values
         self.ax3.imshow(herb, vmax=self.cmax_animals['Herbivore'])
         self.ax3.set_title('Herbivore density map', y=-0.3)
 
     def heatmap_carnivore(self):
+        """
+        Creates a heatmap over carnivore location with input from
+        a pandas dataframe
+        """
         x = self.sim.animal_distribution
         carn = x.pivot('Row', 'Col', 'Carnivore').values
         plot = self.ax4.imshow(carn, vmax=self.cmax_animals['Carnivore'])
         self.ax4.set_title('Carnivore density map', y=-0.3)
 
     def update_heatmap_herb(self):
+        """
+        Updates the herbivore heatmap with new data
+        """
         x = self.sim.animal_distribution
         herb = x.pivot('Row', 'Col', 'Herbivore').values
         self.ax3.imshow(herb, vmax=self.cmax_animals['Herbivore'])
 
     def update_heatmap_carn(self):
+        """
+        Updates the carnivore heatmap with new data
+        """
         x = self.sim.animal_distribution
         carn = x.pivot('Row', 'Col', 'Carnivore').values
         self.ax4.imshow(carn, vmax=self.cmax_animals['Carnivore'])
 
     def visualize(self, vis_steps):
+        """
+        Sets up the graphics by creating a figure and subplots
+        """
         if self._fig is None:
             self._fig = plt.figure()
         self.ax1 = self._fig.add_subplot(221)
@@ -192,6 +225,9 @@ class Visualization:
         plt.draw()
 
     def update_graphics(self):
+        """
+        Updates the graphics defined in visualize
+        """
         self.update_heatmap_herb()
         self.update_heatmap_carn()
         self.update_population_line_plot()
@@ -208,21 +244,22 @@ class Visualization:
             /SampleProjects/randvis_project/randvis/simulation.py /
         """
 
-        if self._img_base is None:
+        if self.img_base is None:
             raise RuntimeError("No filename defined.")
 
         if movie_fmt == 'mp4':
             try:
-                # Parameters chosen according to http://trac.ffmpeg.org/wiki/Encode/H.264,
+                # Parameters chosen according to
+                # http://trac.ffmpeg.org/wiki/Encode/H.264,
                 # section "Compatibility"
                 subprocess.check_call([_FFMPEG_BINARY,
                                        '-i',
-                                       '{}_%05d.png'.format(self._img_base),
+                                       '{}_%05d.png'.format(self.img_base),
                                        '-y',
                                        '-profile:v', 'baseline',
                                        '-level', '3.0',
                                        '-pix_fmt', 'yuv420p',
-                                       '{}.{}'.format(self._img_base,
+                                       '{}.{}'.format(self.img_base,
                                                       movie_fmt)])
             except subprocess.CalledProcessError as err:
                 raise RuntimeError('ERROR: ffmpeg failed with: {}'.format(err))
@@ -231,8 +268,8 @@ class Visualization:
                 subprocess.check_call([_CONVERT_BINARY,
                                        '-delay', '1',
                                        '-loop', '0',
-                                       '{}_*.png'.format(self._img_base),
-                                       '{}.{}'.format(self._img_base,
+                                       '{}_*.png'.format(self.img_base),
+                                       '{}.{}'.format(self.img_base,
                                                       movie_fmt)])
             except subprocess.CalledProcessError as err:
                 raise RuntimeError(
@@ -247,10 +284,10 @@ class Visualization:
             /SampleProjects/randvis_project/randvis/simulation.py /
         """
 
-        if self._img_base is None:
+        if self.img_base is None:
             return
 
-        plt.savefig('{base}_{num:05d}.{type}'.format(base=self._img_base,
+        plt.savefig('{base}_{num:05d}.{type}'.format(base=self.img_base,
                                                      num=self._img_ctr,
-                                                     type=self._img_fmt))
+                                                     type=self.img_fmt))
         self._img_ctr += 1

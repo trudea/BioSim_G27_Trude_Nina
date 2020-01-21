@@ -29,6 +29,8 @@ class BioSim:
             seed=None,
             ymax_animals=None,
             cmax_animals=None,
+            img_base=None,
+            img_fmt=None
             ):
 
         """
@@ -50,13 +52,6 @@ class BioSim:
         cmax_animals is a dict mapping species names to numbers, e.g.,
            {'Herbivore': 50, 'Carnivore': 20}
 
-        If img_base is None, no figures are written to file.
-        Filenames are formed as
-
-            '{}_{:05d}.{}'.format(img_base, img_no, img_fmt)
-
-        where img_no are consecutive image numbers starting from 0.
-        img_base should contain a path and beginning of a file name.
         """
         self.land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M':
                           Mountain, 'D': Desert}
@@ -90,13 +85,7 @@ class BioSim:
             self.add_population(ini_pop)
         self.change = {'Born': {'Herbivore': 0, 'Carnivore': 0},
                        'Dead': {'Herbivore': 0, 'Carnivore': 0}}
-
-        np.random.seed(seed)
-
-        self._step = 0
-        self._final_step = None
-        self._img_ctr = 0
-        self.Vis = Vis(self, cmax_animals, ymax_animals)
+        self.Vis = Vis(self, cmax_animals, ymax_animals, img_base, img_fmt)
 
     def str_to_dict(self, txt):
         """
@@ -310,6 +299,7 @@ class BioSim:
             self.sim_years += 1
             # print(self.year, ' ', self.num_animals_per_species)
             self.Vis.update_graphics()
+            self.Vis._save_graphics()
             for cell in self.map.values():
                 for key in self.change:
                     for species in self.change[key]:
@@ -379,5 +369,6 @@ if __name__ == '__main__':
     print(sim.change['Born']['Carnivore'])
     """
     sim = BioSim(default_txt, ini_herbs, ymax_animals=(0, 300))
-    sim.simulate(18)
+    sim.simulate(40, 1)
+
     print(sim.num_animals_per_species)

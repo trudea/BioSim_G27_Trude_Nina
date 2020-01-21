@@ -16,8 +16,6 @@ class Animal:
     """Create animals with weight and age, and have them perform actions like
     eating, losing weight and dying. """
 
-
-
     def __init__(self, attribute_dict):
         """
         :param attribute_dict: Dictionary specifying age and weight of animal
@@ -33,7 +31,6 @@ class Animal:
                 self.age = attribute_dict['age']
             if 'phi' in attribute_dict:
                 self.phi = attribute_dict['phi']
-
 
         if self.age is None:
             self.age = 0
@@ -152,8 +149,8 @@ class Animal:
     def move(self, old_cell, new_cell):
         """
         Move animal.
-
-        :param old_cell: Landscape instance, the location of the animal before move
+        :param old_cell: Landscape instance,
+        the location of the animal before move
         :param new_cell: Landscape instance, the destination of the animal
         """
 
