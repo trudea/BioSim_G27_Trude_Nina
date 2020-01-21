@@ -528,3 +528,4 @@ if __name__ == '__main__':
     """
     sim = BioSim(default_txt, ini_herbs, ymax_animals=(0, 300))
     sim.simulate(100)
+    print('hei')
