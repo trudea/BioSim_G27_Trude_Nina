@@ -10,26 +10,30 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
     graph"""
 
 import matplotlib.pyplot as plt
-from biosim.simulation import BioSim as BioSim
 import subprocess
 import os
 import numpy as np
 
 # update these variables to point to your ffmpeg and convert binaries
-_FFMPEG_BINARY = 'ffmpeg'
-_CONVERT_BINARY = 'magick'
+_FFMPEG_BINARY = 'FFMPEG'
+# _CONVERT_BINARY = 'magick'
 
 # update this to the directory and file-name beginning
 # for the graphics files
 _DEFAULT_GRAPHICS_DIR = os.path.join('..', 'data')
-_DEFAULT_GRAPHICS_NAME = 'dv'
+_DEFAULT_GRAPHICS_NAME = 'Rossumøya'
 _DEFAULT_MOVIE_FORMAT = 'mp4'   # alternatives: mp4, gif
 
 
-class Visualization(BioSim):
-    def __init__(self, sys_size, noise, seed, ymax_animals=None,
-                 cmax_animals=None, img_base=None,
-                 img_name=_DEFAULT_GRAPHICS_NAME, img_fmt='png'):
+class Visualization:
+    def __init__(self,
+                simulator,
+                cmax_animals,
+                ymax_animals,
+                img_base=None,
+                img_name=_DEFAULT_GRAPHICS_NAME,
+                img_fmt='png',
+                ):
         """
         :param ymax_animals:
         :param cmax_animals:
@@ -42,17 +46,22 @@ class Visualization(BioSim):
         :param img_fmt:
         """
 
-        super().__init__(seed, ymax_animals, cmax_animals, img_base, img_fmt)
-        self._img_base = _DEFAULT_GRAPHICS_DIR
-        self.img_name= _DEFAULT_GRAPHICS_NAME
+        self.island_map = None
+        if img_base is not None:
+            self.img_base = os.path.join(img_base, img_name)
+        else:
+            self.img_base = None
+            self.img_fmt = img_fmt
 
-
-        self._year = 0
-        self.ymax_animals = ymax_animals
-        self.cmax_animals = cmax_animals
         self.img = img_base
         self.img_fmt = img_fmt
+        self._step = 0
+        self._final_step = None
+        self._img_ctr = 0
 
+        self._year = 0
+
+        # The plots
         self._fig = None
         self.ax1, self.ax2, self.ax3, self.ax4 = None, None, None, None
         self.line_herbivore = None
@@ -60,17 +69,19 @@ class Visualization(BioSim):
         self.heat_herb = None
         self.heat_carn = None
 
-        self.ymax_animals = ymax_animals
         self.cmax_animals = cmax_animals
+        self.ymax_animals = ymax_animals
         if self.cmax_animals is None:
             self.cmax_animals = {'Herbivore': 50, 'Carnivore': 20}
         if self.ymax_animals is None:
             self.ymax_animals = (0, 1000)
+        self.sim = simulator
 
     def make_rgb_map(self):
         # Add tp left subplot for images created with imshow().
         # We cannot create the actual ImageAxis object before we know
         # the size of the image, so we delay its creation.
+        plt.title('Rossum Island')
         #                   R    G    B
         rgb_value = {'O': (0.0, 0.0, 1.0),  # blue
                      'M': (0.5, 0.5, 0.5),  # grey
@@ -79,13 +90,14 @@ class Visualization(BioSim):
                      'D': (1.0, 1.0, 0.5)}  # light yellow
 
         kart_rgb = [[rgb_value[column] for column in row]
-                    for row in self.simulation.island_map.splitlines()]
+                    for row in self.sim.island_map.splitlines()]
 
         self.ax1.imshow(kart_rgb, interpolation='nearest')
         self.ax1.set_xticks(range(len(kart_rgb[0])))
         self.ax1.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
         self.ax1.set_yticks(range(len(kart_rgb)))
         self.ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))
+        self.ax1.set_title('Map of the island')
 
         axlg = self._fig.add_axes([0.05, 0.6, 0.1, 0.8])  # llx, lly, w, h
         axlg.axis('off')
@@ -97,72 +109,71 @@ class Visualization(BioSim):
             axlg.text(0.2, ix * 0.05, name, transform=axlg.transAxes)
 
     def population_line_plot(self, vis_years):
-        self.ax2.set_xlim(0, self.simulation.num_years)
+        self.ax2.set_xlim(0, self.sim.num_years)
         self.ax2.set_ylim(self.ymax_animals[0], self.ymax_animals[1])
         self.ax2.set_title('Population')
 
         if self.line_herbivore is None:
             self.line_herbivore, = self.ax2.plot(
-                np.arange(0, self.simulation.num_years + 1, vis_years),
+                np.arange(0, self.sim.num_years + 1, vis_years),
                 np.nan * np.ones(
-                    len(np.arange(0, self.simulation.num_years + 1,
+                    len(np.arange(0, self.sim.num_years + 1,
                                   vis_years))), 'g-')
 
             self.line_carnivore, = self.ax2.plot(
-                np.arange(0, self.simulation.num_years + 1, vis_years),
+                np.arange(0, self.sim.num_years + 1, vis_years),
                 np.nan * np.ones(
-                    len(np.arange(0, self.simulation.num_years + 1,
+                    len(np.arange(0, self.sim.num_years + 1,
                                   vis_years))), 'r-')
             self.ax2.legend(['Herbivore', 'Carnivore'])
 
         else:
             x, y = self.line_herbivore.get_data()
-            new_x = np.arange(x[-1] + 1, self.simulation.num_years + 1,
+            new_x = np.arange(x[-1] + 1, self.sim.num_years + 1,
                               vis_years)
             if len(new_x > 0):
                 new_y = np.nan * np.ones_like(new_x)
                 self.line_herbivore.set_data(new_x, new_y)
 
             x, y = self.line_carnivore.get_data()
-            new_x = np.arange(x[-1] + 1, self.simulation.num_years + 1,
+            new_x = np.arange(x[-1] + 1, self.sim.num_years + 1,
                               vis_years)
             if len(new_x > 0):
                 new_y = np.nan * np.ones_like(new_x)
                 self.line_carnivore.set_data(new_x, new_y)
 
     def update_population_line_plot(self):
-        if self.simulation.num_animals_per_species['Herbivore'] > 0:
+        if self.sim.num_animals_per_species['Herbivore'] > 0:
             y = self.line_herbivore.get_ydata()
-            y[self.simulation.sim_years] = \
-                self.simulation.num_animals_per_species[
-                'Herbivore']
+            y[self.sim.sim_years] = \
+                self.sim.num_animals_per_species['Herbivore']
             self.line_herbivore.set_ydata(y)
 
-        if self.simulation.num_animals_per_species['Carnivore'] > 0:
+        if self.sim.num_animals_per_species['Carnivore'] > 0:
             y = self.line_carnivore.get_ydata()
-            y[self.simulation.sim_years] = \
-                self.simulation.num_animals_per_species['Carnivore']
+            y[self.sim.sim_years] = \
+                self.sim.num_animals_per_species['Carnivore']
             self.line_carnivore.set_ydata(y)
 
     def heatmap_herbivore(self):
-        x = self.simulation.animal_distribution
+        x = self.sim.animal_distribution
         herb = x.pivot('Row', 'Col', 'Herbivore').values
         self.ax3.imshow(herb, vmax=self.cmax_animals['Herbivore'])
-        self.ax3.set_title('Herbivore density map')
+        self.ax3.set_title('Herbivore density map', y=-0.3)
 
     def heatmap_carnivore(self):
-        x = self.simulation.animal_distribution
+        x = self.sim.animal_distribution
         carn = x.pivot('Row', 'Col', 'Carnivore').values
-        self.ax4.imshow(carn, vmax=self.cmax_animals['Carnivore'])
-        self.ax4.set_title('Carnivore density map')
+        plot = self.ax4.imshow(carn, vmax=self.cmax_animals['Carnivore'])
+        self.ax4.set_title('Carnivore density map', y=-0.3)
 
     def update_heatmap_herb(self):
-        x = self.simulation.animal_distribution
+        x = self.sim.animal_distribution
         herb = x.pivot('Row', 'Col', 'Herbivore').values
         self.ax3.imshow(herb, vmax=self.cmax_animals['Herbivore'])
 
     def update_heatmap_carn(self):
-        x = self.simulation.animal_distribution
+        x = self.sim.animal_distribution
         carn = x.pivot('Row', 'Col', 'Carnivore').values
         self.ax4.imshow(carn, vmax=self.cmax_animals['Carnivore'])
 
