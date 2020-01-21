@@ -15,6 +15,7 @@ import textwrap
 import matplotlib.pyplot as plt
 import random
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
+from src.biosim.animals import Herbivore, Carnivore
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -67,7 +68,7 @@ class BioSim:
         """
         self.land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M':
             Mountain, 'D': Desert}
-        self.active = {Savannah: 0, Jungle: 0}
+        self.active = {Savannah: 0, Jungle: 0, Desert: 0}
         self._year = 0
         self.ymax_animals = ymax_animals
         self.cmax_animals = cmax_animals
@@ -101,7 +102,8 @@ class BioSim:
                              type(value) in self.active}
         self.map_copy = self.map.copy()
         self.map = self.map_active
-        self.add_population(ini_pop)
+        if ini_pop != None:
+            self.add_population(ini_pop)
         self.change = {'Born': {'Herbivore': 0, 'Carnivore': 0},
                        'Dead': {'Herbivore': 0, 'Carnivore': 0}}
 
@@ -179,23 +181,6 @@ class BioSim:
         """
         self.land_dict[landscape].set_params(params)
 
-    def one_year(self):
-        """ Implement one annual cycle. """
-
-        self.all_cells('replenish')
-        self.all_cells('feeding')
-        self.all_cells('procreation')
-        # print('Num animals before: ', self.num_animals_per_species)
-        self.migration()
-        # print('Num animals after: ', self.num_animals_per_species)
-        self.all_animals('aging')
-        self.all_animals('weightloss')
-        self.all_cells('dying')
-        self.num_animals_results.append(self.num_animals)
-        self.per_species_results.append(self.num_animals_per_species)
-        self.year = 1
-        # print(self.num_animals_per_species)
-        # print(self.year, ' ', self.change)
 
     def add_population(self, population):
         """
@@ -434,6 +419,26 @@ class BioSim:
         """
         self.land_dict[landscape].set_params(params)
 
+    def one_year(self):
+        """ Implement one annual cycle. """
+
+        print(self.year, ' ', self.change)
+        print(self.year, ' ', self.num_animals_per_species)
+
+        self.all_cells('replenish')
+        self.all_cells('feeding')
+        self.all_cells('procreation')
+        # print('Num animals before: ', self.num_animals_per_species)
+        self.migration()
+        # print('Num animals after: ', self.num_animals_per_species)
+        self.all_animals('aging')
+        self.all_animals('weightloss')
+        self.all_cells('dying')
+        self.num_animals_results.append(self.num_animals)
+        self.per_species_results.append(self.num_animals_per_species)
+        self.year = 1
+
+
     def simulate(self, num_years, vis_years=1, img_years=None):
         """
         Run simulation while visualizing the result.
@@ -519,8 +524,9 @@ if __name__ == '__main__':
             ],
         }
     ]
-
+    """
     sim = BioSim('OOOOO\nODJMO\nOJJSO\nOJSDO\nOOOOO', ini_herbs, 1)
     sim.add_population(ini_carns)
-    sim.simulate(5)
-    print(sim.num_animals_per_species)
+    sim.all_cells('procreation')
+    print(sim.change['Born']['Carnivore'])
+    """

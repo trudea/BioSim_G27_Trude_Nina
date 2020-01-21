@@ -132,7 +132,6 @@ class Animal:
 
     def procreate(self, cell):
         """Animal gives birth to newborn if conditions are met. """
-
         newborn = type(self)()
         if self.weight >= self.zeta * (
                 newborn.weight + self.sigma_birth):
@@ -141,10 +140,11 @@ class Animal:
             if self.weight < 0:
                 print('animal weight too small after birth')
 
+    """
     @phi.setter
     def phi(self, value):
         self._phi = value
-
+    """
 
 class Herbivore(Animal):
     params = {'w_birth': 8.0,
@@ -226,15 +226,7 @@ class Carnivore(Animal):
         for prey in cell.pop['Herbivore']:
             if eaten < self.F:
                 if self.check_if_kills(prey):
-                    x = self.weight
                     self.weight += self.beta * prey.weight
-                    if self.weight <= x:
-                        print('Carni weight not gained')
-                    c = self.phi
-                    if self.phi <= c and self.phi < 0.98:
-                        # print(c, ' ', self.phi)
-                        # print('Fitness not updated')
-                        pass
                     dead.append(prey)
         cell.pop['Herbivore'] =\
             [herbivore for herbivore in cell.pop['Herbivore']
