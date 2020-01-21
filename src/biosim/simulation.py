@@ -174,7 +174,7 @@ class BioSim:
         :param params: Dict with valid parameter specification for species
         """
         self.name = species
-        # self.land_dict[].set_parameter(params)
+        eval(species).set_params(params)
 
     def set_landscape_parameters(self, landscape, params):
         """
@@ -405,15 +405,6 @@ class BioSim:
         self.update_population_line_plot()
         plt.pause(1e-03)
 
-    def set_landscape_parameters(self, landscape, params):
-        """
-        Set parameters for landscape type.
-
-        :param landscape: String, code letter for landscape
-        :param params: Dict with valid parameter specification for landscape
-        """
-        self.land_dict[landscape].set_params(params)
-
     def one_year(self):
         """ Implement one annual cycle. """
 
@@ -527,4 +518,4 @@ if __name__ == '__main__':
     print(sim.change['Born']['Carnivore'])
     """
     sim = BioSim(default_txt, ini_herbs, ymax_animals=(0, 300))
-    sim.simulate(100)
+  

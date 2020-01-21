@@ -114,6 +114,9 @@ class Animal:
         else:
             return False
 
+    def migrate(self, cell, neighbours):
+        pass
+
     def move(self, old_cell, new_cell):
         """
         Move animal.
