@@ -9,9 +9,21 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
     heatmap of herbivore and carnivore distribution and population line 
     graph"""
 
-
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import subprocess
+import os
+import numpy as np
+
+# update these variables to point to your ffmpeg and convert binaries
+_FFMPEG_BINARY = 'ffmpeg'
+_CONVERT_BINARY = 'magick'
+
+# update this to the directory and file-name beginning
+# for the graphics files
+_DEFAULT_GRAPHICS_DIR = os.path.join('..', 'data')
+_DEFAULT_GRAPHICS_NAME = 'dv'
+_DEFAULT_MOVIE_FORMAT = 'mp4'   # alternatives: mp4, gif
 
 
 class Visualization:
@@ -20,7 +32,12 @@ class Visualization:
             ymax_animals=None,
             cmax_animals=None,
             img_base=None,
-            img_fmt="png",
+            sys_size,
+            noise,
+            seed,
+            img_dir=None,
+            img_name=_DEFAULT_GRAPHICS_NAME,
+            img_fmt='png'
             ):
 
         self._year = 0
@@ -162,3 +179,61 @@ class Visualization:
         self.update_heatmap_carn()
         self.update_population_line_plot()
         plt.pause(1e-03)
+
+    def make_movie(self, movie_fmt=_DEFAULT_MOVIE_FORMAT):
+        """
+        Creates MPEG4 movie from visualization images saved.
+        .. :note:
+            Requires ffmpeg
+        The movie is stored as img_base + movie_fmt
+         Method from github by Hans E Plessser, nmbu:
+            INF200-2019/Project
+            /SampleProjects/randvis_project/randvis/simulation.py /
+        """
+
+        if self._img_base is None:
+            raise RuntimeError("No filename defined.")
+
+        if movie_fmt == 'mp4':
+            try:
+                # Parameters chosen according to http://trac.ffmpeg.org/wiki/Encode/H.264,
+                # section "Compatibility"
+                subprocess.check_call([_FFMPEG_BINARY,
+                                       '-i',
+                                       '{}_%05d.png'.format(self._img_base),
+                                       '-y',
+                                       '-profile:v', 'baseline',
+                                       '-level', '3.0',
+                                       '-pix_fmt', 'yuv420p',
+                                       '{}.{}'.format(self._img_base,
+                                                      movie_fmt)])
+            except subprocess.CalledProcessError as err:
+                raise RuntimeError('ERROR: ffmpeg failed with: {}'.format(err))
+        elif movie_fmt == 'gif':
+            try:
+                subprocess.check_call([_CONVERT_BINARY,
+                                       '-delay', '1',
+                                       '-loop', '0',
+                                       '{}_*.png'.format(self._img_base),
+                                       '{}.{}'.format(self._img_base,
+                                                      movie_fmt)])
+            except subprocess.CalledProcessError as err:
+                raise RuntimeError(
+                    'ERROR: convert failed with: {}'.format(err))
+        else:
+            raise ValueError('Unknown movie format: ' + movie_fmt)
+
+    def _save_graphics(self):
+        """Saves graphics to file if file name given.
+            Method from github by Hans E Plessser, nmbu:
+            INF200-2019/Project
+            /SampleProjects/randvis_project/randvis/simulation.py /
+        """
+
+        if self._img_base is None:
+            return
+
+        plt.savefig('{base}_{num:05d}.{type}'.format(base=self._img_base,
+                                                     num=self._img_ctr,
+                                                     type=self._img_fmt))
+        self._img_ctr += 1
