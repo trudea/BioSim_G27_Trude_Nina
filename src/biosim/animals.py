@@ -247,6 +247,7 @@ class Carnivore(Animal):
                 if self.check_if_kills(prey):
                     self.weight += self.beta * prey.weight
                     dead.append(prey)
+                    eaten += prey.weight
         cell.pop['Herbivore'] =\
             [herbivore for herbivore in cell.pop['Herbivore']
              if herbivore not in dead]
