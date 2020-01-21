@@ -8,8 +8,6 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 import numpy as np
 from math import exp
-import random
-import pytest
 
 
 class Animal:

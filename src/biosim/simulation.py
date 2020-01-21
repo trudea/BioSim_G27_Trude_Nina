@@ -10,9 +10,8 @@ and carnivores. Landscape types consist of savannah, jungle, desert and
 mountain, with surrounding ocean.
 """
 
-
+from .animals import Herbivore, Carnivore
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
-from src.biosim.animals import Carnivore, Herbivore
 from src.biosim.visualization import Visualization as Vis
 import pandas as pd
 import numpy as np
@@ -72,19 +71,14 @@ class BioSim:
         self.per_species_results = []
         self.island_map = island_map
         self.map = self.str_to_dict(island_map)
-        for cell in self.map.values():
-            if type(cell) in self.active:
-                self.active[type(cell)] += 1
         self.map_active = {key: value for (key, value) in self.map.items() if
                            type(value) in self.active}
-        self.map_inactive = {key: value for (key, value) in self.map.items() if
-                             type(value) in self.active}
-        self.map_copy = self.map.copy()
+        #self.map_inactive = {key: value for (key, value) in self.map.items() if
+        #                     type(value) in self.active}
+        self.map_full = self.map.copy()
         self.map = self.map_active
         if ini_pop is not None:
             self.add_population(ini_pop)
-        self.change = {'Born': {'Herbivore': 0, 'Carnivore': 0},
-                       'Dead': {'Herbivore': 0, 'Carnivore': 0}}
         self.Vis = Vis(self, cmax_animals, ymax_animals, img_base, img_fmt)
 
     def str_to_dict(self, txt):
@@ -193,12 +187,12 @@ class BioSim:
 
     @property
     def animal_distribution(self):
-        self.map_copy.update(self.map)
-        y = [cell[0] for cell in self.map_copy]
-        x = [cell[1] for cell in self.map_copy]
+        self.map_full.update(self.map)
+        y = [cell[0] for cell in self.map_full]
+        x = [cell[1] for cell in self.map_full]
 
         dictionary = {}
-        for cell in self.map_copy.values():
+        for cell in self.map_full.values():
             herbivore = 0
             carnivore = 0
             for species in cell.population:
@@ -229,7 +223,7 @@ class BioSim:
 
     def all_animals(self, myfunc):
         """
-        Execute method for all animals.
+        Execute method for every individual animal.
 
         :param myfunc: Method to be executed.
         """
@@ -241,6 +235,7 @@ class BioSim:
 
     def migration(self):
         """Execute migration step of annual cycle."""
+
         for pos, cell in self.map.items():
             if type(cell) == Ocean or type(cell) == Mountain:
                 pass
@@ -258,15 +253,12 @@ class BioSim:
     def one_year(self):
         """ Implement one annual cycle. """
 
-        print(self.year, ' ', self.change)
-        print(self.year, ' ', self.num_animals_per_species)
+        # print(self.year, ' ', self.num_animals_per_species)
 
         self.all_cells('replenish')
         self.all_cells('feeding')
         self.all_cells('procreation')
-        # print('Num animals before: ', self.num_animals_per_species)
         self.migration()
-        # print('Num animals after: ', self.num_animals_per_species)
         self.all_animals('aging')
         self.all_animals('weightloss')
         self.all_cells('dying')
@@ -300,7 +292,6 @@ class BioSim:
             # print(self.year, ' ', self.num_animals_per_species)
             self.Vis.update_graphics()
             self.Vis._save_graphics()
-            
 
 
 if __name__ == '__main__':
