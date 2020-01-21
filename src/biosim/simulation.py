@@ -338,7 +338,7 @@ class BioSim:
                 np.nan * np.ones(
                     len(np.arange(0, self.num_years + 1, vis_years))), 'r-')
             self.ax2.legend(['Herbivore', 'Carnivore'])
-
+# f
         else:
             x, y = self.line_herbivore.get_data()
             new_x = np.arange(x[-1] + 1, self.num_years + 1, vis_years)
