@@ -270,6 +270,17 @@ class TestSimulation:
         assert len(cell.pop['Carnivore']) > 50
 
 
+class BaseTestAnimal:
+
+
+
+class BaseTestHerbivore:
+
+
+class BasetestCarnivore:
+
+
+
 
 
 
