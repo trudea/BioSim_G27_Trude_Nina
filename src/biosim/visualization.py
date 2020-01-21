@@ -71,7 +71,7 @@ class Visualization:
         self.cmax_animals = cmax_animals
         self.ymax_animals = ymax_animals
         if self.cmax_animals is None:
-            self.cmax_animals = {'Herbivore': 50, 'Carnivore': 20}
+            self.cmax_animals = {'Herbivore': 200, 'Carnivore': 50}
 
         if self.ymax_animals is None:
             self.ymax_animals = (0, self.sim.num_animals + 100)
@@ -120,7 +120,7 @@ class Visualization:
         """
         self.ax2.set_title('Population')
 
-        if self.line_herbivore is None and self.sim.sim_years % vis_years == 0:
+        if self.line_herbivore is None:
             self.line_herbivore, = self.ax2.plot(
                 np.arange(0, self.sim.num_years + 1, vis_years),
                 np.nan * np.ones(
@@ -136,18 +136,16 @@ class Visualization:
 
         else:
             x, y = self.line_herbivore.get_data()
-            new_x = np.arange(x[-1] + 1, self.sim.num_years + 1,
-                              vis_years)
+            new_x = np.arange(x[-1] + 1, self.sim.num_years)
             if len(new_x > 0):
-                new_y = np.nan * np.ones_like(new_x)
+                new_y = np.full(new_x, np.nan)
                 self.line_herbivore.set_data(np.hstack((new_x, x)),
                                              np.hstack((new_y, y)))
 
             x, y = self.line_carnivore.get_data()
-            new_x = np.arange(x[-1] + 1, self.sim.num_years + 1,
-                              vis_years)
+            new_x = np.arange(x[-1] + 1, self.sim.num_years)
             if len(new_x > 0):
-                new_y = np.nan * np.ones_like(new_x)
+                new_y = np.full(new_x, np.nan)
                 self.line_carnivore.set_data(np.hstack((new_x, x)),
                                              np.hstack((new_y, y)))
 
@@ -158,7 +156,8 @@ class Visualization:
         """
         self.ymax_animals = (0, self.sim.num_animals + 100)
         self.ax2.set_ylim(self.ymax_animals[0], self.ymax_animals[1])
-        self.ax2.set_xlim(0, self.sim._year + self.sim.sim_years + 10)
+        self.ax2.set_xlim(0, self.sim.sim_years + 10)
+
         if self.sim.num_animals_per_species['Herbivore'] > 0:
             y = self.line_herbivore.get_ydata()
             y[self.sim.sim_years] = \
@@ -213,16 +212,16 @@ class Visualization:
         """
         if self._fig is None:
             self._fig = plt.figure()
-        self.ax1 = self._fig.add_subplot(221)
-        self.ax2 = self._fig.add_subplot(222)
-        self.ax3 = self._fig.add_subplot(223)
-        self.ax4 = self._fig.add_subplot(224)
+            self.ax1 = self._fig.add_subplot(221)
+            self.ax2 = self._fig.add_subplot(222)
+            self.ax3 = self._fig.add_subplot(223)
+            self.ax4 = self._fig.add_subplot(224)
 
-        self.make_rgb_map()
-        self.heatmap_herbivore()
-        self.heatmap_carnivore()
-        self.population_line_plot(vis_steps)
-        plt.draw()
+            self.make_rgb_map()
+            self.heatmap_herbivore()
+            self.heatmap_carnivore()
+            self.population_line_plot(vis_steps)
+            plt.draw()
 
     def update_graphics(self):
         """
