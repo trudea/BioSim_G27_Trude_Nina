@@ -13,87 +13,89 @@ from .animals import Herbivore, Carnivore
 
 
 class LandscapeCell:
+    """Create landscape cells that can be replensihed and with a population of
+    herbivore and carnivores. Placement, migration, feeding, procreation and
+    death of the animals can be executed. """
+
     def __init__(self):
         self.params_set = False
         self.f = 0
-        self.pop = {'Herbivore': [], 'Carnivore': []}
+        self.population = {'Herbivore': [], 'Carnivore': []}
         self.propensity = 0
         self.likelihood = 0
-        self.change = {'Born': {'Herbivore': 0, 'Carnivore': 0},
-                       'Dead': {'Herbivore': 0, 'Carnivore': 0}}
 
     def num_specimen(self, species):
-        return len(self.pop[species])
+        """Get the number of individuals of a species in the population of
+        the cell.
+        :param species: String with the name of the species
+        :return: Integer signifying the number of individuals of the species.
+        """
+        return len(self.population[species])
 
     @property
     def tot_w_herbivores(self):
-        return sum([herbivore.weight for herbivore in self.pop['Herbivore']])
+        return sum([herbivore.weight for herbivore in self.population['Herbivore']])
 
     def migration(self, neighbours):
         """
-        Move each animal if the conditions require so.
+        Move each animal if the conditions dictate so.
 
         :param map_list: List of potential destinations for animal
         """
-        for species in self.pop:
-            for animal in self.pop[species]:
+        for species in self.population:
+            for animal in self.population[species]:
                 animal.migrate(self, neighbours)
 
     def place_animals(self, pop_list):
         """
-        Place animals on a location.
+        Place animals at specific locations.
 
         :param pop_list: List of dictionaries, each dictionary specifying
         characteristics of the individual animal to be placed.
         """
+
         for individual_dict in pop_list:
-            if individual_dict['species'] not in self.pop:
-                self.pop[individual_dict['species']] = []
+            if individual_dict['species'] not in self.population:
+                self.population[individual_dict['species']] = []
             if individual_dict['age'] < 0:
                 raise ValueError
             if individual_dict['weight'] <= 0:
                 raise ValueError
             new_animal = eval(individual_dict['species'])(individual_dict)
-            self.pop[individual_dict['species']].append(new_animal)
+            self.population[individual_dict['species']].append(new_animal)
 
     def replenish(self):
         """Replenish plant fodder if required. """
         pass
 
     def feeding(self):
-        """ Carry out feeding of each animal on the location. """
-        for species in self.pop:
-            self.pop[species] = sorted(self.pop[species],
-                                       key=lambda x: getattr(x, 'phi'))
-        for herbivore in self.pop['Herbivore']:
+        """ Carry out feeding of each animals at the location. """
+        for species in self.population:
+            self.population[species] = sorted(self.population[species],
+                                              key=lambda x: getattr(x, 'phi'))
+        for herbivore in self.population['Herbivore']:
             herbivore.feeding(self)
-        for carnivore in self.pop['Carnivore']:
+        for carnivore in self.population['Carnivore']:
             carnivore.feeding(self)
 
     def procreation(self):
         """Carry out procreation of animals on the location. """
-        for species, pop_list in self.pop.items():
-            remembered_n = len(self.pop[species])
+        for species, pop_list in self.population.items():
             copy = pop_list
             for animal in copy:
                 n = self.num_specimen(species)
                 if n >= 2:
                     if animal.fertile(n):
                         animal.procreate(self)
-                if len(self.pop[species]) - n > 0:
-                    self.change['Born'][species] += len(self.pop[species]) - n
 
     def dying(self):
         """
         Remove dying animals from population
         """
-        for species in self.pop:
-            rem_n = len(self.pop[species])
-            if len(self.pop[species]) > 0:
-                self.pop[species] = [animal for animal in self.pop[species] if
-                                     not animal.dies()]
-            if rem_n - len(self.pop[species]) > 0:
-                self.change['Dead'][species] = rem_n - len(self.pop[species])
+        for species in self.population:
+            if len(self.population[species]) > 0:
+                self.population[species] = [animal for animal in self.population[species] if
+                                            not animal.dies()]
 
 
 class Savannah(LandscapeCell):
