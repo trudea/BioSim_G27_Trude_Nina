@@ -538,5 +538,4 @@ if __name__ == '__main__':
     sim.all_cells('procreation')
     print(sim.change['Born']['Carnivore'])
     """
-    sim = BioSim(default_txt, ini_herbs)
-    sim.simulate(10)
+
