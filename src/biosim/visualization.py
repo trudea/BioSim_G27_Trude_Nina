@@ -10,7 +10,7 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
     graph"""
 
 import matplotlib.pyplot as plt
-import numpy as np
+from biosim.simulation import BioSim as BioSim
 import subprocess
 import os
 import numpy as np
@@ -26,19 +26,26 @@ _DEFAULT_GRAPHICS_NAME = 'dv'
 _DEFAULT_MOVIE_FORMAT = 'mp4'   # alternatives: mp4, gif
 
 
-class Visualization:
-    def __init__(
-            self,
-            ymax_animals=None,
-            cmax_animals=None,
-            img_base=None,
-            sys_size,
-            noise,
-            seed,
-            img_dir=None,
-            img_name=_DEFAULT_GRAPHICS_NAME,
-            img_fmt='png'
-            ):
+class Visualization(BioSim):
+    def __init__(self, sys_size, noise, seed, ymax_animals=None,
+                 cmax_animals=None, img_base=None,
+                 img_name=_DEFAULT_GRAPHICS_NAME, img_fmt='png'):
+        """
+        :param ymax_animals:
+        :param cmax_animals:
+        :param img_base:
+        :param sys_size:
+        :param noise:
+        :param seed:
+        :param img_dir:
+        :param img_name:
+        :param img_fmt:
+        """
+
+        super().__init__(seed, ymax_animals, cmax_animals, img_base, img_fmt)
+        self._img_base = _DEFAULT_GRAPHICS_DIR
+        self.img_name= _DEFAULT_GRAPHICS_NAME
+
 
         self._year = 0
         self.ymax_animals = ymax_animals
@@ -64,7 +71,6 @@ class Visualization:
         # Add tp left subplot for images created with imshow().
         # We cannot create the actual ImageAxis object before we know
         # the size of the image, so we delay its creation.
-        plt.title('Rossum Island')
         #                   R    G    B
         rgb_value = {'O': (0.0, 0.0, 1.0),  # blue
                      'M': (0.5, 0.5, 0.5),  # grey

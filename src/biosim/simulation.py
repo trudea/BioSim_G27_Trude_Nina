@@ -10,19 +10,11 @@ and carnivores. Landscape types consist of savannah, jungle, desert and
 mountain, with surrounding ocean.
 """
 
-import inspect
-import textwrap
-import matplotlib.pyplot as plt
-import random
+
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
-from src.biosim.animals import Herbivore, Carnivore
+from src.biosim.animals import Carnivore, Herbivore
 import pandas as pd
 import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-import numpy as np
-import subprocess
-import os
 import matplotlib.pyplot as plt
 
 
@@ -67,7 +59,7 @@ class BioSim:
         img_base should contain a path and beginning of a file name.
         """
         self.land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M':
-            Mountain, 'D': Desert}
+                          Mountain, 'D': Desert}
         self.active = {Savannah: 0, Jungle: 0, Desert: 0}
         self._year = 0
         self.ymax_animals = ymax_animals
@@ -108,7 +100,7 @@ class BioSim:
                              type(value) in self.active}
         self.map_copy = self.map.copy()
         self.map = self.map_active
-        if ini_pop != None:
+        if ini_pop is not None:
             self.add_population(ini_pop)
         self.change = {'Born': {'Herbivore': 0, 'Carnivore': 0},
                        'Dead': {'Herbivore': 0, 'Carnivore': 0}}
@@ -118,8 +110,6 @@ class BioSim:
         self._step = 0
         self._final_step = None
         self._img_ctr = 0
-
-
 
     def str_to_dict(self, txt):
         """
@@ -252,9 +242,6 @@ class BioSim:
         df = pd.DataFrame(data)
         return df
 
-    def make_movie(self):
-        """Create MPEG4 movie from visualization images saved."""
-
     def all_cells(self, myfunc):
         """
         Execute method for every active location.
@@ -312,6 +299,7 @@ class BioSim:
         self.ax1.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
         self.ax1.set_yticks(range(len(kart_rgb)))
         self.ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))
+        self.ax1.set_title('Map of the island')
 
         axlg = self._fig.add_axes([0.05, 0.6, 0.1, 0.8])  # llx, lly, w, h
         axlg.axis('off')
@@ -367,13 +355,13 @@ class BioSim:
         x = self.animal_distribution
         herb = x.pivot('Row', 'Col', 'Herbivore').values
         self.ax3.imshow(herb, vmax=self.cmax_animals['Herbivore'])
-        self.ax3.set_title('Herbivore density map')
+        self.ax3.set_title('Herbivore density map', y=-0.3)
 
     def heatmap_carnivore(self):
         x = self.animal_distribution
         carn = x.pivot('Row', 'Col', 'Carnivore').values
         plot = self.ax4.imshow(carn, vmax=self.cmax_animals['Carnivore'])
-        self.ax4.set_title('Carnivore density map')
+        self.ax4.set_title('Carnivore density map', y=-0.3)
 
     def update_heatmap_herb(self):
         x = self.animal_distribution
@@ -518,6 +506,4 @@ if __name__ == '__main__':
     print(sim.change['Born']['Carnivore'])
     """
     sim = BioSim(default_txt, ini_herbs, ymax_animals=(0, 300))
-    sim.simulate()
-
-
+    sim.simulate(18)
