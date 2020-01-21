@@ -349,7 +349,7 @@ if __name__ == '__main__':
             "loc": (2, 2),
             "pop": [
                 {"species": "Herbivore", "age": 5, "weight": 20}
-                for _ in range(3)
+                for _ in range(50)
             ],
         }
     ]
@@ -369,6 +369,7 @@ if __name__ == '__main__':
     print(sim.change['Born']['Carnivore'])
     """
     sim = BioSim(default_txt, ini_herbs, ymax_animals=(0, 300))
-    sim.simulate(40, 1)
+    sim.simulate(30, 1)
+    sim.simulate(10, 1)
 
     print(sim.num_animals_per_species)
