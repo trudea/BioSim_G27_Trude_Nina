@@ -16,24 +16,24 @@ import numpy as np
 
 # update these variables to point to your ffmpeg and convert binaries
 _FFMPEG_BINARY = 'FFMPEG'
-# _CONVERT_BINARY = 'magick'
+_CONVERT_BINARY = 'magick'
 
 # update this to the directory and file-name beginning
 # for the graphics files
 _DEFAULT_GRAPHICS_DIR = os.path.join('..', 'data')
-_DEFAULT_GRAPHICS_NAME = 'Rossumøya'
+_DEFAULT_GRAPHICS_NAME = 'Rossumoya'
 _DEFAULT_MOVIE_FORMAT = 'mp4'   # alternatives: mp4, gif
 
 
 class Visualization:
     def __init__(self,
-                simulator,
-                cmax_animals,
-                ymax_animals,
-                img_base=None,
-                img_name=_DEFAULT_GRAPHICS_NAME,
-                img_fmt='png',
-                ):
+                 simulator,
+                 cmax_animals,
+                 ymax_animals,
+                 img_base=None,
+                 img_name=_DEFAULT_GRAPHICS_NAME,
+                 img_fmt='png',
+                 ):
         """
         :param simulator: Simulator that contains specific attributes
         :param cmax_animals: Dictionary specifying vmax value of heatmap for
@@ -75,7 +75,6 @@ class Visualization:
 
         if self.ymax_animals is None:
             self.ymax_animals = (0, self.sim.num_animals + 100)
-
 
     def make_rgb_map(self):
         """
@@ -250,7 +249,8 @@ class Visualization:
 
         if movie_fmt == 'mp4':
             try:
-                # Parameters chosen according to http://trac.ffmpeg.org/wiki/Encode/H.264,
+                # Parameters chosen according to
+                # http://trac.ffmpeg.org/wiki/Encode/H.264,
                 # section "Compatibility"
                 subprocess.check_call([_FFMPEG_BINARY,
                                        '-i',
