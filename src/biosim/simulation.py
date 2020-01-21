@@ -313,14 +313,14 @@ class BioSim:
         self.ax1.set_yticks(range(len(kart_rgb)))
         self.ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))
 
-        axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
+        axlg = self._fig.add_axes([0.05, 0.5, 0.1, 0.8])  # llx, lly, w, h
         axlg.axis('off')
         for ix, name in enumerate(('Ocean', 'Mountain', 'Jungle',
                                    'Savannah', 'Desert')):
-            axlg.add_patch(plt.Rectangle((0., ix * 0.2), 0.3, 0.1,
+            axlg.add_patch(plt.Rectangle((0.0, ix * 0.05), 0.1, 0.2,
                                          edgecolor='none',
                                          facecolor=rgb_value[name[0]]))
-            axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
+            axlg.text(0.1, ix * 0.05, name, transform=axlg.transAxes)
 
     def population_line_plot(self, vis_years):
         self.ax2.set_xlim(0, self.num_years)
@@ -353,13 +353,15 @@ class BioSim:
                 self.line_carnivore.set_data(new_x, new_y)
 
     def update_population_line_plot(self):
-        y = self.line_herbivore.get_ydata()
-        y[self.sim_years] = self.num_animals_per_species['Herbivore']
-        self.line_herbivore.set_ydata(y)
+        if self.num_animals_per_species['Herbivore'] > 0:
+            y = self.line_herbivore.get_ydata()
+            y[self.sim_years] = self.num_animals_per_species['Herbivore']
+            self.line_herbivore.set_ydata(y)
 
-        y = self.line_carnivore.get_ydata()
-        y[self.sim_years] = self.num_animals_per_species['Carnivore']
-        self.line_carnivore.set_ydata(y)
+        if self.num_animals_per_species['Carnivore'] > 0:
+            y = self.line_carnivore.get_ydata()
+            y[self.sim_years] = self.num_animals_per_species['Carnivore']
+            self.line_carnivore.set_ydata(y)
 
     def heatmap_herbivore(self):
         x = self.animal_distribution
@@ -525,4 +527,4 @@ if __name__ == '__main__':
     print(sim.change['Born']['Carnivore'])
     """
     sim = BioSim(default_txt, ini_herbs, ymax_animals=(0, 300))
-    sim.simulate(500)
+    sim.simulate(100)
