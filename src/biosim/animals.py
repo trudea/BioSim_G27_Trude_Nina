@@ -12,8 +12,15 @@ import random
 
 
 class Animal:
+    """Create animals with weight and age, and have them perform actions like
+    eating, losing weight and dying. """
+
+
 
     def __init__(self, attribute_dict):
+        """
+        :param attribute_dict: Dictionary specifying age and weight of animal
+        """
         self.params_set = False
         self.age = None
         self.weight = None
@@ -53,9 +60,10 @@ class Animal:
     @property
     def phi(self):
         """
-        Evaluate the fitness of animal.
+        Evaluate the fitness of an animal.
 
-        :return: Float, signifying level fitness with a number between 0 and 1.
+        :return: Float signifying level of fitness with a number between 0 and
+        1.
         """
 
         q_plus = 1.0 / (1 + exp(self.params['phi_age'] *
@@ -82,7 +90,7 @@ class Animal:
         """
         Check if animal is dying.
 
-        :return: Boolean value
+        :return: Boolean value, True for dying and False for surviving.
         """
         probability = self.params['omega'] * (1 - self.phi)
         if self.weight <= 0:
@@ -98,7 +106,7 @@ class Animal:
         """
         Check if animal will move.
 
-        :return: Boolean value
+        :return: Boolean value, True for will move and False for will stay.
         """
         probability = self.mu * self.phi
         if np.random() <= probability:
@@ -110,8 +118,8 @@ class Animal:
         """
         Move animal.
 
-        :param old_cell: Landscape instance, location of animal before move
-        :param new_cell: Landscape instance, destination of animal
+        :param old_cell: Landscape instance, the location of the animal before move
+        :param new_cell: Landscape instance, the destination of the animal
         """
 
         new_cell.pop[type(self).__name__].append(self)
@@ -120,7 +128,7 @@ class Animal:
     def fertile(self, n):
         """Check if animal is fertile.
 
-        :return: Boolean value
+        :return: Boolean value, True for fertile and False for infertile.
         """
         probability = self.lambdah * self.phi * (n-1)
         if probability > 1.0:
@@ -131,7 +139,12 @@ class Animal:
             return False
 
     def procreate(self, cell):
-        """Animal gives birth to newborn if conditions are met. """
+        """ Animal gives birth to newborn if conditions are fulfilled.
+
+         :param cell: Instance of landscape in which the animal is currently
+         staying.
+        """
+
         newborn = type(self)()
         if self.weight >= self.zeta * (
                 newborn.weight + self.sigma_birth):
@@ -140,13 +153,10 @@ class Animal:
             if self.weight < 0:
                 print('animal weight too small after birth')
 
-    """
-    @phi.setter
-    def phi(self, value):
-        self._phi = value
-    """
 
 class Herbivore(Animal):
+    """Create an herbivore that can feed. """
+
     params = {'w_birth': 8.0,
               'sigma_birth': 1.5,
               'beta': 0.9,
@@ -165,13 +175,21 @@ class Herbivore(Animal):
               }
 
     def __init__(self, attribute_dict=None):
+        """
+
+        :param attribute_dict: Dictionary specifying age and weight of animal.
+        """
         super().__init__(attribute_dict)
         if not self.params_set:
             self.set_params()
             self.params_set = True
 
     def feeding(self, cell):
-        """ Carry out feeding of herbivore. """
+        """Carry out feeding of single herbivore.
+
+        :param cell: Instance of landscape in which the animal is currently
+         staying.
+        """
 
         if cell.f >= self.F:
             cell.f -= self.F
