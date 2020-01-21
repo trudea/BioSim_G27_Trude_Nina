@@ -303,7 +303,6 @@ class BioSim:
         kart_rgb = [[rgb_value[column] for column in row]
                     for row in self.island_map.splitlines()]
 
-        #self.ax1 = self._fig.add_axes([0.1, 0.1, 0.7, 0.8])  # llx, lly, w, h
         self.ax1.imshow(kart_rgb, interpolation='nearest')
         self.ax1.set_xticks(range(len(kart_rgb[0])))
         self.ax1.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
@@ -330,7 +329,6 @@ class BioSim:
                 np.nan * np.ones(
                     len(np.arange(0, self.n_steps + 1, vis_steps))), 'g-')
 
-        axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
         axlg.axis('off')
         for ix, name in enumerate(('Ocean', 'Mountain', 'Jungle',
                                    'Savannah', 'Desert')):
@@ -385,16 +383,18 @@ class BioSim:
         x = self.animal_distribution
         herb = x.pivot('Row', 'Col', 'Herbivore')
         most_herbivore = max(self.animal_distribution['Herbivore'])
-        self.ax3 = sns.heatmap(herb, vmax=most_herbivore)
+        heat_herb = sns.heatmap(herb, vmax=most_herbivore)
         self.ax3.set_title('Herbivore density map')
+        return heat_herb
 
     def heatmap_carnivore(self):
         x_carn = self.animal_distribution
         carn = x_carn.pivot('Row', 'Col', 'Herbivore')
         most_carnivore = max(self.animal_distribution['Carnivore'])
-        self.ax4 = sns.heatmap(carn, vmax=most_carnivore)
+        heat_carn = sns.heatmap(carn, vmax=most_carnivore)
         self.ax4.set_title('Carnivore density map')
-    """
+        return heat_carn
+
     def visualize(self, vis_steps):
         if self._fig is None:
             self._fig = plt.figure()
@@ -404,10 +404,9 @@ class BioSim:
         self.ax4 = self._fig.add_subplot(224)
 
         self.make_rgb_map()
-        # self.heatmap_herbivore()
-        #self.heatmap_carnivore()
         self.population_line_plot(vis_steps)
-        plt.pause(1e-03)
+        self.ax3.imshow(self.heatmap_herbivore())
+        self.heatmap_carnivore()
         plt.show()
 
     def update_graphics(self):
@@ -539,3 +538,4 @@ if __name__ == '__main__':
     """
     sim = BioSim(default_txt, ini_herbs)
     sim.simulate(4)
+
