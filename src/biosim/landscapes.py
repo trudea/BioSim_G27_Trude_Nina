@@ -16,10 +16,9 @@ class LandscapeCell:
     def __init__(self):
         self.params_set = False
         self.f = 0
-        self.species_to_class = dict(inspect.getmembers(animals,
-                                                        inspect.isclass))
-        del self.species_to_class['Animal']
         self.pop = {'Herbivore': [], 'Carnivore': []}
+        self.propensity = 0
+        self.likelihood = 0
         self.change = {'Born': {'Herbivore': 0, 'Carnivore': 0},
                        'Dead': {'Herbivore': 0, 'Carnivore': 0}}
 
@@ -30,47 +29,6 @@ class LandscapeCell:
     def tot_w_herbivores(self):
         return sum([herbivore.weight for herbivore in self.pop['Herbivore']])
 
-    @property
-    def rel_abundance(self):
-        return self._rel_abundance
-
-    """
-    @rel_abundance.setter
-    def rel_abundance(self, animal):
-        fodder = 0
-        if type(animal) == Herbivore:
-            fodder = self.f
-        elif type(animal) == Carnivore:
-
-            fodder = self.tot_w_herbivores
-        n = self.num_specimen(type(animal).__name__)
-
-        self._rel_abundance = fodder / ((n + 1) * animal.F)
-    """
-
-    """
-    @property
-    def propensity(self):
-        return self._propensity
-
-    @propensity.setter
-    def propensity(self, animal):
-        if type(self) == Ocean:
-            self._propensity = 0
-        elif type(self) == Mountain:
-            self._propensity = 0
-        else:
-            self.rel_abundance = animal
-            self._propensity = exp(animal.lambdah * self._rel_abundance)
-    """
-    @property
-    def likelihood(self):
-        return self._likelihood
-
-    @likelihood.setter
-    def likelihood(self, total):
-        self._likelihood = self._propensity / total
-
     def migration(self, neighbours):
         """
         Move each animal if the conditions require so.
@@ -80,38 +38,6 @@ class LandscapeCell:
         for species in self.pop:
             for animal in self.pop[species]:
                 animal.migrate(self, neighbours)
-                """
-                if len(neighbours) == 0:
-                    pass
-                elif len(neighbours) == 1:
-                    animal.move(self, neighbours[0])
-                else:
-                    new_cell = self.new_cell(animal, neighbours)
-                    animal.move(self, new_cell)
-                """
-
-    def new_cell(self, animal, map_list):
-        """
-        Find which cell the animal should move to, if it should move.
-
-        :param animal: Instance of animal class
-        :param map_list: List of potential destinations for animal
-        :return: landscape instance. Either the cell the animal should move to,
-         or the same cell if the animal shouldn't move.
-        """
-        for cell in map_list:
-            cell.propensity = animal   # setter verdi
-        total_propensity = sum([cell.propensity for cell in map_list])
-        for cell in map_list:
-            cell.likelihood = total_propensity
-        if not sum([cell.likelihood for cell in map_list]) == approx(1):
-            print('Probabilities do not add up: ', sum([cell.likelihood for
-                                                        cell in map_list]))
-        upper_limits = np.cumsum([cell.likelihood for cell in map_list])
-        r = np.random.random()
-        for i in range(len(upper_limits)):
-            if r <= upper_limits[i]:
-                return map_list[i]
 
     def place_animals(self, pop_list):
         """
