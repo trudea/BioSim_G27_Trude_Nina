@@ -1,3 +1,5 @@
+numpy
+pandas
 matplotlib
 PyQt5
 pytest
