@@ -20,7 +20,8 @@ class LandscapeCell:
                                                         inspect.isclass))
         del self.species_to_class['Animal']
         self.pop = {'Herbivore': [], 'Carnivore': []}
-        self.change = {'Born' : {'Herbivore': 0, 'Carnivore': 0}, 'Dead' : {'Herbivore': 0, 'Carnivore': 0}}
+        self.change = {'Born': {'Herbivore': 0, 'Carnivore': 0},
+                       'Dead': {'Herbivore': 0, 'Carnivore': 0}}
 
     def num_specimen(self, species):
         return len(self.pop[species])
@@ -161,7 +162,7 @@ class LandscapeCell:
             rem_n = len(self.pop[species])
             if len(self.pop[species]) > 0:
                 self.pop[species] = [animal for animal in self.pop[species] if
-                                 not animal.dies()]
+                                     not animal.dies()]
             if rem_n - len(self.pop[species]) > 0:
                 self.change['Dead'][species] = rem_n - len(self.pop[species])
 
