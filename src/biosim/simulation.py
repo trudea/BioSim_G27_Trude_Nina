@@ -313,14 +313,14 @@ class BioSim:
         self.ax1.set_yticks(range(len(kart_rgb)))
         self.ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))
 
-        axlg = self._fig.add_axes([0.05, 0.5, 0.1, 0.8])  # llx, lly, w, h
+        axlg = self._fig.add_axes([0.05, 0.6, 0.1, 0.8])  # llx, lly, w, h
         axlg.axis('off')
-        for ix, name in enumerate(('Ocean', 'Mountain', 'Jungle',
-                                   'Savannah', 'Desert')):
+        for ix, name in enumerate(('O', 'M', 'J',
+                                   'S', 'D')):
             axlg.add_patch(plt.Rectangle((0.0, ix * 0.05), 0.1, 0.2,
                                          edgecolor='none',
                                          facecolor=rgb_value[name[0]]))
-            axlg.text(0.1, ix * 0.05, name, transform=axlg.transAxes)
+            axlg.text(0.2, ix * 0.05, name, transform=axlg.transAxes)
 
     def population_line_plot(self, vis_years):
         self.ax2.set_xlim(0, self.num_years)
@@ -372,7 +372,7 @@ class BioSim:
     def heatmap_carnivore(self):
         x = self.animal_distribution
         carn = x.pivot('Row', 'Col', 'Carnivore').values
-        self.ax4.imshow(carn, vmax=self.cmax_animals['Carnivore'])
+        plot = self.ax4.imshow(carn, vmax=self.cmax_animals['Carnivore'])
         self.ax4.set_title('Carnivore density map')
 
     def update_heatmap_herb(self):
