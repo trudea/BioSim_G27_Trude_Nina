@@ -107,19 +107,33 @@ class Animal:
         :return: Boolean value, True for will move and False for will stay.
         """
         probability = self.mu * self.phi
-        if np.random() <= probability:
+        if np.random.random() <= probability:
             return True
         else:
             return False
 
+    def get_rel_abundance(self, current_cell):
+        fodder = 0
+        if type(self) == Herbivore:
+            fodder = current_cell.f
+        elif type(self) == Carnivore:
+            fodder = current_cell.tot_w_herbivores
+        n = current_cell.num_specimen(type(self).__name__)
+
+        return fodder / ((n + 1) * self.F)
+
+    def get_propensity(self, current_cell):
+        rel_abundance = self.get_rel_abundance(current_cell)
+        return exp(self.lambdah * rel_abundance)
+
     def migrate(self, current_cell, neighbours):
         if len(neighbours) == 0:
-            return
+            new_cell = current_cell
         elif len(neighbours) == 1:
             new_cell = neighbours[0]
         else:
             new_cell = self.choose_new_cell(current_cell, neighbours)
-            self.move(current_cell, new_cell)
+        self.move(current_cell, new_cell)
 
     def choose_new_cell(self, current_cell, neighbours):
         """
@@ -131,15 +145,10 @@ class Animal:
          or the same cell if the animal shouldn't move.
         """
         for current_cell in neighbours:
-            current_cell.propensity = self   # setter verdi
+            current_cell.propensity = self.get_propensity(current_cell)
         total_propensity = sum([cell.propensity for cell in neighbours])
         for cell in neighbours:
-            cell.likelihood = total_propensity
-        """
-        if not sum([cell.likelihood for cell in map_list]) == approx(1):
-            print('Probabilities do not add up: ', sum([cell.likelihood for
-                                                        cell in map_list]))
-        """
+            cell.likelihood = cell.propensity / total_propensity
         upper_limits = np.cumsum([cell.likelihood for cell in neighbours])
         r = np.random.random()
         for i in range(len(upper_limits)):
@@ -212,6 +221,7 @@ class Herbivore(Animal):
 
         :param attribute_dict: Dictionary specifying age and weight of animal.
         """
+
         super().__init__(attribute_dict)
         if not self.params_set:
             self.set_params()
@@ -226,10 +236,7 @@ class Herbivore(Animal):
 
         if cell.f >= self.F:
             cell.f -= self.F
-            m = self.weight
             self.weight += (self.beta * self.F)
-            if m >= self.weight:
-                print('weight not gained')
 
         elif cell.f < self.F:
             cell.f = 0

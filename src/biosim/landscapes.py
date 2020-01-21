@@ -34,6 +34,7 @@ class LandscapeCell:
     def rel_abundance(self):
         return self._rel_abundance
 
+    """
     @rel_abundance.setter
     def rel_abundance(self, animal):
         fodder = 0
@@ -45,7 +46,9 @@ class LandscapeCell:
         n = self.num_specimen(type(animal).__name__)
 
         self._rel_abundance = fodder / ((n + 1) * animal.F)
+    """
 
+    """
     @property
     def propensity(self):
         return self._propensity
@@ -59,7 +62,7 @@ class LandscapeCell:
         else:
             self.rel_abundance = animal
             self._propensity = exp(animal.lambdah * self._rel_abundance)
-
+    """
     @property
     def likelihood(self):
         return self._likelihood
