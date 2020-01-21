@@ -303,15 +303,15 @@ class BioSim:
         kart_rgb = [[rgb_value[column] for column in row]
                     for row in self.island_map.splitlines()]
 
-        self.ax1 = self._fig.add_axes([0.1, 0.1, 0.7, 0.8])  # llx, lly, w, h
+        #self.ax1 = self._fig.add_axes([0.1, 0.1, 0.7, 0.8])  # llx, lly, w, h
         self.ax1.imshow(kart_rgb, interpolation='nearest')
         self.ax1.set_xticks(range(len(kart_rgb[0])))
         self.ax1.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
         self.ax1.set_yticks(range(len(kart_rgb)))
-        self.ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))
+        self.ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))3a
 
-        axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
-        axlg.axis('off')
+        #axlg = self._fig.add_axes([0.85, 0.1, 0.1, 0.8])  # llx, lly, w, h
+        #axlg.axis('off')
         for ix, name in enumerate(('Ocean', 'Mountain', 'Jungle',
                                    'Savannah', 'Desert')):
             axlg.add_patch(plt.Rectangle((0., ix * 0.2), 0.3, 0.1,
@@ -340,32 +340,32 @@ class BioSim:
             axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
 
 
-    def population_line_plot(self, vis_steps):
+    def population_line_plot(self, vis_years):
         self.ax2.set_xlim(0, self.num_years)
         self.ax2.set_ylim(self.y_lim[0], self.y_lim[1])
         self.ax2.set_title('Population')
 
         if self.line_herbivore is None:
             self.line_herbivore, = self.ax2.plot(
-                np.arange(0, self.num_years + 1, vis_steps),
+                np.arange(0, self.num_years + 1, vis_years),
                 np.nan * np.ones(
-                    len(np.arange(0, self.num_years + 1, vis_steps))), 'g-')
+                    len(np.arange(0, self.num_years + 1, vis_years))), 'g-')
 
             self.line_carnivore, = self.ax2.plot(
-                np.arange(0, self.num_years + 1, vis_steps),
+                np.arange(0, self.num_years + 1, vis_years),
                 np.nan * np.ones(
-                    len(np.arange(0, self.num_years + 1, vis_steps))), 'r-')
+                    len(np.arange(0, self.num_years + 1, vis_years))), 'r-')
             self.ax2.legend(['Herbivore', 'Carnivore'])
 
         else:
             x, y = self.line_herbivore.get_data()
-            new_x = np.arange(x[-1] + 1, self.num_years + 1, vis_steps)
+            new_x = np.arange(x[-1] + 1, self.num_years + 1, vis_years)
             if len(new_x > 0):
                 new_y = np.nan * np.ones_like(new_x)
                 self.line_herbivore.set_data(new_x, new_y)
 
             x, y = self.line_carnivore.get_data()
-            new_x = np.arange(x[-1] + 1, self.num_years + 1, vis_steps)
+            new_x = np.arange(x[-1] + 1, self.num_years + 1, vis_years)
             if len(new_x > 0):
                 new_y = np.nan * np.ones_like(new_x)
                 self.line_carnivore.set_data(new_x, new_y)
@@ -380,8 +380,7 @@ class BioSim:
         self.line_carnivore.set_ydata(y)
 
         self.current_idx += 1
-        plt.pause(1e-03)
-
+    """
     def heatmap_herbivore(self):
         x = self.animal_distribution
         herb = x.pivot('Row', 'Col', 'Herbivore')
@@ -395,9 +394,8 @@ class BioSim:
         most_carnivore = max(self.animal_distribution['Carnivore'])
         self.ax4 = sns.heatmap(carn, vmax=most_carnivore)
         self.ax4.set_title('Carnivore density map')
-
+    """
     def visualize(self, vis_steps):
-        plt.cla()
         if self._fig is None:
             self._fig = plt.figure()
         self.ax1 = self._fig.add_subplot(221)
@@ -406,14 +404,15 @@ class BioSim:
         self.ax4 = self._fig.add_subplot(224)
 
         self.make_rgb_map()
-        self.heatmap_herbivore()
-        self.heatmap_carnivore()
+        # self.heatmap_herbivore()
+        #self.heatmap_carnivore()
         self.population_line_plot(vis_steps)
+        plt.pause(1e-03)
         plt.show()
 
     def update_graphics(self):
-        self.heatmap_herbivore()
-        self.heatmap_carnivore()
+        #self.heatmap_herbivore()
+        #self.heatmap_carnivore()
         self.update_population_line_plot()
 
     def set_landscape_parameters(self, landscape, params):
@@ -466,7 +465,8 @@ class BioSim:
 
         while (self.sim_years < self.num_years):
             self.one_year()
-            self.visualize(num_years)
+            if num_years % vis_years == 0:
+                self.visualize(num_years)
             self.sim_years += 1
             # print(self.year, ' ', self.num_animals_per_species)
             for cell in self.map.values():
@@ -537,3 +537,5 @@ if __name__ == '__main__':
     sim.all_cells('procreation')
     print(sim.change['Born']['Carnivore'])
     """
+    sim = BioSim(default_txt, ini_herbs)
+    sim.simulate(4)
