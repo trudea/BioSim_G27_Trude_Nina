@@ -181,7 +181,6 @@ class BioSim:
         """
         self.land_dict[landscape].set_params(params)
 
-
     def add_population(self, population):
         """
         Add a population to the island
