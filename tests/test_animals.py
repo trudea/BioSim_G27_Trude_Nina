@@ -5,9 +5,9 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 import pytest
 import random
-import biosim.animals as ani
-import biosim.landscapes as land
-import biosim.simulation as sim
+import src.biosim.animals as ani
+import src.biosim.landscapes as land
+import src.biosim.simulation as sim
 
 
 @pytest.fixture

@@ -1,6 +1,8 @@
 import src.biosim.animals as animals
 import pytest
 import numpy as np
+import src.biosim.landscapes as landscapes
+
 
 
 class BaseTestAnimal:
@@ -21,6 +23,11 @@ class BaseTestAnimal:
         ani = self.AnimalType()
         ani.weight = 0
         yield ani
+
+    @pytest.fixture
+    def ex_jungle(self):
+        yield landscapes.Jungle()
+
 
     def test_isinstance(self, ex_ani):
         assert isinstance(ex_ani, animals.Animal)
@@ -48,22 +55,22 @@ class BaseTestAnimal:
         assert 0 <= ex_ani.weight < remembered_w
 
     def test_dying(self, mocker, ex_fit_ani, ex_unfit_ani):
-        mocker.patch('np.random.random', return_value=0)
+        mocker.patch('numpy.random.random', return_value=1)
         survivor = ex_fit_ani
         assert survivor.dies() is False
-        mocker.patch('np.random', return_value=1)
+        mocker.patch('numpy.random.random', return_value=0)
         dying_ani = ex_unfit_ani
         assert dying_ani.dies()
 
     def test_movable(self, mocker, ex_fit_ani, ex_unfit_ani):
-        mocker.patch('np.random.random', return_value=0)
+        mocker.patch('numpy.random.random', return_value=0)
         fit_ani = ex_fit_ani
         assert fit_ani.movable()
-        mocker.patch('np.random', return_value=1)
+        mocker.patch('numpy.random.random', return_value=1)
         unfit_ani = ex_fit_ani
         assert unfit_ani.movable() is False
 
-    def test_get_relabundance(self):
+
 
 
 
@@ -72,6 +79,28 @@ class BaseTestAnimal:
 
 class TestHerbivore(BaseTestAnimal):
     AnimalType = animals.Herbivore
+
+    @pytest.fixture
+    def ex_herbivore(self):
+        yield animals.Herbivore()
+
+    def test_get_rel_abundance(self, ex_herbivore, ex_jungle):
+        assert type(ex_herbivore.get_rel_abundance(ex_jungle)) == float
+        assert 0 < ex_herbivore.get_rel_abundance(ex_jungle) < 1
+
+class TestCarnivore(BaseTestAnimal):
+    AnimalType = animals.Carnivore
+
+    @pytest.fixture
+    def ex_carnivore(self):
+        yield animals.Carnivore()
+
+    def test_get_rel_abundance(self, ex_ani, ex_carnivore,
+                               ex_jungle):
+        ex_jungle.population['Herbivore'].append(animals.Herbivore())
+        assert type(ex_carnivore.get_rel_abundance(ex_jungle)) == float
+        assert 0 < ex_carnivore.get_rel_abundance(ex_jungle)
+
 
 
 
