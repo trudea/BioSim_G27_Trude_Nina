@@ -44,13 +44,6 @@ class BioSim:
         including path
         :param img_fmt: String with file type for figures, e.g. 'png'
 
-        If ymax_animals is None, the y-axis limit should be adjusted
-        automatically.
-
-        If cmax_animals is None, sensible, fixed default values should be used.
-        cmax_animals is a dict mapping species names to numbers, e.g.,
-           {'Herbivore': 50, 'Carnivore': 20}
-
         """
         self.land_dict = {'S': Savannah, 'J': Jungle, 'O': Ocean, 'M':
                           Mountain, 'D': Desert}
@@ -73,8 +66,6 @@ class BioSim:
         self.map = self.str_to_dict(island_map)
         self.map_active = {key: value for (key, value) in self.map.items() if
                            type(value) in self.active}
-        #self.map_inactive = {key: value for (key, value) in self.map.items() if
-        #                     type(value) in self.active}
         self.map_full = self.map.copy()
         self.map = self.map_active
         if ini_pop is not None:
@@ -253,9 +244,6 @@ class BioSim:
 
     def one_year(self):
         """ Implement one annual cycle. """
-
-        # print(self.year, ' ', self.num_animals_per_species)
-
         self.all_cells('replenish')
         self.all_cells('feeding')
         self.all_cells('procreation')
@@ -290,75 +278,6 @@ class BioSim:
         while (self.sim_years < self.num_years):
             self.one_year()
             self.sim_years += 1
-            # print(self.year, ' ', self.num_animals_per_species)
             self.Vis.update_graphics()
             self.Vis._save_graphics()
-
-
-if __name__ == '__main__':
-    """
-    default_seed = 33
-    default_txt = open('rossum.txt').read()
-    default_pop = [{'loc': (3, 4), 'pop': [
-        {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
-        {'species': 'Herbivore', 'age': 9, 'weight': 10.3},
-        {'species': 'Carnivore', 'age': 14, 'weight': 10.3},
-        {'species': 'Carnivore', 'age': 5, 'weight': 10.1}]},
-                     {'loc': (4, 4),
-                      'pop': [
-                          {'species': 'Herbivore', 'age': 10, 'weight': 12.5},
-                          {'species': 'Carnivore', 'age': 3, 'weight': 7.3},
-                          {'species': 'Carnivore', 'age': 5, 'weight': 8.1}]}]
-    """
-
-    # sim = BioSim(default_txt, default_pop, default_seed)
-    # sim.simulate(10)
-    """
-    geogr = '\
-               OOOOOOOOOOOOOOOOOOOOO
-               OOOOOOOOSMMMMJJJJJJJO
-               OSSSSSJJJJMMJJJJJJJOO
-               OSSSSSSSSSMMJJJJJJOOO
-               OSSSSSJJJJJJJJJJJJOOO
-               OSSSSSJJJDDJJJSJJJOOO
-               OSSJJJJJDDDJJJSSSSOOO
-               OOSSSSJJJDDJJJSOOOOOO
-               OSSSJJJJJDDJJJJJJJOOO
-               OSSSSJJJJDDJJJJOOOOOO
-               OOSSSSJJJJJJJJOOOOOOO
-               OOOSSSSJJJJJJJOOOOOOO
-               OOOOOOOOOOOOOOOOOOOOO'
-    geogr = textwrap.dedent(geogr)
-    """
-    # default_txt = open('rossum.txt').read()
-    default_txt = 'OOOOO\nOJJJO\nOJJJO\nOJJJO\nOOOOO'
-
-    ini_herbs = [
-        {
-            "loc": (2, 2),
-            "pop": [
-                {"species": "Herbivore", "age": 5, "weight": 20}
-                for _ in range(50)
-            ],
-        }
-    ]
-    ini_carns = [
-        {
-            "loc": (2, 2),
-            "pop": [
-                {"species": "Carnivore", "age": 5, "weight": 20}
-                for _ in range(3)
-            ],
-        }
-    ]
-    """
-    sim = BioSim('OOOOO\nODJMO\nOJJSO\nOJSDO\nOOOOO', ini_herbs, 1)
-    sim.add_population(ini_carns)
-    sim.all_cells('procreation')
-    print(sim.change['Born']['Carnivore'])
-    """
-    sim = BioSim(default_txt, ini_herbs, ymax_animals=(0, 300))
-    sim.simulate(30, 1)
-    sim.simulate(10, 1)
-
-    print(sim.num_animals_per_species)
+        self.Vis.make_movie()
