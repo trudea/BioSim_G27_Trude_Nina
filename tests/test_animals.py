@@ -4,6 +4,7 @@ __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 import pytest
+import random
 import biosim.animals as ani
 import biosim.landscapes as land
 import biosim.simulation as sim
@@ -105,7 +106,7 @@ class TestAnimal:
     def test_place_animal(self, input_list, example_map):
         i = sim.BioSim(example_map, input_list, None)
         herbivore_list = i.map[(1, 1)]
-        assert len(herbivore_list.pop['Herbivore']) == 2
+        assert len(herbivore_list.population['Herbivore']) == 2
 
     def test_tot_w_herbivores(self, input_list, example_map):
         i = sim.BioSim(example_map, input_list, None)
@@ -124,9 +125,9 @@ class TestAnimal:
 
     def test_migration(self, example_carnivore):
         cell1, cell2 = land.Savannah(), land.Savannah()
-        cell1.pop["Carnivore"].append(example_carnivore)
+        cell1.population["Carnivore"].append(example_carnivore)
         example_carnivore.move(cell1, cell2)
-        assert len(cell2.pop["Carnivore"]) == 1
+        assert len(cell2.population["Carnivore"]) == 1
 
     def test_eat_in_order_fitness(self, example_savannah):
         herbert, herman = ani.Herbivore(), ani.Herbivore()
