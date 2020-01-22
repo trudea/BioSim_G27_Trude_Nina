@@ -10,7 +10,7 @@ and carnivores. Landscape types consist of savannah, jungle, desert and
 mountain, with surrounding ocean.
 """
 
-from .animals import Herbivore, Carnivore
+from biosim.animals import Herbivore, Carnivore
 from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
 from src.biosim.visualization import Visualization as Vis
 import pandas as pd

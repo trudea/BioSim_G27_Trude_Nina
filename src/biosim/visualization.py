@@ -20,7 +20,7 @@ _CONVERT_BINARY = 'magick'
 
 # update this to the directory and file-name beginning
 # for the graphics files
-_DEFAULT_GRAPHICS_DIR = os.path.join('..', 'data')
+_DEFAULT_GRAPHICS_DIR = os.path.join('.', 'data')
 _DEFAULT_GRAPHICS_NAME = 'Rossumoya'
 _DEFAULT_MOVIE_FORMAT = 'mp4'   # alternatives: mp4, gif
 
@@ -117,6 +117,10 @@ class Visualization:
         If the lines are made the data from array and number of
         new points are merged together to a new array of data
         :param vis_years: number of years between each plot update
+        inspiration:
+            Hans E Plessser, nmbu:
+            INF200-2019/Project
+            /SampleProjects/randvis_project/randvis/simulation.py
         """
         self.ax2.set_title('Population')
 
@@ -153,6 +157,9 @@ class Visualization:
         """
         Updates the array of NaN in y with real data from simulation.
         Two plots are created one for herbivore and one for carnivore
+        Inspiration from github by Hans E Plessser, nmbu:
+            INF200-2019/Project
+            /SampleProjects/randvis_project/randvis/simulation.py
         """
         self.ymax_animals = (0, self.sim.num_animals + 100)
         self.ax2.set_ylim(self.ymax_animals[0], self.ymax_animals[1])
