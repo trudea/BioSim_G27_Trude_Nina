@@ -1,6 +1,6 @@
 Landscape class
 ***************
 
-.. automodule:: biosim.landscapes
+.. automodule:: .landscapes
    :members:
 

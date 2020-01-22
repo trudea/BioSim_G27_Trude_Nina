@@ -1,6 +1,6 @@
 Animal class
 *************
 
-.. automodule:: biosim.animals
+.. automodule:: .animals
    :members:
 
