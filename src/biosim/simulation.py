@@ -11,8 +11,8 @@ mountain, with surrounding ocean.
 """
 
 from biosim.animals import Herbivore, Carnivore
-from src.biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
-from src.biosim.visualization import Visualization as Vis
+from biosim.landscapes import Savannah, Jungle, Desert, Mountain, Ocean
+from biosim.visualization import Visualization as Vis
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
