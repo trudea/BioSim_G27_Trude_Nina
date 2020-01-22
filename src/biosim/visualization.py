@@ -47,7 +47,7 @@ class Visualization:
         """
 
         if img_base is not None:
-            self.img_base = os.path.join(img_base, img_name)
+            self.img_base = img_base
         else:
             self.img_base = None
             self.img_fmt = img_fmt
