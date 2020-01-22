@@ -45,75 +45,46 @@ def example_map():
     return """OOOO\nOJJO\nOOOO"""
 
 
-class TestLandscapes:
+class BaseTestLandscapes:
+    LandscapeType = land.LandscapeCell
 
-    def test_change_param_dict(self):
+    @pytest.fixture
+    def ex_land(self):
+        yield self.LandscapeType
+
+    def test_instance(self, ex_land):
+        assert isinstance(ex_land, land.LandscapeCell)
+
+    def test_change_param_dict(self, ex_land):
         """
         Checks if a change of parameters actually applies to class instance
         and replaces standard values
         """
-        original_dict = land.Savannah.params.copy()
-        jungle = land.Jungle(param_dict={'f_max': 500})
-        savannah = land.Savannah({'f_max': 200})
-        assert jungle.params['f_max'] is not 800 \
-            and savannah.params['f_max'] is not 300
-        land.Savannah.params = original_dict
+        original_dict = ex_land.f_max
+        ex_land.set_params({'f_max': 900})
+        assert ex_land.f_max is not original_dict
 
-    def test_jungle_instance(self, example_jungle):
+    def test_fodder(self, ex_land):
         """
-        Checks if an instance of jungle is created by providing a jungle tile
+        A test that tests if an instance of the landscape class, given a
+        value under f_max replenishes itself if possible (increases the f
+        value)
         """
-        assert isinstance(example_jungle, land.Jungle)
+        ex_land.f = 200.0
+        ex_land.replenish()
+        assert ex_land.f > 200.0
 
-    def test_desert_instance(self):
-        """
-        Checks if an instance of desert is created by providing a desert tile
-        """
-        desert = land.Desert()
-        assert isinstance(desert, land.Desert)
 
-    def test_ocean(self):
-        """
-        Checks if an instance of ocean is created by providing an ocean tile
-        """
-        ocean = land.Ocean()
-        assert isinstance(ocean, land.Ocean)
+class TestSavannah(BaseTestLandscapes):
+    LandscapeType = land.Savannah()
 
-    def test_mountain(self):
-        """
-        Checks if an instance of mountain is
-        created by providing a mountain tile
-        """
-        mountain = land.Mountain()
-        assert isinstance(mountain, land.Mountain)
 
-    def test_fodder_savannah(self, example_savannah):
-        """
-        A test that tests if an instance of the Savannah class, given a
-        value under f_max replenishes itself (increases the f value)
-        """
-        example_savannah.f = 200.0
-        example_savannah.replenish()
-        assert example_savannah.f > 200.0
+class TestJungle(BaseTestLandscapes):
+    LandscapeType = land.Jungle()
 
-    def test_fodder_jungle(self, example_jungle):
-        """
-        A test that checks if an instance of Jungle class, given a value
-        under f_max replenishes itself to the given parameter
-        f_max given to that instance of jungle.
-        """
-        example_jungle.f = 500
-        example_jungle.replenish()
-        assert example_jungle.f == example_jungle.params['f_max']
 
-    def test_num_animals(self, input_list, example_map):
-        island = sim.BioSim(example_map, input_list, None)
-        island.add_population(input_list)
-        assert island.num_animals == 8
+class TestDesert(BaseTestLandscapes):
+    LandscapeType = land.Desert()
 
-    def test_num_animals_per_species(self, input_list, example_map):
-        island = sim.BioSim(example_map, input_list, None)
-        assert island.num_animals_per_species['Herbivore'] == 4
-
-    def test_relative_abundance(self, example_jungle):
-        assert example_jungle._rel_abundance == 700
+class TestMountain():
+    pass
