@@ -1,5 +1,6 @@
 import src.biosim.animals as animals
 import pytest
+import numpy as np
 
 
 class BaseTestAnimal:
@@ -8,6 +9,18 @@ class BaseTestAnimal:
     @pytest.fixture
     def ex_ani(self):
         yield self.AnimalType()
+
+    @pytest.fixture
+    def ex_fit_ani(self):
+        ani = self.AnimalType()
+        ani.weight = 90
+        yield ani
+
+    @pytest.fixture
+    def ex_unfit_ani(self):
+        ani = self.AnimalType()
+        ani.weight = 0
+        yield ani
 
     def test_isinstance(self, ex_ani):
         assert isinstance(ex_ani, animals.Animal)
@@ -34,15 +47,26 @@ class BaseTestAnimal:
         ex_ani.weightloss()
         assert 0 <= ex_ani.weight < remembered_w
 
-    def test_dying(self, mocker, ex_ani):
-        mocker.patch('np.random.random', return_value=0.999)
-        dying_animal = ex_ani
-        dying_animal.weight = 0
-        survivor = ex_ani
-        print(survivor.weight)
-        assert dying_animal.dies == True
-        mocker.patch('np.random.random', return_value=0.999)
-        assert survivor.dies == False
+    def test_dying(self, mocker, ex_fit_ani, ex_unfit_ani):
+        mocker.patch('np.random.random', return_value=0)
+        survivor = ex_fit_ani
+        assert survivor.dies() is False
+        mocker.patch('np.random', return_value=1)
+        dying_ani = ex_unfit_ani
+        assert dying_ani.dies()
+
+    def test_movable(self, mocker, ex_fit_ani, ex_unfit_ani):
+        mocker.patch('np.random.random', return_value=0)
+        fit_ani = ex_fit_ani
+        assert fit_ani.movable()
+        mocker.patch('np.random', return_value=1)
+        unfit_ani = ex_fit_ani
+        assert unfit_ani.movable() is False
+
+    def test_get_relabundance(self):
+
+
+
 
 
 
