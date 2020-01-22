@@ -1,6 +1,6 @@
 Simulation
 *************
 
-.. automodule:: biosim.simulation
+.. automodule:: .simulation
    :members:
 

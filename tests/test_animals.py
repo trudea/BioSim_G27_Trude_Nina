@@ -5,9 +5,104 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 import pytest
 import random
-import biosim.animals as ani
-import biosim.landscapes as land
-import biosim.simulation as sim
+import .animals as ani
+import .landscapes as land
+import .simulation as sim
+
+
+class BaseTestAnimal:
+    AnimalType = ani.Animal
+
+    @pytest.fixture
+    def ex_ani(self):
+        yield self.AnimalType()
+
+    @pytest.fixture
+    def ex_fit_ani(self):
+        ani = self.AnimalType()
+        ani.weight = 90
+        yield ani
+
+    @pytest.fixture
+    def ex_unfit_ani(self):
+        ani = self.AnimalType()
+        ani.weight = 0
+        yield ani
+
+    @pytest.fixture
+    def ex_jungle(self):
+        yield land.Jungle()
+
+
+    def test_isinstance(self, ex_ani):
+        assert isinstance(ex_ani, ani.Animal)
+
+    def test_set_params(self, ex_ani):
+        different_params = {'a_half': 123, 'gamma': 456 }
+        ex_ani.set_params(different_params)
+        assert ex_ani.a_half == 123
+        assert ex_ani.gamma == 456
+
+    def test_initial_age(self, ex_ani):
+        assert ex_ani.age == 0
+
+    def test_aging(self, ex_ani):
+        ex_ani.aging()
+        ex_ani.aging()
+        assert ex_ani.age == 2
+
+    def test_phi(self, ex_ani):
+        assert 0 < ex_ani.phi < 1
+
+    def test_weightloss(self, ex_ani):
+        remembered_w = ex_ani.weight
+        ex_ani.weightloss()
+        assert 0 <= ex_ani.weight < remembered_w
+
+    def test_dying(self, mocker, ex_fit_ani, ex_unfit_ani):
+        mocker.patch('numpy.random.random', return_value=1)
+        survivor = ex_fit_ani
+        assert survivor.dies() is False
+        mocker.patch('numpy.random.random', return_value=0)
+        dying_ani = ex_unfit_ani
+        assert dying_ani.dies()
+
+    def test_movable(self, mocker, ex_fit_ani, ex_unfit_ani):
+        mocker.patch('numpy.random.random', return_value=0)
+        fit_ani = ex_fit_ani
+        assert fit_ani.movable()
+        mocker.patch('numpy.random.random', return_value=1)
+        unfit_ani = ex_fit_ani
+        assert unfit_ani.movable() is False
+
+
+class TestHerbivore(BaseTestAnimal):
+    AnimalType = ani.Herbivore
+
+    @pytest.fixture
+    def ex_herbivore(self):
+        yield ani.Herbivore()
+
+    def test_get_rel_abundance(self, ex_herbivore, ex_jungle):
+        assert type(ex_herbivore.get_rel_abundance(ex_jungle)) == float
+        assert 0 < ex_herbivore.get_rel_abundance(ex_jungle)
+
+class TestCarnivore(BaseTestAnimal):
+    AnimalType = ani.Carnivore
+
+    @pytest.fixture
+    def ex_carnivore(self):
+        yield ani.Carnivore()
+
+    def test_get_rel_abundance(self, ex_ani, ex_carnivore,
+                               ex_jungle):
+        ex_jungle.population['Herbivore'].append(ani.Herbivore())
+        assert type(ex_carnivore.get_rel_abundance(ex_jungle)) == float
+        assert 0 < ex_carnivore.get_rel_abundance(ex_jungle)
+
+
+
+
 
 
 @pytest.fixture
@@ -113,47 +208,11 @@ class TestAnimal:
         c = i.map[(1, 1)]
         assert c.tot_w_herbivores == 22.8
 
-    def test_move_check(self):
-        """
-        A test that ensures that the boolean check_if_animal_moves behaves
-        accordingly
-        """
-        random.seed(1)
-        harold = ani.Herbivore({'phi': 0})  # asserts probability of
-        # moving is high
-        assert harold.movable()
-
     def test_migration(self, example_carnivore):
         cell1, cell2 = land.Savannah(), land.Savannah()
         cell1.population["Carnivore"].append(example_carnivore)
         example_carnivore.move(cell1, cell2)
         assert len(cell2.population["Carnivore"]) == 1
-
-    def test_eat_in_order_fitness(self, example_savannah):
-        herbert, herman = ani.Herbivore(), ani.Herbivore()
-        herbert.weight, herbert.phi, herman.weight, herman.phi = 10, 10, 1, 0.5
-        example_savannah.f = (herbert.params['F'] - 1)
-        example_savannah.pop['Herbivore'].append(herbert)
-        example_savannah.pop['Herbivore'].append(herman)
-        example_savannah.feeding()
-        assert herbert.weight > herman.weight
-
-    def test_check_kills(self, example_herbivore, example_carnivore):
-        random.seed(999)
-        herman = ani.Herbivore({'phi': 0})
-        # asserts that the probability of killing is high
-        carnie = ani.Carnivore({'phi': 1})
-        assert carnie.check_if_kills(herman)
-
-    def test_animal_dead(self):
-        herbert = ani.Herbivore({'phi': 0})
-        assert herbert.dies()
-
-    def test_animal_dead_is_removed(self):
-        herman = ani.Herbivore({'phi': 0})
-        example_savannah.pop['Herbivore'].append(herman)
-        example_savannah.dying()
-        assert herman not in example_savannah.pop['Herbivore']
 
     def test_little_fodder(self, example_herbivore):
         herbivore = example_herbivore
@@ -169,16 +228,6 @@ class TestAnimal:
         example_carnivore.weight = 45
         assert example_carnivore.fertile(90)
 
-    def test_new_individual(self, example_herbivore, example_savannah):
-        random.seed(999)
-        example_herbivore.weight = 45
-        for i in range(5):
-            example_savannah.pop['Herbivore'].append(example_herbivore)
-        old_pop = len(example_savannah.pop['Herbivore'])
-        example_savannah.procreation()
-        new_pop = len(example_savannah.pop['Herbivore'])
-        assert new_pop > old_pop
-
     def test_parameter_change(self, example_carnivore):
         old_parameter = example_carnivore.params["w_birth"]
         example_carnivore.params["w_birth"] = 10
@@ -190,11 +239,3 @@ class TestAnimal:
                                           'weight': 12.5}]}]
         with pytest.raises(ValueError):
             sim.BioSim(test_map, input, None)
-
-    def test_kill_order_fitness(self):
-        cell = land.Jungle()
-        herb, herman = ani.Herbivore({'phi': 0.5}), ani.Herbivore({'phi': 1})
-        killer = ani.Carnivore({'phi': 1})
-        cell.pop.add(herb, herman, killer)
-        land.LandscapeCell.feeding(cell)
-        assert cell.pop == 2

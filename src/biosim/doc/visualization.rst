@@ -7,7 +7,7 @@ graph
 
 
 
-.. automodule:: biosim.visualization
+.. automodule:: .visualization
    :members:
 
 
