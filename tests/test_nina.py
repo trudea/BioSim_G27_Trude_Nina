@@ -68,6 +68,7 @@ def test_herbivore_weight():
 
 
 """
+"""
 class TestSimulation:
     @pytest.fixture
     def random_map(self):
@@ -190,8 +191,7 @@ class TestSimulation:
         assert cell.pop['Herbivore'][0].weight > 5
 
     def test_savannah_feeding(self, island):
-        """Check if herbivores gain weight feeding on savannah, and if fodder
-        runs out."""
+        
         simple_map = 'OOO\nOSO\nOOO'
         herbivores =   [{'species': 'Herbivore', 'age': 5, 'weight': 20.0} for i in range(31)]
         island = sim.BioSim(simple_map, [{'loc': (1, 1), 'pop': herbivores}],
@@ -207,8 +207,8 @@ class TestSimulation:
 
 
     def test_jungle_feeding(self, jungle):
-        """Check if herbivores gain weight feeding in jungle, and if fodder
-        runs out."""
+        Check if herbivores gain weight feeding in jungle, and if fodder
+        runs out.
 
         herbivores = [{'species': 'Herbivore', 'age': 5, 'weight': 20.0}
                       for i in range(81)]
@@ -223,7 +223,7 @@ class TestSimulation:
         assert cell.pop['Herbivore'][-1].phi == old_phi[-1]
 
     def test_desert_feeding(self, desert):
-        """Check that herbivore doesn't gain weight in desert."""
+        Check that herbivore doesn't gain weight in desert.
         desert.add_population([{'loc': (1, 1), 'pop':
             [{'species': 'Herbivore', 'age': 5, 'weight': 20.0}]}])
         cell = desert.map[(1, 1)]
@@ -234,8 +234,8 @@ class TestSimulation:
 
 
     def test_unsuitable_placements(self, mountain, ocean):
-        """Check that population can't be placed on mountain or in the
-        ocean."""
+        Check that population can't be placed on mountain or in the
+        ocean.
         with pytest.raises(ValueError):
             mountain.add_population([{'loc': (1, 1), 'pop':
                 [{'species': 'Herbivore', 'age': 5, 'weight': 20}]}])
@@ -244,8 +244,8 @@ class TestSimulation:
                 [{'species': 'Herbivore', 'age': 5, 'weight': 20}]}])
 
     def test_carnivore_feeding(self, desert, mocker):
-        """Test if carnivore gains weight and increases fitness in cell with
-        herbivores, and if herbivore population is diminished. """
+        Test if carnivore gains weight and increases fitness in cell with
+        herbivores, and if herbivore population is diminished.
         mocker.patch('random.random', return_value=0.0001)
         herb_pop = [{'species': 'Herbivore', 'age': 5, 'weight': 20} for i in range(200)]
         carn_pop = [{'species': 'Carnivore', 'age': 5, 'weight': 20}]
@@ -262,7 +262,7 @@ class TestSimulation:
         assert cell.tot_w_herbivores < old_tot_w
 
     def test_carnivore_procreation(self, desert):
-        """Test if carnivores are born"""
+        Test if carnivores are born
         carn_pop = [{'species': 'Carnivore', 'age': 5, 'weight': 20} for i in range(50)]
         desert.add_population([{'loc': (1,1), 'pop': carn_pop}])
         desert.all_cells('procreation')
@@ -272,14 +272,22 @@ class TestSimulation:
 
 class BaseTestAnimal:
 
+    @pytest.fixture
+    def empty_jungle(self):
 
 
-class BaseTestHerbivore:
+class BaseTestHerbivore(BaseTestAnimal):
+    pass
 
 
-class BasetestCarnivore:
+class BasetestCarnivore(BaseTestAnimal):
+    pass
 
+"""
 
+if __name__ == '__main__':
+    h = ani.Herbivore({'weight': 0})
+    print(h.weight)
 
 
 
