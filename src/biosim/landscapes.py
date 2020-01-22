@@ -3,14 +3,7 @@
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
-import inspect
-from math import exp
-import numpy as np
-from pytest import approx
-import random
-import src.biosim.animals as animals
 from .animals import Herbivore, Carnivore
-
 
 class LandscapeCell:
     """Create landscape cells that can be replensihed and with a population of
@@ -27,6 +20,7 @@ class LandscapeCell:
     def num_specimen(self, species):
         """Get the number of individuals of a species in the population of
         the cell.
+
         :param species: String with the name of the species
         :return: Integer signifying the number of individuals of the species.
         """
@@ -34,19 +28,20 @@ class LandscapeCell:
 
     @property
     def tot_w_herbivores(self):
-        return sum([herbivore.weight for herbivore in self.population['Herbivore']])
+        return sum([herbivore.weight for herbivore in
+                    self.population['Herbivore']])
 
     def migration(self, neighbours):
         """
         Move each animal if the conditions dictate so.
 
-        :param map_list: List of potential destinations for animal
+        :param neighbours: List of potential destinations for animal
         """
         for species in self.population:
             for animal in self.population[species]:
                 animal.migrate(self, neighbours)
 
-    def place_animals(self, pop_list):
+    def place_animals(self, placement_list):
         """
         Place animals at specific locations.
 
@@ -54,9 +49,7 @@ class LandscapeCell:
         characteristics of the individual animal to be placed.
         """
 
-        for individual_dict in pop_list:
-            if individual_dict['species'] not in self.population:
-                self.population[individual_dict['species']] = []
+        for individual_dict in placement_list:
             if individual_dict['age'] < 0:
                 raise ValueError
             if individual_dict['weight'] <= 0:
@@ -69,7 +62,8 @@ class LandscapeCell:
         pass
 
     def feeding(self):
-        """ Carry out feeding of each animals at the location. """
+        """ Carry out feeding of each animal in the cell. """
+
         for species in self.population:
             self.population[species] = sorted(self.population[species],
                                               key=lambda x: getattr(x, 'phi'))
@@ -79,26 +73,31 @@ class LandscapeCell:
             carnivore.feeding(self)
 
     def procreation(self):
-        """Carry out procreation of animals on the location. """
+        """Carry out procreation of animals in the cell. """
+
         for species, pop_list in self.population.items():
+            n = self.num_specimen(species)
             copy = pop_list
             for animal in copy:
-                n = self.num_specimen(species)
                 if n >= 2:
                     if animal.fertile(n):
                         animal.procreate(self)
 
     def dying(self):
         """
-        Remove dying animals from population
+        Remove dying animals from population.
         """
+
         for species in self.population:
             if len(self.population[species]) > 0:
-                self.population[species] = [animal for animal in self.population[species] if
+                self.population[species] =\
+                    [animal for animal in self.population[species] if
                                             not animal.dies()]
 
 
 class Savannah(LandscapeCell):
+    """Create a savannah cell that can be replenshed. """
+
     params = {'f_max': 300.0, 'alpha': 0.3}
 
     def __init__(self, new_params=None):
@@ -124,10 +123,13 @@ class Savannah(LandscapeCell):
 
     def replenish(self):
         """Replenish plant fodder at the start of every season. """
+
         self.f = self.alpha * (self.f_max - self.f) + self.f
 
 
 class Jungle(LandscapeCell):
+    """Create a jungle cell that can be replenished. """
+
     params = {'f_max': 800.0}
 
     def __init__(self, param_dict=None):
@@ -152,20 +154,30 @@ class Jungle(LandscapeCell):
 
     def replenish(self):
         """Replenish plant fodder at the start of every season. """
+
         self.f = self.f_max
 
 
 class Desert(LandscapeCell):
+    """Create a desert cell that animals can be in, but no plant fodder is
+    available."""
+
     def __init__(self):
         super().__init__()
         self.f = 0
 
 
 class Ocean(LandscapeCell):
+    """Create an ocean cell that can't be replenished, and animals can't be
+    placed in or move to. """
+
     def __init__(self):
         super().__init__()
 
 
 class Mountain(LandscapeCell):
+    """Create an mountain cell that can't be replenished, and animals can't be
+        placed in or move to. """
+
     def __init__(self):
         super().__init__()
