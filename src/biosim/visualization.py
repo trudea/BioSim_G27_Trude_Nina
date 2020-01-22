@@ -4,11 +4,6 @@
 __author__ = "Trude Haug Almestrand", "Nina Mariann Vesseltun"
 __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
-""" Implements a biological visualization of an island with a population of
-    herbivores and carnivores. Consists of four subplots with a static map,
-    heatmap of herbivore and carnivore distribution and population line 
-    graph"""
-
 import matplotlib.pyplot as plt
 import subprocess
 import os
