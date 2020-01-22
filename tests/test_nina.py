@@ -286,8 +286,8 @@ class BasetestCarnivore(BaseTestAnimal):
 """
 
 if __name__ == '__main__':
-    h = ani.Herbivore({'weight': 0})
-    print(h.weight)
+    h = ani.Carnivore({'weight': 90, 'age': 0})
+    print(h.phi)
 
 
 

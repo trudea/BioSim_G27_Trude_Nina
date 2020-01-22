@@ -149,7 +149,8 @@ class BioSim:
         """
         Add a population to the island
 
-        :param population: List of dictionaries specifying population
+        :param population: List of dictionaries specifying charactersitics of
+        individual animals to be added
         """
         for loc_dict in population:
             if loc_dict['loc'] not in self.map:
