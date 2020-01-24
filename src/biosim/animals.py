@@ -313,7 +313,7 @@ class Carnivore(Animal):
             if np.random.random() <= probability:
                 return True
             else:
-                return False
+                return True
 
     def feeding(self, cell):
         """Carry out feeding of a single carnivore by checking if it is able to
