@@ -265,8 +265,9 @@ class Herbivore(Animal):
             self.weight += (self.beta * self.F)
 
         elif cell.f < self.F:
-            cell.f = 0
             self.weight += (self.beta * cell.f)
+            cell.f = 0
+
 
 
 class Carnivore(Animal):
