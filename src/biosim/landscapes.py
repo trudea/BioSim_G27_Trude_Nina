@@ -39,7 +39,8 @@ class LandscapeCell:
         """
         for species in self.population:
             for animal in self.population[species]:
-                animal.migrate(self, neighbours)
+                if animal.movable():
+                    animal.migrate(self, neighbours)
 
     def place_animals(self, placement_list):
         """
