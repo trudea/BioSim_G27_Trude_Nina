@@ -328,9 +328,15 @@ class Carnivore(Animal):
         for prey in cell.population['Herbivore']:
             if eaten < self.F:
                 if self.check_if_kills(prey):
-                    self.weight += self.beta * prey.weight
-                    dead.append(prey)
-                    eaten += prey.weight
+                    if prey.weight < self.DeltaPhiMax:
+                        self.weight += self.beta * prey.weight
+                        dead.append(prey)
+                        eaten += prey.weight
+                    else:
+                        self.weight += self.beta * self.DeltaPhiMax
+                        dead.append(prey)
+                        eaten += prey.weight
+
         cell.population['Herbivore'] =\
             [herbivore for herbivore in cell.population['Herbivore']
              if herbivore not in dead]
