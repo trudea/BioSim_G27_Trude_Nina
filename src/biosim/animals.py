@@ -8,6 +8,7 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 import numpy as np
 from math import exp
+from operator import attrgetter
 
 
 class Animal:
@@ -325,14 +326,15 @@ class Carnivore(Animal):
 
         eaten = 0
         dead = []
-        for prey in cell.population['Herbivore']:
+        cell_sorted_fitness = sorted(cell.population['Herbivore'],key=attrgetter('phi'), reverse=True)
+        for prey in cell_sorted_fitness:
             if eaten < self.F:
                 if self.check_if_kills(prey):
                     if prey.weight < eaten:
                         self.weight += self.beta * prey.weight
                         dead.append(prey)
                         eaten += prey.weight
-                    else:
+                    elif prey.weight > eaten:
                         self.weight += self.beta * (self.F - eaten)
                         dead.append(prey)
                         eaten += prey.weight

@@ -290,7 +290,7 @@ if __name__ == '__main__':
     ini_carns = [{'loc': (10, 10), 'pop': [{'species': 'Carnivore', 'age': 5, 'weight': 20}
     for _ in range(40)]}]
 
-    sim = BioSim(map, ini_herbs, seed=1)
+    sim = BioSim(map, ini_herbs)
     sim.simulate(100)
     sim.add_population(ini_carns)
     sim.simulate(100)
