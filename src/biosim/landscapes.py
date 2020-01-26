@@ -68,10 +68,10 @@ class LandscapeCell:
         for species in self.population:
             self.population[species] = sorted(self.population[species],
                                               key=lambda x: getattr(x, 'phi'))
-        for herbivore in self.population['Herbivore']:
-            herbivore.feeding(self)
-        for carnivore in self.population['Carnivore']:
-            carnivore.feeding(self)
+            for herbivore in self.population['Herbivore']:
+                herbivore.feeding(self)
+                for carnivore in self.population['Carnivore']:
+                    carnivore.feeding(self)
 
     def procreation(self):
         """Carry out procreation of animals in the cell. """

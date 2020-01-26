@@ -315,7 +315,7 @@ class Carnivore(Animal):
             if np.random.random() <= probability:
                 return True
             else:
-                return True
+                return False
 
     def feeding(self, cell):
         """Carry out feeding of a single carnivore by checking if it is able to
@@ -329,16 +329,18 @@ class Carnivore(Animal):
         dead = []
         cell_sorted_fitness = sorted(cell.population['Herbivore'],key=attrgetter('phi'), reverse=True)
         for prey in cell_sorted_fitness:
-            if eaten < self.F:
-                if self.check_if_kills(prey):
+            if self.check_if_kills(prey):
+                if eaten < self.F:
                     if prey.weight < eaten:
+                        eaten += prey.weight
                         self.weight += self.beta * prey.weight
                         dead.append(prey)
-                        eaten += prey.weight
+
                     elif prey.weight > eaten:
+                        eaten += prey.weight
                         self.weight += self.beta * (self.F - eaten)
                         dead.append(prey)
-                        eaten += prey.weight
+
 
         cell.population['Herbivore'] =\
             [herbivore for herbivore in cell.population['Herbivore']
