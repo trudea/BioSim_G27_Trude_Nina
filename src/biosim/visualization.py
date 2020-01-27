@@ -71,6 +71,8 @@ class Visualization:
         if self.ymax_animals is None:
             self.ymax_animals = (0, self.sim.num_animals + 100)
 
+        self.imh = None
+        self.imc = None
     def make_rgb_map(self):
         """
         code from github repository
@@ -185,7 +187,7 @@ class Visualization:
         """
         x = self.sim.animal_distribution
         herb = x.pivot('Row', 'Col', 'Herbivore').values
-        self.ax3.imshow(herb, vmax=self.cmax_animals['Herbivore'])
+        self.imh = self.ax3.imshow(herb, vmax=self.cmax_animals['Herbivore'])
         self.ax3.set_title('Herbivore density map', y=-0.3)
 
     def heatmap_carnivore(self):
@@ -195,7 +197,7 @@ class Visualization:
         """
         x = self.sim.animal_distribution
         carn = x.pivot('Row', 'Col', 'Carnivore').values
-        plot = self.ax4.imshow(carn, vmax=self.cmax_animals['Carnivore'])
+        self.imc = self.ax4.imshow(carn, vmax=self.cmax_animals['Carnivore'])
         self.ax4.set_title('Carnivore density map', y=-0.3)
 
     def update_heatmap_herb(self):
@@ -204,7 +206,7 @@ class Visualization:
         """
         x = self.sim.animal_distribution
         herb = x.pivot('Row', 'Col', 'Herbivore').values
-        self.ax3.imshow(herb, vmax=self.cmax_animals['Herbivore'])
+        self.imh.set_data(herb)
 
     def update_heatmap_carn(self):
         """
@@ -212,7 +214,7 @@ class Visualization:
         """
         x = self.sim.animal_distribution
         carn = x.pivot('Row', 'Col', 'Carnivore').values
-        self.ax4.imshow(carn, vmax=self.cmax_animals['Carnivore'])
+        self.imc.set_data(carn)
 
     def visualize(self, vis_steps):
         """
