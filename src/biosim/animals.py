@@ -40,6 +40,16 @@ class Animal:
                                  self.params['sigma_birth'], 1000)
             self.weight = np.random.choice(statistic_population)
 
+        q_plus = 1.0 / (1 + exp(self.params['phi_age'] *
+                                (self.age - self.params['a_half'])))
+
+        q_minus = 1.0 / (1 + exp(-self.params['phi_weight'] *
+                                 (self.weight - self.params[
+                                     'w_half'])))
+
+        self.phi = q_plus * q_minus
+
+
     @classmethod
     def set_params(cls, new_params=None):
         if new_params is not None:
@@ -54,8 +64,7 @@ class Animal:
                 setattr(cls, param, cls.params[param])
         cls.params_set = True
 
-    @property
-    def phi(self):
+    def set_phi(self):
         """
         Evaluate the fitness of an animal.
 
@@ -76,6 +85,7 @@ class Animal:
         """ Make animal age by one year. """
 
         self.age += 1
+        self.phi = self.set_phi()
 
     def weightloss(self):
         """ Execute annual weight loss for animal. """
@@ -84,6 +94,7 @@ class Animal:
             self.weight -= (self.eta * self.weight)
         elif (self.eta * self.weight) > self.weight:
             self.weight = 0
+        self.phi = self.set_phi()
 
     def dies(self):
         """
@@ -220,6 +231,7 @@ class Animal:
 
             cell.population[type(self).__name__].append(newborn)
             self.weight -= self.zeta * newborn.weight
+            self.phi = self.set_phi()
 
 
 class Herbivore(Animal):
@@ -263,10 +275,12 @@ class Herbivore(Animal):
         if cell.f >= self.F:
             cell.f -= self.F
             self.weight += (self.beta * self.F)
+            self.phi = self.set_phi()
 
         elif cell.f < self.F:
             self.weight += (self.beta * cell.f)
             cell.f = 0
+            self.phi = self.set_phi()
 
 
 
@@ -335,11 +349,13 @@ class Carnivore(Animal):
                         eaten += prey.weight
                         self.weight += self.beta * prey.weight
                         dead.append(prey)
+                        self.phi = self.set_phi()
 
                     elif prey.weight > eaten:
                         eaten += prey.weight
                         self.weight += self.beta * (self.F - eaten)
                         dead.append(prey)
+                        self.phi = self.set_phi()
 
 
         cell.population['Herbivore'] =\
