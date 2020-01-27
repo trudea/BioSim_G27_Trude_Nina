@@ -40,14 +40,7 @@ class Animal:
                                  self.params['sigma_birth'], 1000)
             self.weight = np.random.choice(statistic_population)
 
-        q_plus = 1.0 / (1 + exp(self.params['phi_age'] *
-                                (self.age - self.params['a_half'])))
-
-        q_minus = 1.0 / (1 + exp(-self.params['phi_weight'] *
-                                 (self.weight - self.params[
-                                     'w_half'])))
-
-        self.phi = q_plus * q_minus
+        self.phi = self.set_phi()
 
 
     @classmethod

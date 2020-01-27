@@ -291,6 +291,6 @@ if __name__ == '__main__':
     for _ in range(40)]}]
 
     sim = BioSim(map, ini_herbs)
-    sim.simulate(100)
+    sim.simulate(200)
     sim.add_population(ini_carns)
     sim.simulate(100)
