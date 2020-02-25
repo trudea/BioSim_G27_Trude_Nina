@@ -39,7 +39,8 @@ class LandscapeCell:
         """
         for species in self.population:
             for animal in self.population[species]:
-                animal.migrate(self, neighbours)
+                if animal.movable():
+                    animal.migrate(self, neighbours)
 
     def place_animals(self, placement_list):
         """
@@ -67,10 +68,10 @@ class LandscapeCell:
         for species in self.population:
             self.population[species] = sorted(self.population[species],
                                               key=lambda x: getattr(x, 'phi'))
-        for herbivore in self.population['Herbivore']:
-            herbivore.feeding(self)
-        for carnivore in self.population['Carnivore']:
-            carnivore.feeding(self)
+            for herbivore in self.population['Herbivore']:
+                herbivore.feeding(self)
+            for carnivore in self.population['Carnivore']:
+                carnivore.feeding(self)
 
     def procreation(self):
         """Carry out procreation of animals in the cell. """

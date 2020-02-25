@@ -71,6 +71,8 @@ class Visualization:
         if self.ymax_animals is None:
             self.ymax_animals = (0, self.sim.num_animals + 100)
 
+        self.imh = None
+        self.imc = None
     def make_rgb_map(self):
         """
         code from github repository
@@ -96,11 +98,14 @@ class Visualization:
         self.ax1.set_yticklabels(range(1, 1 + len(kart_rgb)))
         self.ax1.set_title('Map of the island')
 
+        for item in(self.ax1.get_xticklabels() + self.ax1.get_yticklabels()):
+            item.set_fontsize(5)
+
         axlg = self._fig.add_axes([0.05, 0.6, 0.1, 0.8])  # llx, lly, w, h
         axlg.axis('off')
         for ix, name in enumerate(('O', 'M', 'J',
                                    'S', 'D')):
-            axlg.add_patch(plt.Rectangle((0.0, ix * 0.05), 0.1, 0.2,
+            axlg.add_patch(plt.Rectangle((0.05, ix * 0.05), 0.1, 0.05,
                                          edgecolor='none',
                                          facecolor=rgb_value[name[0]]))
             axlg.text(0.2, ix * 0.05, name, transform=axlg.transAxes)
@@ -135,18 +140,20 @@ class Visualization:
 
         else:
             x, y = self.line_herbivore.get_data()
-            new_x = np.arange(x[-1] + 1, self.sim.num_years)
+            new_x = np.arange(x[-1] + 1, self.sim.num_years + self.sim._year)
             if len(new_x > 0):
-                new_y = np.full(new_x, np.nan)
+                new_y = np.nan * np.ones(len(np.arange(x[-1]+1, self.sim.num_years + self.sim._year)))
                 self.line_herbivore.set_data(np.hstack((new_x, x)),
                                              np.hstack((new_y, y)))
 
             x, y = self.line_carnivore.get_data()
-            new_x = np.arange(x[-1] + 1, self.sim.num_years)
+            new_x = np.arange(x[-1] + 1, self.sim.num_years + self.sim._year)
             if len(new_x > 0):
                 new_y = np.full(new_x, np.nan)
-                self.line_carnivore.set_data(np.hstack((new_x, x)),
-                                             np.hstack((new_y, y)))
+                self.line_carnivore.set_data(np.hstack((x, new_x)),
+                                             np.hstack((y, new_y)))
+
+
 
     def update_population_line_plot(self):
         """
@@ -156,6 +163,7 @@ class Visualization:
             INF200-2019/Project
             /SampleProjects/randvis_project/randvis/simulation.py
         """
+
         self.ymax_animals = (0, self.sim.num_animals + 100)
         self.ax2.set_ylim(self.ymax_animals[0], self.ymax_animals[1])
         self.ax2.set_xlim(0, self.sim.sim_years + 10)
@@ -179,7 +187,7 @@ class Visualization:
         """
         x = self.sim.animal_distribution
         herb = x.pivot('Row', 'Col', 'Herbivore').values
-        self.ax3.imshow(herb, vmax=self.cmax_animals['Herbivore'])
+        self.imh = self.ax3.imshow(herb, vmax=self.cmax_animals['Herbivore'])
         self.ax3.set_title('Herbivore density map', y=-0.3)
 
     def heatmap_carnivore(self):
@@ -189,7 +197,7 @@ class Visualization:
         """
         x = self.sim.animal_distribution
         carn = x.pivot('Row', 'Col', 'Carnivore').values
-        plot = self.ax4.imshow(carn, vmax=self.cmax_animals['Carnivore'])
+        self.imc = self.ax4.imshow(carn, vmax=self.cmax_animals['Carnivore'])
         self.ax4.set_title('Carnivore density map', y=-0.3)
 
     def update_heatmap_herb(self):
@@ -198,7 +206,7 @@ class Visualization:
         """
         x = self.sim.animal_distribution
         herb = x.pivot('Row', 'Col', 'Herbivore').values
-        self.ax3.imshow(herb, vmax=self.cmax_animals['Herbivore'])
+        self.imh.set_data(herb)
 
     def update_heatmap_carn(self):
         """
@@ -206,7 +214,7 @@ class Visualization:
         """
         x = self.sim.animal_distribution
         carn = x.pivot('Row', 'Col', 'Carnivore').values
-        self.ax4.imshow(carn, vmax=self.cmax_animals['Carnivore'])
+        self.imc.set_data(carn)
 
     def visualize(self, vis_steps):
         """

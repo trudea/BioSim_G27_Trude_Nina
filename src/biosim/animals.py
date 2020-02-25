@@ -8,6 +8,7 @@ __email__ = "trude.haug.almestrand@nmbu.no", "nive@nmbu.no"
 
 import numpy as np
 from math import exp
+from operator import attrgetter
 
 
 class Animal:
@@ -39,6 +40,9 @@ class Animal:
                                  self.params['sigma_birth'], 1000)
             self.weight = np.random.choice(statistic_population)
 
+        self.phi = self.set_phi()
+
+
     @classmethod
     def set_params(cls, new_params=None):
         if new_params is not None:
@@ -53,8 +57,7 @@ class Animal:
                 setattr(cls, param, cls.params[param])
         cls.params_set = True
 
-    @property
-    def phi(self):
+    def set_phi(self):
         """
         Evaluate the fitness of an animal.
 
@@ -75,6 +78,7 @@ class Animal:
         """ Make animal age by one year. """
 
         self.age += 1
+        self.phi = self.set_phi()
 
     def weightloss(self):
         """ Execute annual weight loss for animal. """
@@ -83,6 +87,7 @@ class Animal:
             self.weight -= (self.eta * self.weight)
         elif (self.eta * self.weight) > self.weight:
             self.weight = 0
+        self.phi = self.set_phi()
 
     def dies(self):
         """
@@ -198,7 +203,7 @@ class Animal:
         :return: Boolean value, True representing fertile and False
         representing infertile.
         """
-        probability = self.lambdah * self.phi * (n-1)
+        probability = self.gamma * self.phi * (n-1)
         if probability > 1.0:
             probability = 1.0
         if np.random.random() <= probability:
@@ -219,6 +224,7 @@ class Animal:
 
             cell.population[type(self).__name__].append(newborn)
             self.weight -= self.zeta * newborn.weight
+            self.phi = self.set_phi()
 
 
 class Herbivore(Animal):
@@ -262,10 +268,13 @@ class Herbivore(Animal):
         if cell.f >= self.F:
             cell.f -= self.F
             self.weight += (self.beta * self.F)
+            self.phi = self.set_phi()
 
         elif cell.f < self.F:
-            cell.f = 0
             self.weight += (self.beta * cell.f)
+            cell.f = 0
+            self.phi = self.set_phi()
+
 
 
 class Carnivore(Animal):
@@ -325,12 +334,23 @@ class Carnivore(Animal):
 
         eaten = 0
         dead = []
-        for prey in cell.population['Herbivore']:
-            if eaten < self.F:
-                if self.check_if_kills(prey):
-                    self.weight += self.beta * prey.weight
-                    dead.append(prey)
-                    eaten += prey.weight
+        cell_sorted_fitness = sorted(cell.population['Herbivore'],key=attrgetter('phi'), reverse=True)
+        for prey in cell_sorted_fitness:
+            if self.check_if_kills(prey):
+                if eaten < self.F:
+                    if prey.weight < eaten:
+                        eaten += prey.weight
+                        self.weight += self.beta * prey.weight
+                        dead.append(prey)
+                        self.phi = self.set_phi()
+
+                    elif prey.weight > eaten:
+                        eaten += prey.weight
+                        self.weight += self.beta * (self.F - eaten)
+                        dead.append(prey)
+                        self.phi = self.set_phi()
+
+
         cell.population['Herbivore'] =\
             [herbivore for herbivore in cell.population['Herbivore']
              if herbivore not in dead]
