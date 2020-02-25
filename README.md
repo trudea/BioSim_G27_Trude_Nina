@@ -29,9 +29,13 @@ and two species of animals (one carnivore and one herbivore) and simulates
      are on the same tile as them. If there are multiple herbivores then
       they eat the ones with the lowest fitness. Weight gained is equivalent
        to the weight from the eaten herbivore. Carnivores can only eat
-        herbivores with a lower fitness than themselves (DARWIN)
+        herbivores with a lower fitness than themselves
         
  ## Movement
  Movement is based off of fodder available and the amount of individuals of
  the same species present. Together with a probability of moving. Carnivores
   are more mobile and have a higher percentage chance of moving. 
+  
+ ## Statistical testing
+ Statistical testing for animals and their behaviors are yet to be added. 
+ Still working on optimalisation of the code.
